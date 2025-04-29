@@ -14,15 +14,17 @@ import java.util.UUID;
 public class Pagamento {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID uuid;
 
     @ManyToOne
-    @JoinColumn(name = "placa", referencedColumnName = "placa")
+    @JoinColumn(name = "placa", referencedColumnName = "placa", nullable = false)
     private Veiculo veiculo;
 
     private LocalDateTime horaEntrada;
+
     private LocalDateTime horaSaida;
+
     private double valor;
 
     public Pagamento() {}

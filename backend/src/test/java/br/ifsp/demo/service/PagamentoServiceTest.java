@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,9 +32,29 @@ class PagamentoServiceTest {
         veiculo.setPlaca("ABC-1234");
         veiculo.setEntrada(LocalDateTime.now().minusHours(2));
 
-        service.salvarPagamento(veiculo);
+        Pagamento pagamento = new Pagamento(veiculo);
+
+        service.salvarPagamento(pagamento);
 
         verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
+
+    }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve deletar o pagamento")
+    void deveDeletarPagamento() {
+
+        PagamentoRepository pagamentoRepository = mock(PagamentoRepository.class);
+        PagamentoService service = new PagamentoService(pagamentoRepository);
+
+        Pagamento pagamento = new Pagamento();
+        pagamento.setUuid(UUID.randomUUID());
+
+        service.deletarPagamento(pagamento);
+
+        verify(pagamentoRepository, times(1)).delete(pagamento);
 
     }
 
