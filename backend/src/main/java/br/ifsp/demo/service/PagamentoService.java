@@ -5,6 +5,8 @@ import br.ifsp.demo.repository.PagamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class PagamentoService {
 
@@ -27,6 +29,10 @@ public class PagamentoService {
     public void atualizarPagamento(Pagamento pagamento) {
         pagamentoRepository.delete(pagamento);
         pagamentoRepository.save(pagamento);
+    }
+
+    public Pagamento buscarPorId(UUID uuid) {
+        return pagamentoRepository.findById(uuid).orElse(null);
     }
 
 
