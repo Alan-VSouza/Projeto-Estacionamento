@@ -58,4 +58,24 @@ class PagamentoServiceTest {
 
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve atualizar o pagamento")
+    void deveAtualizarPagamento() {
+
+        PagamentoRepository pagamentoRepository = mock(PagamentoRepository.class);
+        PagamentoService service = new PagamentoService(pagamentoRepository);
+
+        Pagamento pagamento = new Pagamento();
+        pagamento.setUuid(UUID.randomUUID());
+        pagamento.setHoraSaida(LocalDateTime.now());
+        pagamento.setValor(42.0);
+
+        service.atualizarPagamento(pagamento);
+
+        verify(pagamentoRepository, times(1)).save(pagamento);
+
+    }
+
 }
