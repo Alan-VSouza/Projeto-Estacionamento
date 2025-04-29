@@ -18,6 +18,10 @@ public class VeiculoService {
     }
 
     public Veiculo cadastrarVeiculo(String placa, LocalDateTime horaEntrada, String tipoVeiculo, String modelo, String cor) {
+        if (placa == null || placa.trim().isEmpty()) {
+            throw new IllegalArgumentException("Placa não pode ser vazia");
+        }
+
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca(placa);
         veiculo.setTipoVeiculo(tipoVeiculo);
