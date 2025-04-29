@@ -63,5 +63,25 @@ class VeiculoServiceTest {
         verify(veiculoRepository, times(0)).save(any(Veiculo.class));
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Não deve salvar o veículo com modelo inválido")
+    void naoDeveSalvarVeiculoComModeloInvalido() {
+        String modeloInvalido = "";
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            veiculoService.cadastrarVeiculo("XYZ9876", LocalDateTime.now(), "moto", modeloInvalido, "preto");
+        });
+
+        String expectedMessage = "Modelo não pode ser vazio";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+
+        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    }
+
+
 
 }
