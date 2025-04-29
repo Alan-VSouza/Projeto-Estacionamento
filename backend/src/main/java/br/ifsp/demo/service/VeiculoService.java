@@ -22,6 +22,10 @@ public class VeiculoService {
             throw new IllegalArgumentException("Placa não pode ser vazia");
         }
 
+        if (modelo == null || modelo.trim().isEmpty()) {
+            throw new IllegalArgumentException("Modelo não pode ser vazio");
+        }
+
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca(placa);
         veiculo.setTipoVeiculo(tipoVeiculo);
