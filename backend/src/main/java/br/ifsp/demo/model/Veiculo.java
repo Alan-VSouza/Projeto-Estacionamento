@@ -1,26 +1,33 @@
 package br.ifsp.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
-@NoArgsConstructor
+@Entity
 public class Veiculo {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true, nullable = false)
+    private LocalDateTime horaEntrada;
+
+    @Column(unique = true, nullable = false)
     private String placa;
 
-    private LocalDateTime entrada;
+    @Column(nullable = false)
+    private String tipoVeiculo;
 
-    public Veiculo(String placa) {
-        this.placa = placa;
-        this.entrada = LocalDateTime.now();
-    }
+    @Column(nullable = false)
+    private String modelo;
+
+    @Column(nullable = false)
+    private String cor;
+
 }

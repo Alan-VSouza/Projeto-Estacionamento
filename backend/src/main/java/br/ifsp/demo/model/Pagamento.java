@@ -31,7 +31,7 @@ public class Pagamento {
 
     public Pagamento(Veiculo veiculo) {
         this.veiculo = veiculo;
-        this.horaEntrada = veiculo.getEntrada();
+        this.horaEntrada = veiculo.getHoraEntrada();
         this.horaSaida = LocalDateTime.now();
         this.valor = 0.0;
     }

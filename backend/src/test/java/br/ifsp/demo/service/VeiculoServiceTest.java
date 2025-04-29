@@ -8,9 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
+
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class VeiculoServiceTest {
@@ -31,11 +32,11 @@ class VeiculoServiceTest {
         veiculo.setTipoVeiculo("carro");
         veiculo.setModelo("Fusca");
         veiculo.setCor("azul");
-        veiculo.setAno(1995);
+        veiculo.setHoraEntrada(LocalDateTime.now());
 
-        when(veiculoRepository.save(veiculo)).thenReturn(veiculo);
+        doReturn(veiculo).when(veiculoRepository).save(any(Veiculo.class));
 
-        Veiculo result = veiculoService.cadastrarVeiculo("ABC1234", "carro", "Fusca", "azul", 1995);
+        Veiculo result = veiculoService.cadastrarVeiculo("ABC1234", LocalDateTime.now(), "carro", "Fusca", "azul");
 
         assertEquals(veiculo.getPlaca(), result.getPlaca());
         assertEquals(veiculo.getModelo(), result.getModelo());
