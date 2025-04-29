@@ -21,8 +21,8 @@ class PagamentoServiceTest {
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
-    @DisplayName("Should save payment")
-    void shouldSavePayment() {
+    @DisplayName("Deve salvar o pagamento")
+    void deveSalvarPagamento() {
 
         PagamentoRepository pagamentoRepository = mock(PagamentoRepository.class);
         PagamentoService service = new PagamentoService(pagamentoRepository);
