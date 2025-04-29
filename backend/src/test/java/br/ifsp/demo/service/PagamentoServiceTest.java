@@ -31,7 +31,9 @@ class PagamentoServiceTest {
         veiculo.setPlaca("ABC-1234");
         veiculo.setEntrada(LocalDateTime.now().minusHours(2));
 
-        service.salvarPagamento(veiculo);
+        Pagamento pagamento = new Pagamento(veiculo);
+
+        service.salvarPagamento(pagamento);
 
         verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
 
