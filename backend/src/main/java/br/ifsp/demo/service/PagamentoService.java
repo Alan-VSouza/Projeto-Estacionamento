@@ -25,8 +25,10 @@ public class PagamentoService {
     }
 
     public void atualizarPagamento(Pagamento pagamento) {
+        pagamentoRepository.delete(pagamento);
         pagamentoRepository.save(pagamento);
     }
+
 
 
 }

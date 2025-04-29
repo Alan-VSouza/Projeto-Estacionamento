@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -77,5 +78,27 @@ class PagamentoServiceTest {
         verify(pagamentoRepository, times(1)).save(pagamento);
 
     }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve encontrar o pagamento pelo UUID")
+    void deveEncontrarPagamentoPeloUuid() {
+        UUID uuid = UUID.randomUUID();
+        Pagamento pagamento = new Pagamento();
+        pagamento.setUuid(uuid);
+
+        PagamentoRepository pagamentoRepository = mock(PagamentoRepository.class);
+        when(pagamentoRepository.findById(uuid)).thenReturn(Optional.of(pagamento));
+
+        PagamentoService service = new PagamentoService(pagamentoRepository);
+
+        Pagamento result = service.buscarPorId(uuid);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getUuid()).isEqualTo(uuid);
+        verify(pagamentoRepository, times(1)).findById(uuid);
+    }
+
 
 }
