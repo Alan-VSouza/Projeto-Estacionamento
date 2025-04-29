@@ -19,4 +19,9 @@ public class PagamentoService {
     public void salvarPagamento(Pagamento pagamento) {
         pagamentoRepository.save(pagamento);
     }
+
+    public void deletarPagamento(Pagamento pagamento) {
+        pagamentoRepository.delete(pagamento);
+    }
+
 }
