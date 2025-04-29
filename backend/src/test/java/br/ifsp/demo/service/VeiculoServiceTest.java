@@ -10,8 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class VeiculoServiceTest {
@@ -43,4 +43,25 @@ class VeiculoServiceTest {
 
         verify(veiculoRepository, times(1)).save(any(Veiculo.class));
     }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Não deve salvar o veículo sem uma placa válida")
+    void naoDeveSalvarVeiculoSemPlacaValida() {
+        String placaInvalida = "";
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            veiculoService.cadastrarVeiculo(placaInvalida, LocalDateTime.now(), "carro", "Fusca", "azul");
+        });
+
+        String expectedMessage = "Placa não pode ser vazia";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+
+        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    }
+
+
 }
