@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -80,6 +81,37 @@ class VeiculoServiceTest {
         assertTrue(actualMessage.contains(expectedMessage));
 
         verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve atualizar os dados do veículo corretamente")
+    void deveAtualizarVeiculoComSucesso() {
+        Veiculo veiculoExistente = new Veiculo();
+        veiculoExistente.setId(1L);
+        veiculoExistente.setPlaca("ABC1234");
+        veiculoExistente.setTipoVeiculo("carro");
+        veiculoExistente.setModelo("Fusca");
+        veiculoExistente.setCor("azul");
+
+        when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculoExistente));
+
+        String novaPlaca = "DEF5678";
+        String novoModelo = "Fusca 2.0";
+        String novaCor = "verde";
+        String novoTipoVeiculo = "carro";
+
+        doReturn(veiculoExistente).when(veiculoRepository).save(any(Veiculo.class));
+
+        Veiculo veiculoAtualizado = veiculoService.atualizarVeiculo(1L, novaPlaca, novoTipoVeiculo, novoModelo, novaCor);
+
+        assertEquals(novaPlaca, veiculoAtualizado.getPlaca());
+        assertEquals(novoModelo, veiculoAtualizado.getModelo());
+        assertEquals(novaCor, veiculoAtualizado.getCor());
+        assertEquals(novoTipoVeiculo, veiculoAtualizado.getTipoVeiculo());
+
+        verify(veiculoRepository, times(1)).save(any(Veiculo.class));
     }
 
 
