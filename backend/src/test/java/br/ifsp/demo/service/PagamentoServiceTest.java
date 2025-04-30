@@ -27,14 +27,24 @@ class PagamentoServiceTest {
     @InjectMocks
     private PagamentoService service;
 
+    private Veiculo veiculo;
+
+    @BeforeEach
+    void setUp () {
+        veiculo = new Veiculo();
+        veiculo.setId(1L);
+        veiculo.setPlaca("BQF-2994");
+        veiculo.setTipoVeiculo("carro");
+        veiculo.setHoraEntrada(LocalDateTime.now().minusHours(2));
+        veiculo.setModelo("Escort");
+        veiculo.setCor("prata");
+    }
+
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
     @DisplayName("Deve salvar o pagamento")
     void deveSalvarPagamento() {
-        Veiculo veiculo = new Veiculo();
-        veiculo.setPlaca("ABC-1234");
-        veiculo.setHoraEntrada(LocalDateTime.now().minusHours(2));
 
         Pagamento pagamento = new Pagamento(veiculo);
 
@@ -50,8 +60,11 @@ class PagamentoServiceTest {
     @DisplayName("Deve deletar o pagamento")
     void deveDeletarPagamento() {
 
-        Pagamento pagamento = new Pagamento();
-        pagamento.setUuid(UUID.randomUUID());
+        Pagamento pagamento = new Pagamento(veiculo);
+
+        when(pagamentoRepository.findById(pagamento.getUuid()))
+                .thenReturn(Optional.of(pagamento));
+
 
         service.deletarPagamento(pagamento);
 
@@ -64,14 +77,6 @@ class PagamentoServiceTest {
     @Tag("UnitTest")
     @DisplayName("Deve atualizar o pagamento")
     void deveAtualizarPagamento() {
-
-        Veiculo veiculo = new Veiculo();
-        veiculo.setId(1L);
-        veiculo.setPlaca("BQF-2994");
-        veiculo.setTipoVeiculo("carro");
-        veiculo.setHoraEntrada(LocalDateTime.now().minusHours(2));
-        veiculo.setModelo("Escort");
-        veiculo.setCor("prata");
 
         Pagamento pagamento = new Pagamento();
         pagamento.setUuid(UUID.randomUUID());
@@ -88,10 +93,10 @@ class PagamentoServiceTest {
 
         Pagamento pagamentoAtualizado = service.atualizarPagamento(pagamento.getUuid(), novaEntrada, novaSaida, veiculo, novoValor);
 
-        assertThat(pagamento.getHoraEntrada()).isEqualTo(novaEntrada);
-        assertThat(pagamento.getHoraSaida()).isEqualTo(novaSaida);
-        assertThat(pagamento.getVeiculo()).isEqualTo(veiculo);
-        assertThat(pagamento.getValor()).isEqualTo(44);
+        assertThat(pagamentoAtualizado.getHoraEntrada()).isEqualTo(novaEntrada);
+        assertThat(pagamentoAtualizado.getHoraSaida()).isEqualTo(novaSaida);
+        assertThat(pagamentoAtualizado.getVeiculo()).isEqualTo(veiculo);
+        assertThat(pagamentoAtualizado.getValor()).isEqualTo(44);
 
         verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
 
