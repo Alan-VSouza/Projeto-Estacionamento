@@ -60,4 +60,10 @@ public class VeiculoService {
 
         return veiculoRepository.save(veiculo);
     }
+
+    public void deletarVeiculo(Long id) {
+        Veiculo veiculo = veiculoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
+        veiculoRepository.delete(veiculo);
+    }
 }
