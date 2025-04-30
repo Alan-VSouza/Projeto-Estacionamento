@@ -12,7 +12,12 @@ public class TempoPermanencia {
         this.valorPermanencia = valorPermanencia;
     }
 
+    public double calculaPermanenciaMenorOuIgualASeis(int horas) {
 
+        double custo = valorPermanencia.getValorUmaHora() + (valorPermanencia.getHoraAdicional() * (horas - 1));
+
+        return Math.min(custo, valorPermanencia.getValorSeisHoras());
+    }
 
     public double calcularValorDaPermanencia(int horas) {
 
@@ -21,6 +26,9 @@ public class TempoPermanencia {
 
         if(horas == 1)
             return valorPermanencia.getValorUmaHora();
+
+        if(horas <= 6)
+            return calculaPermanenciaMenorOuIgualASeis(horas);
 
         return 0.0;
     }
