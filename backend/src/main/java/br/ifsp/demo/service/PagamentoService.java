@@ -35,7 +35,15 @@ public class PagamentoService {
     }
 
     public void deletarPagamento(Pagamento pagamento) {
+
+        if(pagamento == null)
+            throw new IllegalArgumentException("Pagamento nao pode ser nulo");
+
+        if(pagamentoRepository.findById(pagamento.getUuid()).isEmpty())
+            throw new IllegalArgumentException("Pagamento nao encontrado");
+
         pagamentoRepository.delete(pagamento);
+
     }
 
     public void atualizarPagamento(Pagamento pagamento) {
