@@ -135,5 +135,23 @@ class VeiculoServiceTest {
         verify(veiculoRepository, times(0)).save(any(Veiculo.class));
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Não deve salvar o veículo com cor inválida")
+    void naoDeveSalvarVeiculoComCorInvalida() {
+        String corInvalida = "";
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            veiculoService.cadastrarVeiculo("XYZ9876", LocalDateTime.now(), "moto", "modelo", corInvalida);
+        });
+
+        String expectedMessage = "Cor não pode ser vazia";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+
+        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    }
 
 }
