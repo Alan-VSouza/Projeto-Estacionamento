@@ -19,6 +19,18 @@ public class PagamentoService {
     }
 
     public void salvarPagamento(Pagamento pagamento) {
+        if(pagamento == null)
+            throw new IllegalArgumentException("Pagamento nao pode ser nulo");
+
+        if(pagamento.getVeiculo() == null)
+            throw new IllegalArgumentException("Veiculo nao pode ser nulo");
+
+        if(pagamento.getHoraEntrada() == null)
+            throw new IllegalArgumentException("Hora de entrada nao pode ser nulo");
+
+        if(pagamento.getHoraSaida() == null)
+            throw new IllegalArgumentException("Hora de saida nao pode ser nulo");
+
         pagamentoRepository.save(pagamento);
     }
 
