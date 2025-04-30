@@ -42,8 +42,11 @@ public class VeiculoService {
     }
 
     public Veiculo atualizarVeiculo(Long id, String placa, String tipoVeiculo, String modelo, String cor) {
-        Optional<Veiculo> veiculoOptional = veiculoRepository.findById(id);
+        if (placa == null || placa.trim().isEmpty()) {
+            throw new IllegalArgumentException("Placa não pode ser vazia");
+        }
 
+        Optional<Veiculo> veiculoOptional = veiculoRepository.findById(id);
         Veiculo veiculo = veiculoOptional.orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
 
         veiculo.setPlaca(placa);

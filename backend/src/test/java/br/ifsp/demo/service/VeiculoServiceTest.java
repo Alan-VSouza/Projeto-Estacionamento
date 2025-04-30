@@ -166,8 +166,6 @@ class VeiculoServiceTest {
         veiculoExistente.setModelo("Fusca");
         veiculoExistente.setCor("azul");
 
-        when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculoExistente));
-
         String novaPlaca = "";
         String novoModelo = "Fusca 2.0";
         String novaCor = "verde";
