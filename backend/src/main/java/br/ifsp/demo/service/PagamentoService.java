@@ -76,6 +76,10 @@ public class PagamentoService {
     }
 
     public Pagamento buscarPorId(UUID uuid) {
+
+        if(uuid == null)
+            throw new IllegalArgumentException("Uuid nao pode ser nulo");
+
         return pagamentoRepository.findById(uuid).orElse(null);
     }
 
