@@ -65,14 +65,35 @@ class PagamentoServiceTest {
     @DisplayName("Deve atualizar o pagamento")
     void deveAtualizarPagamento() {
 
+        Veiculo veiculo = new Veiculo();
+        veiculo.setId(1L);
+        veiculo.setPlaca("BQF-2994");
+        veiculo.setTipoVeiculo("carro");
+        veiculo.setHoraEntrada(LocalDateTime.now().minusHours(2));
+        veiculo.setModelo("Escort");
+        veiculo.setCor("prata");
+
         Pagamento pagamento = new Pagamento();
         pagamento.setUuid(UUID.randomUUID());
+        pagamento.setVeiculo(veiculo);
+        pagamento.setHoraEntrada(veiculo.getHoraEntrada());
         pagamento.setHoraSaida(LocalDateTime.now());
-        pagamento.setValor(42.0);
+        pagamento.setValor(43);
 
-        service.atualizarPagamento(pagamento);
+        when(pagamentoRepository.findById(pagamento.getUuid())).thenReturn(Optional.of(pagamento));
 
-        verify(pagamentoRepository, times(1)).save(pagamento);
+        LocalDateTime novaEntrada = LocalDateTime.now().minusHours(3);
+        LocalDateTime novaSaida = LocalDateTime.now().minusHours(1);
+        double novoValor = 44;
+
+        Pagamento pagamentoAtualizado = service.atualizarPagamento(pagamento.getUuid(), novaEntrada, novaSaida, veiculo, novoValor);
+
+        assertThat(pagamento.getHoraEntrada()).isEqualTo(novaEntrada);
+        assertThat(pagamento.getHoraSaida()).isEqualTo(novaSaida);
+        assertThat(pagamento.getVeiculo()).isEqualTo(veiculo);
+        assertThat(pagamento.getValor()).isEqualTo(44);
+
+        verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
 
     }
 
