@@ -154,4 +154,37 @@ class VeiculoServiceTest {
         verify(veiculoRepository, times(0)).save(any(Veiculo.class));
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Não deve atualizar o veículo com dados inválidos")
+    void naoDeveAtualizarVeiculoComDadosInvalidos() {
+        Veiculo veiculoExistente = new Veiculo();
+        veiculoExistente.setId(1L);
+        veiculoExistente.setPlaca("ABC1234");
+        veiculoExistente.setTipoVeiculo("carro");
+        veiculoExistente.setModelo("Fusca");
+        veiculoExistente.setCor("azul");
+
+        when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculoExistente));
+
+        String novaPlaca = "";
+        String novoModelo = "Fusca 2.0";
+        String novaCor = "verde";
+        String novoTipoVeiculo = "carro";
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            veiculoService.atualizarVeiculo(1L, novaPlaca, novoTipoVeiculo, novoModelo, novaCor);
+        });
+
+        String expectedMessage = "Placa não pode ser vazia";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+
+        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    }
+
+
+
 }
