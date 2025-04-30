@@ -114,6 +114,26 @@ class VeiculoServiceTest {
         verify(veiculoRepository, times(1)).save(any(Veiculo.class));
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Não deve atualizar um veículo que não existe")
+    void naoDeveAtualizarVeiculoQueNaoExiste() {
+        Long idInvalido = 999L;
+
+        when(veiculoRepository.findById(idInvalido)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            veiculoService.atualizarVeiculo(idInvalido, "XYZ9876", "moto", "modelo", "preto");
+        });
+
+        String expectedMessage = "Veículo não encontrado";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+
+        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    }
 
 
 }
