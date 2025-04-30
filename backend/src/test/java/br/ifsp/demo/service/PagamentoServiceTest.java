@@ -247,15 +247,25 @@ class PagamentoServiceTest {
             verify(pagamentoRepository).findById(uuidInexistente);
         }
 
-        @Test
+        @ParameterizedTest
         @Tag("UnitTest")
-        @DisplayName("mensagem de erro ao buscar por um pagamento com um id nulo")
-        void mensagemDeErroAoBuscarPagamentoPorUuidNulo() {
+        @CsvSource(
+                value ={
+                "null, Uuid nao pode ser nulo",
+                "123e4567-e89b-12d3-a456-426614174000, Esse pagamento nao existe"
+            },
+                nullValues = "null"
+        )
+        @DisplayName("mensagem de erro se if for nulo ou inexistente")
+        void mensagemDeErroAoBuscarPagamentoPorUuidNulo(String uuid, String mensagem) {
+            UUID uuidPagamento = uuid == null ? null : UUID.fromString(uuid);
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.buscarPorId(null));
-            assertEquals("Uuid nao pode ser nulo", exception.getMessage());
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.buscarPorId(uuidPagamento));
+            assertEquals(mensagem, exception.getMessage());
 
         }
+
 
 
     }

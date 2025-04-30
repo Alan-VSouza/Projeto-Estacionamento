@@ -90,7 +90,10 @@ public class PagamentoService {
         if(uuid == null)
             throw new IllegalArgumentException("Uuid nao pode ser nulo");
 
-        return pagamentoRepository.findById(uuid).orElse(null);
+        if(pagamentoRepository.findById(uuid).isEmpty())
+            throw new IllegalArgumentException("Esse pagamento nao existe");
+
+        return pagamentoRepository.findById(uuid).get();
     }
 
 
