@@ -142,10 +142,10 @@ class PagamentoServiceTest {
         @ParameterizedTest
         @CsvSource(
                 value = {
-                "null, 2025-04-30T17:00:00, 20.0, Hora de entrada nao pode ser nulo",
-                "2025-04-30T15:30:00, null, 20.0, Hora de saida nao pode ser nulo",
-                "2025-04-30T15:30:00, 2025-04-30T17:00:00, null, Valor nao pode ser nulo"
-        },
+                        "null, 2025-04-30T17:00:00, 20.0, Hora de entrada nao pode ser nula",
+                        "2025-04-30T15:30:00, null, 20.0, Hora de saida nao pode ser nula",
+                        "2025-04-30T15:30:00, 2025-04-30T17:00:00, -10.0, Valor nao pode ser menor que zero"
+                },
                 nullValues = "null"
         )
         void mensagemDeErroAoSalvarPagamento(String horaEntrada, String horaSaida, Double valor, String mensagem) {
