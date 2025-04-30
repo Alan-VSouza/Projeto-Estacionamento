@@ -65,6 +65,8 @@ class PagamentoServiceTest {
             service.salvarPagamento(pagamento);
 
             verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
+            verify(veiculoService).deletarVeiculo(pagamento.getVeiculo().getId());
+
 
         }
 
@@ -255,6 +257,7 @@ class PagamentoServiceTest {
 
 
     }
+
 
 
 }
