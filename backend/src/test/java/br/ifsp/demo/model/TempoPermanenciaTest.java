@@ -28,13 +28,15 @@ class TempoPermanenciaTest {
         @DisplayName("Calcular o valor de uma hora de permanencia")
         void calcularOValorDeUmaHoraDePermanencia() {
 
-            double horas = 1.0;
+            int horas = 1;
 
             double valorPermanencia = tempoPermanencia.calcularValorDaPermanencia(1);
 
             assertEquals(5.0, valorPermanencia);
 
         }
+
+
 
     }
 

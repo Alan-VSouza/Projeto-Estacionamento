@@ -14,12 +14,12 @@ public class TempoPermanencia {
 
 
 
-    public double calcularValorDaPermanencia(double horas) {
+    public double calcularValorDaPermanencia(int horas) {
 
         if(horas <= 0)
             throw new IllegalArgumentException("Horas deve ser maior que zero");
 
-        if(horas <= 1)
+        if(horas == 1)
             return valorPermanencia.getValorUmaHora();
 
         return 0.0;
