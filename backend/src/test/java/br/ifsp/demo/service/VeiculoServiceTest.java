@@ -200,4 +200,25 @@ class VeiculoServiceTest {
         verify(veiculoRepository, times(0)).save(any(Veiculo.class));
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve deletar o veículo corretamente")
+    void deveDeletarVeiculoComSucesso() {
+        Veiculo veiculoExistente = new Veiculo();
+        veiculoExistente.setId(1L);
+        veiculoExistente.setPlaca("ABC1234");
+        veiculoExistente.setTipoVeiculo("carro");
+        veiculoExistente.setModelo("Fusca");
+        veiculoExistente.setCor("azul");
+
+        when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculoExistente));
+
+        VeiculoService veiculoService = new VeiculoService(veiculoRepository);
+
+        veiculoService.deletarVeiculo(1L);
+
+        verify(veiculoRepository, times(1)).delete(veiculoExistente);
+    }
+
 }
