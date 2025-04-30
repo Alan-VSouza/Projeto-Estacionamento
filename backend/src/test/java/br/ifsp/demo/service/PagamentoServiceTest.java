@@ -164,6 +164,8 @@ class PagamentoServiceTest {
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.salvarPagamento(pagamento));
             assertEquals(mensagem, exception.getMessage());
+
+            verify(pagamentoRepository, never()).save(any());
         }
 
         @Test
