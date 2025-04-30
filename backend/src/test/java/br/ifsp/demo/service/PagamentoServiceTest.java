@@ -5,6 +5,8 @@ import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.PagamentoRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,6 +18,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 
@@ -131,7 +135,35 @@ class PagamentoServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("Testando mensagens de erro")
+    class TestandoMensagensDeErro {
 
+        @ParameterizedTest
+        @CsvSource(
+                value = {
+                "null, 2025-04-30T17:00:00, 20.0, Hora de entrada nao pode ser nulo",
+                "2025-04-30T15:30:00, null, 20.0, Hora de saida nao pode ser nulo",
+                "2025-04-30T15:30:00, 2025-04-30T17:00:00, null, Valor nao pode ser nulo"
+        },
+                nullValues = "null"
+        )
+        void mensagemDeErroAoSalvarPagamento(String horaEntrada, String horaSaida, Double valor, String mensagem) {
+            LocalDateTime entrada = horaEntrada == null ? null : LocalDateTime.parse(horaEntrada);
+            LocalDateTime saida = horaSaida == null ? null : LocalDateTime.parse(horaSaida);
+
+            Pagamento pagamento = new Pagamento();
+            pagamento.setUuid(UUID.randomUUID());
+            pagamento.setVeiculo(veiculo);
+            pagamento.setHoraEntrada(entrada);
+            pagamento.setHoraSaida(saida);
+            pagamento.setValor(valor);
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.salvarPagamento(pagamento));
+            assertEquals(mensagem, exception.getMessage());
+        }
+
+    }
 
 
 }
