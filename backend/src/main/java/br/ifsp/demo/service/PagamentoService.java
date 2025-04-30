@@ -31,10 +31,13 @@ public class PagamentoService {
             throw new IllegalArgumentException("Veiculo nao pode ser nulo");
 
         if(pagamento.getHoraEntrada() == null)
-            throw new IllegalArgumentException("Hora de entrada nao pode ser nulo");
+            throw new IllegalArgumentException("Hora de entrada nao pode ser nula");
 
         if(pagamento.getHoraSaida() == null)
-            throw new IllegalArgumentException("Hora de saida nao pode ser nulo");
+            throw new IllegalArgumentException("Hora de saida nao pode ser nula");
+
+        if(pagamento.getValor() < 0.0)
+            throw new IllegalArgumentException("Valor nao pode ser menor que zero");
 
         pagamentoRepository.save(pagamento);
         veiculoService.deletarVeiculo(pagamento.getVeiculo().getId());
