@@ -183,6 +183,21 @@ class VeiculoServiceTest {
         verify(veiculoRepository, times(0)).save(any(Veiculo.class));
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Não deve salvar o veículo com hora de entrada nula")
+    void naoDeveSalvarVeiculoComHoraEntradaNula() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            veiculoService.cadastrarVeiculo("XYZ9876", null, "moto", "modelo", "preto");
+        });
 
+        String expectedMessage = "Hora de entrada não pode ser nula";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+
+        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    }
 
 }
