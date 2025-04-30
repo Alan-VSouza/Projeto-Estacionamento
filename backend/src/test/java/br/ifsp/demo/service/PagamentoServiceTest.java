@@ -139,8 +139,8 @@ class PagamentoServiceTest {
     @DisplayName("Testando mensagens de erro")
     class TestandoMensagensDeErro {
 
-        @Tag("UnitTest")
         @ParameterizedTest
+        @Tag("UnitTest")
         @CsvSource(
                 value = {
                         "null, 2025-04-30T17:00:00, 20.0, Hora de entrada nao pode ser nula",
@@ -186,8 +186,8 @@ class PagamentoServiceTest {
 
         }
 
-        @Tag("UnitTest")
         @ParameterizedTest
+        @Tag("UnitTest")
         @CsvSource(
                 value = {
                         "null, 2025-04-30T15:30:00, 2025-04-30T17:00:00, 15.0, Uuid nao pode ser nulo",
@@ -206,6 +206,18 @@ class PagamentoServiceTest {
                     uuidPagamento, entrada, saida, veiculo, valor
             ));
             assertEquals(mensagem, exception.getMessage());
+
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("mensagem de erro ao atualizar pagamento com veiculo nulo")
+        void mensagemDeErroAoAtualizarPagamentoNulo() {
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()-> service.atualizarPagamento(
+                    UUID.randomUUID(), LocalDateTime.now().minusHours(2), LocalDateTime.now(), null, 0
+            ));
+            assertEquals("Veiculo nao pode ser nulo", exception.getMessage());
 
         }
 
