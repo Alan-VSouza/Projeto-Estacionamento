@@ -6,22 +6,22 @@ import org.springframework.stereotype.Component;
 public class ValorPermanencia {
 
     public double getValorVinteEQuatroHoras() {
-        return 60.0;
+        return 120.0;
     }
 
     public double getValorDozeHoras() {
-        return 30.0;
+        return 55.0;
     }
 
     public double getValorSeisHoras() {
-        return 15.0;
+        return 35.0;
     }
 
     public double getValorUmaHora() {
-        return 5.0;
+        return 10.0;
     }
 
     public double getHoraAdicional() {
-        return 3.0;
+        return 8.0;
     }
 }
