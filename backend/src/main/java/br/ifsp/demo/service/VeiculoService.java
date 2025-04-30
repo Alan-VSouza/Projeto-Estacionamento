@@ -27,6 +27,10 @@ public class VeiculoService {
             throw new IllegalArgumentException("Modelo não pode ser vazio");
         }
 
+        if (cor == null || cor.trim().isEmpty()) {
+            throw new IllegalArgumentException("Cor não pode ser vazia");
+        }
+
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca(placa);
         veiculo.setTipoVeiculo(tipoVeiculo);
