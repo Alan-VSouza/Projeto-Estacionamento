@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class VeiculoService {
@@ -37,8 +38,9 @@ public class VeiculoService {
     }
 
     public Veiculo atualizarVeiculo(Long id, String placa, String tipoVeiculo, String modelo, String cor) {
-        Veiculo veiculo = veiculoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
+        Optional<Veiculo> veiculoOptional = veiculoRepository.findById(id);
+
+        Veiculo veiculo = veiculoOptional.orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
 
         veiculo.setPlaca(placa);
         veiculo.setTipoVeiculo(tipoVeiculo);
