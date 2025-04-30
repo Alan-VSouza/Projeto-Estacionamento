@@ -139,6 +139,7 @@ class PagamentoServiceTest {
     @DisplayName("Testando mensagens de erro")
     class TestandoMensagensDeErro {
 
+        @Tag("UnitTest")
         @ParameterizedTest
         @CsvSource(
                 value = {
@@ -148,7 +149,7 @@ class PagamentoServiceTest {
                 },
                 nullValues = "null"
         )
-        void mensagemDeErroAoSalvarPagamento(String horaEntrada, String horaSaida, Double valor, String mensagem) {
+        void mensagensDeErroAoSalvarPagamento(String horaEntrada, String horaSaida, Double valor, String mensagem) {
             LocalDateTime entrada = horaEntrada == null ? null : LocalDateTime.parse(horaEntrada);
             LocalDateTime saida = horaSaida == null ? null : LocalDateTime.parse(horaSaida);
 
@@ -162,6 +163,19 @@ class PagamentoServiceTest {
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.salvarPagamento(pagamento));
             assertEquals(mensagem, exception.getMessage());
         }
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("mensagem de erro quando veiculo e nulo")
+        void mensagemDeErroQuandoVeiculoNulo() {
+            Pagamento pagamento = new Pagamento();
+            pagamento.setUuid(UUID.randomUUID());
+            pagamento.setVeiculo(null);
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.salvarPagamento(pagamento));
+            assertEquals("Veiculo nao pode ser nulo", exception.getMessage());
+        }
+
 
     }
 
