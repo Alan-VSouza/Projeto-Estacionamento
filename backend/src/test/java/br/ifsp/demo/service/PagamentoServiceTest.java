@@ -186,6 +186,18 @@ class PagamentoServiceTest {
 
         }
 
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("mensagem de erro ao tentar apagar pagamento com uuid nulo")
+        void mensagemDeErroAoApagarPagamentoNulo() {
+
+            Pagamento pagamento = new Pagamento();
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.deletarPagamento(pagamento));
+            assertEquals("Pagamento nao encontrado", exception.getMessage());
+
+        }
+
 
     }
 
