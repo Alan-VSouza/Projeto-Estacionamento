@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.Nested;
+
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -24,8 +26,12 @@ class PagamentoServiceTest {
     @Mock
     private PagamentoRepository pagamentoRepository;
 
+    @Mock
+    private VeiculoService veiculoService;
+
     @InjectMocks
     private PagamentoService service;
+
 
     private Veiculo veiculo;
 
@@ -40,85 +46,92 @@ class PagamentoServiceTest {
         veiculo.setCor("prata");
     }
 
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Deve salvar o pagamento")
-    void deveSalvarPagamento() {
 
-        Pagamento pagamento = new Pagamento(veiculo);
+    @Nested
+    @DisplayName("TDD Tests")
+    class TddTests {
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve salvar o pagamento")
+        void deveSalvarPagamento() {
 
-        service.salvarPagamento(pagamento);
+            Pagamento pagamento = new Pagamento(veiculo);
 
-        verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
+            service.salvarPagamento(pagamento);
 
+            verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
+
+        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve deletar o pagamento")
+        void deveDeletarPagamento() {
+
+            Pagamento pagamento = new Pagamento(veiculo);
+
+            when(pagamentoRepository.findById(pagamento.getUuid()))
+                    .thenReturn(Optional.of(pagamento));
+
+
+            service.deletarPagamento(pagamento);
+
+            verify(pagamentoRepository, times(1)).delete(pagamento);
+
+        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve atualizar o pagamento")
+        void deveAtualizarPagamento() {
+
+            Pagamento pagamento = new Pagamento();
+            pagamento.setUuid(UUID.randomUUID());
+            pagamento.setVeiculo(veiculo);
+            pagamento.setHoraEntrada(veiculo.getHoraEntrada());
+            pagamento.setHoraSaida(LocalDateTime.now());
+            pagamento.setValor(43);
+
+            when(pagamentoRepository.findById(pagamento.getUuid())).thenReturn(Optional.of(pagamento));
+
+            LocalDateTime novaEntrada = LocalDateTime.now().minusHours(3);
+            LocalDateTime novaSaida = LocalDateTime.now().minusHours(1);
+            double novoValor = 44;
+
+            Pagamento pagamentoAtualizado = service.atualizarPagamento(pagamento.getUuid(), novaEntrada, novaSaida, veiculo, novoValor);
+
+            assertThat(pagamentoAtualizado.getHoraEntrada()).isEqualTo(novaEntrada);
+            assertThat(pagamentoAtualizado.getHoraSaida()).isEqualTo(novaSaida);
+            assertThat(pagamentoAtualizado.getVeiculo()).isEqualTo(veiculo);
+            assertThat(pagamentoAtualizado.getValor()).isEqualTo(44);
+
+            verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
+
+        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve encontrar o pagamento pelo UUID")
+        void deveEncontrarPagamentoPeloUuid() {
+            UUID uuid = UUID.randomUUID();
+            Pagamento pagamento = new Pagamento();
+            pagamento.setUuid(uuid);
+
+            when(pagamentoRepository.findById(uuid)).thenReturn(Optional.of(pagamento));
+
+            Pagamento result = service.buscarPorId(uuid);
+
+            assertThat(result).isNotNull();
+            assertThat(result.getUuid()).isEqualTo(uuid);
+            verify(pagamentoRepository, times(1)).findById(uuid);
+        }
     }
 
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Deve deletar o pagamento")
-    void deveDeletarPagamento() {
 
-        Pagamento pagamento = new Pagamento(veiculo);
-
-        when(pagamentoRepository.findById(pagamento.getUuid()))
-                .thenReturn(Optional.of(pagamento));
-
-
-        service.deletarPagamento(pagamento);
-
-        verify(pagamentoRepository, times(1)).delete(pagamento);
-
-    }
-
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Deve atualizar o pagamento")
-    void deveAtualizarPagamento() {
-
-        Pagamento pagamento = new Pagamento();
-        pagamento.setUuid(UUID.randomUUID());
-        pagamento.setVeiculo(veiculo);
-        pagamento.setHoraEntrada(veiculo.getHoraEntrada());
-        pagamento.setHoraSaida(LocalDateTime.now());
-        pagamento.setValor(43);
-
-        when(pagamentoRepository.findById(pagamento.getUuid())).thenReturn(Optional.of(pagamento));
-
-        LocalDateTime novaEntrada = LocalDateTime.now().minusHours(3);
-        LocalDateTime novaSaida = LocalDateTime.now().minusHours(1);
-        double novoValor = 44;
-
-        Pagamento pagamentoAtualizado = service.atualizarPagamento(pagamento.getUuid(), novaEntrada, novaSaida, veiculo, novoValor);
-
-        assertThat(pagamentoAtualizado.getHoraEntrada()).isEqualTo(novaEntrada);
-        assertThat(pagamentoAtualizado.getHoraSaida()).isEqualTo(novaSaida);
-        assertThat(pagamentoAtualizado.getVeiculo()).isEqualTo(veiculo);
-        assertThat(pagamentoAtualizado.getValor()).isEqualTo(44);
-
-        verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
-
-    }
-
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Deve encontrar o pagamento pelo UUID")
-    void deveEncontrarPagamentoPeloUuid() {
-        UUID uuid = UUID.randomUUID();
-        Pagamento pagamento = new Pagamento();
-        pagamento.setUuid(uuid);
-
-        when(pagamentoRepository.findById(uuid)).thenReturn(Optional.of(pagamento));
-
-        Pagamento result = service.buscarPorId(uuid);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getUuid()).isEqualTo(uuid);
-        verify(pagamentoRepository, times(1)).findById(uuid);
-    }
 
 
 }

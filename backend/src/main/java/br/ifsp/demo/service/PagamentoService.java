@@ -15,13 +15,12 @@ import java.util.UUID;
 public class PagamentoService {
 
     private final PagamentoRepository pagamentoRepository;
-    private final VeiculoRepository veiculoRepository;
-
+    private final VeiculoService veiculoService;
 
     @Autowired
-    public PagamentoService(PagamentoRepository pagamentoRepository, VeiculoRepository veiculoRepository) {
+    public PagamentoService(PagamentoRepository pagamentoRepository, VeiculoService veiculoService) {
         this.pagamentoRepository = pagamentoRepository;
-        this.veiculoRepository = veiculoRepository;
+        this.veiculoService = veiculoService;
     }
 
     public void salvarPagamento(Pagamento pagamento) {
@@ -38,7 +37,7 @@ public class PagamentoService {
             throw new IllegalArgumentException("Hora de saida nao pode ser nulo");
 
         pagamentoRepository.save(pagamento);
-        veiculoRepository.delete(pagamento.getVeiculo());
+        veiculoService.deletarVeiculo(pagamento.getVeiculo().getId());
     }
 
     public void deletarPagamento(Pagamento pagamento) {
@@ -56,12 +55,16 @@ public class PagamentoService {
     public Pagamento atualizarPagamento(UUID uuid, LocalDateTime novaEntrada, LocalDateTime novaSaida, Veiculo veiculo, double novoValor) {
         if(uuid == null)
             throw new IllegalArgumentException("Uuid nao pode ser nulo");
+
         if(novaEntrada == null)
             throw new IllegalArgumentException("Entrada nao pode ser nulo");
+
         if(novaSaida == null)
             throw new IllegalArgumentException("Saida nao pode ser nulo");
+
         if(veiculo == null || veiculo.getId() == null)
             throw new IllegalArgumentException("Veiculo nao pode ser nulo");
+
         if(novoValor < 0)
             throw new IllegalArgumentException("Valor nao pode ser menor que zero");
 
