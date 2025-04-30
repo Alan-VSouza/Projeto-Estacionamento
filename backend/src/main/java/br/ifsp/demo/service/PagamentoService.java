@@ -1,10 +1,13 @@
 package br.ifsp.demo.service;
 
 import br.ifsp.demo.model.Pagamento;
+import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.PagamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -46,9 +49,30 @@ public class PagamentoService {
 
     }
 
-    public void atualizarPagamento(Pagamento pagamento) {
-        pagamentoRepository.delete(pagamento);
+    public Pagamento atualizarPagamento(UUID uuid, LocalDateTime novaEntrada, LocalDateTime novaSaida, Veiculo veiculo, double novoValor) {
+        if(uuid == null)
+            throw new IllegalArgumentException("Uuid nao pode ser nulo");
+        if(novaEntrada == null)
+            throw new IllegalArgumentException("Entrada nao pode ser nulo");
+        if(novaSaida == null)
+            throw new IllegalArgumentException("Saida nao pode ser nulo");
+        if(veiculo == null || veiculo.getId() == null)
+            throw new IllegalArgumentException("Veiculo nao pode ser nulo");
+        if(novoValor < 0)
+            throw new IllegalArgumentException("Valor nao pode ser menor que zero");
+
+        Optional<Pagamento> pagamentoOptional = pagamentoRepository.findById(uuid);
+        Pagamento pagamento = pagamentoOptional.orElseThrow(() -> new IllegalArgumentException("Pagamento não encontrado"));
+
+        pagamento.setHoraEntrada(novaEntrada);
+        pagamento.setHoraSaida(novaSaida);
+        pagamento.setVeiculo(veiculo);
+        pagamento.setValor(novoValor);
+
         pagamentoRepository.save(pagamento);
+
+        return pagamento;
+
     }
 
     public Pagamento buscarPorId(UUID uuid) {
