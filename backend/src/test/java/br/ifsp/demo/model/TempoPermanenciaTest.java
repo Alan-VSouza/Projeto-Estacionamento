@@ -28,9 +28,9 @@ class TempoPermanenciaTest {
         @DisplayName("Calcular o valor de uma hora de permanencia")
         void calcularOValorDeUmaHoraDePermanencia() {
 
-            int horas = 1;
+            double horas = 1.0;
 
-            double valorPermanencia = tempoPermanencia.valorMinimo(1);
+            double valorPermanencia = tempoPermanencia.calcularValorDaPermanencia(1);
 
             assertEquals(5.0, valorPermanencia);
 
