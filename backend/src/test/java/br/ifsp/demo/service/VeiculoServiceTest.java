@@ -221,4 +221,33 @@ class VeiculoServiceTest {
         verify(veiculoRepository, times(1)).delete(veiculoExistente);
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Não deve cadastrar veículo com placa já existente")
+    void naoDeveCadastrarVeiculoComPlacaExistente() {
+        String placaExistente = "ABC1234";
+        Veiculo veiculoExistente = new Veiculo();
+        veiculoExistente.setPlaca(placaExistente);
+
+        when(veiculoRepository.findByPlaca(placaExistente)).thenReturn(Optional.of(veiculoExistente));
+
+        Veiculo veiculoNovo = new Veiculo();
+        veiculoNovo.setPlaca(placaExistente);
+        veiculoNovo.setModelo("Fusca");
+        veiculoNovo.setTipoVeiculo("carro");
+        veiculoNovo.setCor("azul");
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            veiculoService.cadastrarVeiculo(placaExistente, null, "carro", "Fusca", "azul");
+        });
+
+        String expectedMessage = "Placa já cadastrada";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+
+        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    }
+
 }
