@@ -3,6 +3,7 @@ package br.ifsp.demo.service;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.PagamentoRepository;
+import br.ifsp.demo.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +14,14 @@ import java.util.UUID;
 @Service
 public class PagamentoService {
 
-    public final PagamentoRepository pagamentoRepository;
+    private final PagamentoRepository pagamentoRepository;
+    private final VeiculoRepository veiculoRepository;
+
 
     @Autowired
-
-    public PagamentoService(PagamentoRepository pagamentoRepository) {
+    public PagamentoService(PagamentoRepository pagamentoRepository, VeiculoRepository veiculoRepository) {
         this.pagamentoRepository = pagamentoRepository;
+        this.veiculoRepository = veiculoRepository;
     }
 
     public void salvarPagamento(Pagamento pagamento) {
@@ -35,6 +38,7 @@ public class PagamentoService {
             throw new IllegalArgumentException("Hora de saida nao pode ser nulo");
 
         pagamentoRepository.save(pagamento);
+        veiculoRepository.delete(pagamento.getVeiculo());
     }
 
     public void deletarPagamento(Pagamento pagamento) {
