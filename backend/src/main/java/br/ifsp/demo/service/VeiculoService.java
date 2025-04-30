@@ -35,6 +35,10 @@ public class VeiculoService {
             throw new IllegalArgumentException("Hora de entrada não pode ser nula");
         }
 
+        if (veiculoRepository.findByPlaca(placa).isPresent()) {
+            throw new IllegalArgumentException("Placa já cadastrada");
+        }
+
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca(placa);
         veiculo.setTipoVeiculo(tipoVeiculo);
@@ -66,4 +70,5 @@ public class VeiculoService {
                 .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
         veiculoRepository.delete(veiculo);
     }
+
 }

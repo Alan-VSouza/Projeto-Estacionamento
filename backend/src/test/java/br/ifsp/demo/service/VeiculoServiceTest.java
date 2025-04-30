@@ -239,7 +239,7 @@ class VeiculoServiceTest {
         veiculoNovo.setCor("azul");
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            veiculoService.cadastrarVeiculo(placaExistente, null, "carro", "Fusca", "azul");
+            veiculoService.cadastrarVeiculo(placaExistente, LocalDateTime.now(), "carro", "Fusca", "azul");
         });
 
         String expectedMessage = "Placa já cadastrada";
