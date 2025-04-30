@@ -35,4 +35,16 @@ public class VeiculoService {
 
         return veiculoRepository.save(veiculo);
     }
+
+    public Veiculo atualizarVeiculo(Long id, String placa, String tipoVeiculo, String modelo, String cor) {
+        Veiculo veiculo = veiculoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
+
+        veiculo.setPlaca(placa);
+        veiculo.setTipoVeiculo(tipoVeiculo);
+        veiculo.setModelo(modelo);
+        veiculo.setCor(cor);
+
+        return veiculoRepository.save(veiculo);
+    }
 }
