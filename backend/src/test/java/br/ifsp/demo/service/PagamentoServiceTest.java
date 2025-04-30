@@ -21,15 +21,17 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(MockitoExtension.class)
 class PagamentoServiceTest {
 
+    @Mock
+    private PagamentoRepository pagamentoRepository;
+
+    @InjectMocks
+    private PagamentoService service;
+
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
     @DisplayName("Deve salvar o pagamento")
     void deveSalvarPagamento() {
-
-        PagamentoRepository pagamentoRepository = mock(PagamentoRepository.class);
-        PagamentoService service = new PagamentoService(pagamentoRepository);
-
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca("ABC-1234");
         veiculo.setHoraEntrada(LocalDateTime.now().minusHours(2));
@@ -48,9 +50,6 @@ class PagamentoServiceTest {
     @DisplayName("Deve deletar o pagamento")
     void deveDeletarPagamento() {
 
-        PagamentoRepository pagamentoRepository = mock(PagamentoRepository.class);
-        PagamentoService service = new PagamentoService(pagamentoRepository);
-
         Pagamento pagamento = new Pagamento();
         pagamento.setUuid(UUID.randomUUID());
 
@@ -65,9 +64,6 @@ class PagamentoServiceTest {
     @Tag("UnitTest")
     @DisplayName("Deve atualizar o pagamento")
     void deveAtualizarPagamento() {
-
-        PagamentoRepository pagamentoRepository = mock(PagamentoRepository.class);
-        PagamentoService service = new PagamentoService(pagamentoRepository);
 
         Pagamento pagamento = new Pagamento();
         pagamento.setUuid(UUID.randomUUID());
@@ -89,10 +85,7 @@ class PagamentoServiceTest {
         Pagamento pagamento = new Pagamento();
         pagamento.setUuid(uuid);
 
-        PagamentoRepository pagamentoRepository = mock(PagamentoRepository.class);
         when(pagamentoRepository.findById(uuid)).thenReturn(Optional.of(pagamento));
-
-        PagamentoService service = new PagamentoService(pagamentoRepository);
 
         Pagamento result = service.buscarPorId(uuid);
 
