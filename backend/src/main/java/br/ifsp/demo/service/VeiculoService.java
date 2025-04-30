@@ -31,6 +31,10 @@ public class VeiculoService {
             throw new IllegalArgumentException("Cor não pode ser vazia");
         }
 
+        if (horaEntrada == null || horaEntrada.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Hora de entrada não pode ser nula");
+        }
+
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca(placa);
         veiculo.setTipoVeiculo(tipoVeiculo);
