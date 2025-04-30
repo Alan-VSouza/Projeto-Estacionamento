@@ -221,6 +221,29 @@ class PagamentoServiceTest {
 
         }
 
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("mensagem de erro ao atualizar pagamento com UUID inexistente")
+        void mensagemDeErroAoAtualizarPagamentoInexistente() {
+            UUID uuidInexistente = UUID.randomUUID();
+
+            when(pagamentoRepository.findById(uuidInexistente)).thenReturn(Optional.empty());
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    service.atualizarPagamento(
+                            uuidInexistente,
+                            LocalDateTime.now().minusHours(1),
+                            LocalDateTime.now(),
+                            veiculo,
+                            10.0
+                    )
+            );
+
+            assertEquals("Pagamento não encontrado", exception.getMessage());
+            verify(pagamentoRepository).findById(uuidInexistente);
+        }
+
+
 
     }
 
