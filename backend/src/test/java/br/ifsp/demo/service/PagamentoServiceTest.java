@@ -176,6 +176,16 @@ class PagamentoServiceTest {
             assertEquals("Veiculo nao pode ser nulo", exception.getMessage());
         }
 
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("mensgaem de erro ao tentar excluir pagamento nulo")
+        void mensagemDeErroAoExcluirPagamentoNulo() {
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()-> service.deletarPagamento(null));
+            assertEquals("Pagamento nao pode ser nulo", exception.getMessage());
+
+        }
+
 
     }
 
