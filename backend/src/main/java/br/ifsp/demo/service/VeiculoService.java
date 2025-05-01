@@ -3,7 +3,9 @@ package br.ifsp.demo.service;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -11,7 +13,7 @@ import java.util.Optional;
 @Service
 public class VeiculoService {
 
-    private VeiculoRepository veiculoRepository;
+    private final VeiculoRepository veiculoRepository;
 
     @Autowired
     public VeiculoService(VeiculoRepository veiculoRepository) {
@@ -51,11 +53,13 @@ public class VeiculoService {
 
     public Veiculo atualizarVeiculo(Long id, String placa, String tipoVeiculo, String modelo, String cor) {
         if (placa == null || placa.trim().isEmpty()) {
-            throw new IllegalArgumentException("Placa não pode ser vazia");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Placa não pode ser vazia");
         }
 
         Optional<Veiculo> veiculoOptional = veiculoRepository.findById(id);
-        Veiculo veiculo = veiculoOptional.orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
+        Veiculo veiculo = veiculoOptional.orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Veículo não encontrado")
+        );
 
         veiculo.setPlaca(placa);
         veiculo.setTipoVeiculo(tipoVeiculo);
