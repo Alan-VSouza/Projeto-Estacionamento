@@ -23,6 +23,12 @@ public class VeiculoController {
             ErrorResponse errorResponse = new ErrorResponse("Placa não pode ser vazia");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
+
+        if (veiculo.getModelo() == null || veiculo.getModelo().trim().isEmpty()) {
+            ErrorResponse errorResponse = new ErrorResponse("Modelo não pode ser vazio");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
         try {
             Veiculo veiculoCadastrado = veiculoService.cadastrarVeiculo(
                     veiculo.getPlaca(), veiculo.getHoraEntrada(),
