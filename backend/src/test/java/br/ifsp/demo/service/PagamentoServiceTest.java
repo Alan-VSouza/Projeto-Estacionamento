@@ -1,6 +1,7 @@
 package br.ifsp.demo.service;
 
 import br.ifsp.demo.model.Pagamento;
+import br.ifsp.demo.model.TempoPermanencia;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.PagamentoRepository;
 import org.junit.jupiter.api.*;
@@ -33,6 +34,9 @@ class PagamentoServiceTest {
     @Mock
     private VeiculoService veiculoService;
 
+    @Mock
+    TempoPermanencia tempoPermanencia;
+
     @InjectMocks
     private PagamentoService service;
 
@@ -45,7 +49,7 @@ class PagamentoServiceTest {
         veiculo.setId(1L);
         veiculo.setPlaca("BQF-2994");
         veiculo.setTipoVeiculo("carro");
-        veiculo.setHoraEntrada(LocalDateTime.now().minusHours(2));
+        veiculo.setHoraEntrada(LocalDateTime.of(2025,4,30,10,0,0));
         veiculo.setModelo("Escort");
         veiculo.setCor("prata");
     }
@@ -134,6 +138,26 @@ class PagamentoServiceTest {
             assertThat(result).isNotNull();
             assertThat(result.getUuid()).isEqualTo(uuid);
             verify(pagamentoRepository, times(1)).findById(uuid);
+        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Testa salvar pagamento calculando o valor de permanencia")
+        void testaSalvarPagamentoCalculandoOValorDePermanencia() {
+
+            Pagamento pagamento = new Pagamento(veiculo);
+            pagamento.setHoraSaida(LocalDateTime.of(2025,04,30,13,1,0));
+
+            when(tempoPermanencia.calcularValorDaPermanencia(anyInt())).thenReturn(26.0);
+
+            service.salvarPagamento(pagamento);
+
+            assertEquals(26.0, pagamento.getValor());
+
+            verify(pagamentoRepository, times(1)).save(pagamento);
+            verify(veiculoService, times(1)).deletarVeiculo(pagamento.getVeiculo().getId());
+
         }
     }
 
