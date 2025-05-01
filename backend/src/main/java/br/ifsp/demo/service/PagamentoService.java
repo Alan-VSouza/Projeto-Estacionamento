@@ -1,6 +1,7 @@
 package br.ifsp.demo.service;
 
 import br.ifsp.demo.model.Pagamento;
+import br.ifsp.demo.model.TempoPermanencia;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.PagamentoRepository;
 import br.ifsp.demo.repository.VeiculoRepository;
@@ -16,11 +17,13 @@ public class PagamentoService {
 
     private final PagamentoRepository pagamentoRepository;
     private final VeiculoService veiculoService;
+    private final TempoPermanencia tempoPermanencia;
 
     @Autowired
-    public PagamentoService(PagamentoRepository pagamentoRepository, VeiculoService veiculoService) {
+    public PagamentoService(PagamentoRepository pagamentoRepository, VeiculoService veiculoService, TempoPermanencia tempoPermanencia) {
         this.pagamentoRepository = pagamentoRepository;
         this.veiculoService = veiculoService;
+        this.tempoPermanencia = tempoPermanencia;
     }
 
     public void salvarPagamento(Pagamento pagamento) {
@@ -39,8 +42,19 @@ public class PagamentoService {
         if(pagamento.getValor() < 0.0)
             throw new IllegalArgumentException("Valor nao pode ser menor que zero");
 
+        int horasPermanencia = calcularHorasPermanencia(pagamento.getHoraEntrada(), pagamento.getHoraSaida());
+        double valorPermanencia = tempoPermanencia.calcularValorDaPermanencia(horasPermanencia);
+        pagamento.setValor(valorPermanencia);
+
         pagamentoRepository.save(pagamento);
         veiculoService.deletarVeiculo(pagamento.getVeiculo().getId());
+    }
+
+    private int calcularHorasPermanencia(LocalDateTime horaEntrada, LocalDateTime horaSaida) {
+
+        double horas =java.time.Duration.between(horaEntrada, horaSaida).toMinutes() / 60.0;
+        return (int) Math.ceil(horas);
+
     }
 
     public void deletarPagamento(Pagamento pagamento) {
