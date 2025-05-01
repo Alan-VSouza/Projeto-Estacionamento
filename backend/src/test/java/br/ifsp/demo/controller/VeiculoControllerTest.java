@@ -77,7 +77,7 @@ class VeiculoControllerTest {
     @DisplayName("Deve retornar 400 quando a placa for vazia")
     void deveRetornarBadRequestQuandoPlacaVazia() throws Exception {
         Veiculo veiculo = new Veiculo();
-        veiculo.setPlaca("");
+        veiculo.setPlaca("");  // Placa vazia
         veiculo.setModelo("Fusca");
         veiculo.setTipoVeiculo("carro");
         veiculo.setCor("azul");

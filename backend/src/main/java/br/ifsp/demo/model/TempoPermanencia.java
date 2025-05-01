@@ -35,6 +35,14 @@ public class TempoPermanencia {
 
     }
 
+
+    public double calculaMaisDeVinteQuatroHoras(int horas) {
+
+        return valorPermanencia.getValorVinteEQuatroHoras() + (valorPermanencia.getHoraAdicional() * (horas - 24));
+
+    }
+
+
     public double calcularValorDaPermanencia(int horas) {
 
         if(horas <= 0)
@@ -55,6 +63,5 @@ public class TempoPermanencia {
         else
             return calculaMaisDeVinteQuatroHoras(horas);
 
-        return 0.0;
     }
 }
