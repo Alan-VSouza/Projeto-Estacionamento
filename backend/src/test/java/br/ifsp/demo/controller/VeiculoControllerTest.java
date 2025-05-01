@@ -118,7 +118,7 @@ class VeiculoControllerTest {
         veiculo.setPlaca("ABC1234");
         veiculo.setModelo("Fusca");
         veiculo.setTipoVeiculo("carro");
-        veiculo.setCor(""); // Cor vazia
+        veiculo.setCor("");
         veiculo.setHoraEntrada(LocalDateTime.now());
 
         mockMvc.perform(post("/api/veiculos")

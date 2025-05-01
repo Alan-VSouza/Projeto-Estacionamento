@@ -29,6 +29,11 @@ public class VeiculoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
+        if (veiculo.getCor() == null || veiculo.getCor().trim().isEmpty()) {
+            ErrorResponse errorResponse = new ErrorResponse("Cor não pode ser vazia");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
         try {
             Veiculo veiculoCadastrado = veiculoService.cadastrarVeiculo(
                     veiculo.getPlaca(), veiculo.getHoraEntrada(),
