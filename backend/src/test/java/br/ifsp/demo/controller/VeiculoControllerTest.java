@@ -195,6 +195,21 @@ class VeiculoControllerTest {
                 .andExpect(jsonPath("$.modelo").value("Civic"));
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve deletar o veículo com sucesso")
+    void deveDeletarVeiculoComSucesso() throws Exception {
+        Long idExistente = 1L;
+
+        doNothing().when(veiculoService).deletarVeiculo(eq(idExistente));
+
+        mockMvc.perform(delete("/api/veiculos/{id}", idExistente))
+                .andExpect(status().isNoContent());
+
+        verify(veiculoService, times(1)).deletarVeiculo(eq(idExistente));
+    }
+
 
 
 
