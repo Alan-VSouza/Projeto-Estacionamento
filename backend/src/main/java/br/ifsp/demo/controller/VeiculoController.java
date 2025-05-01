@@ -34,6 +34,11 @@ public class VeiculoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
+        if (veiculo.getHoraEntrada() == null) {
+            ErrorResponse errorResponse = new ErrorResponse("Hora de entrada não pode ser nula");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
         try {
             Veiculo veiculoCadastrado = veiculoService.cadastrarVeiculo(
                     veiculo.getPlaca(), veiculo.getHoraEntrada(),
