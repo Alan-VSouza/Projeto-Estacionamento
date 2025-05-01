@@ -2,6 +2,8 @@ package br.ifsp.demo.model;
 
 import br.ifsp.demo.service.ValorPermanencia;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -74,6 +76,30 @@ class TempoPermanenciaTest {
 
     }
 
+    @Nested
+    @DisplayName("Testando funcionamento da classe completa")
+    class TestandoFuncionamentoDaClassCompleta {
 
+        @ParameterizedTest
+        @Tag("UnitTest")
+        @CsvSource({
+                "1, 10.0",
+                "4, 34.0",
+                "5, 35.0",
+                "6, 35.0",
+                "8, 51.0",
+                "9, 55.0",
+                "12, 55,0",
+                "20, 119.0",
+                "24, 120.0"
+        })
+        @DisplayName("Testando valores limites")
+        void testandoValoresLimites(int horas, double custo) {
+
+            assertEquals(custo, tempoPermanencia.calcularValorDaPermanencia(horas));
+
+        }
+
+    }
 
 }
