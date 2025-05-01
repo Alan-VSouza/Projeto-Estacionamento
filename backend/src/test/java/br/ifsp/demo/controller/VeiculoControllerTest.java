@@ -147,6 +147,28 @@ class VeiculoControllerTest {
                 .andExpect(jsonPath("$.message").value("Hora de entrada não pode ser nula"));
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve retornar 400 quando a placa já estiver cadastrada")
+    void deveRetornarBadRequestQuandoPlacaJaCadastrada() throws Exception {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca("ABC1234");
+        veiculo.setModelo("Fusca");
+        veiculo.setTipoVeiculo("carro");
+        veiculo.setCor("azul");
+        veiculo.setHoraEntrada(LocalDateTime.now());
+
+        when(veiculoService.cadastrarVeiculo(anyString(), any(), anyString(), anyString(), anyString()))
+                .thenThrow(new IllegalArgumentException("Placa já cadastrada"));
+
+        mockMvc.perform(post("/api/veiculos")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(veiculo)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Placa já cadastrada"));
+    }
+
 
 
 }
