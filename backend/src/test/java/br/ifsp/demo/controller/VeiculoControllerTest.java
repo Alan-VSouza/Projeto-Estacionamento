@@ -109,4 +109,24 @@ class VeiculoControllerTest {
                 .andExpect(jsonPath("$.message").value("Modelo não pode ser vazio"));
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve retornar 400 quando a cor for vazia")
+    void deveRetornarBadRequestQuandoCorVazia() throws Exception {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca("ABC1234");
+        veiculo.setModelo("Fusca");
+        veiculo.setTipoVeiculo("carro");
+        veiculo.setCor(""); // Cor vazia
+        veiculo.setHoraEntrada(LocalDateTime.now());
+
+        mockMvc.perform(post("/api/veiculos")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(veiculo)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Cor não pode ser vazia"));
+    }
+
+
 }
