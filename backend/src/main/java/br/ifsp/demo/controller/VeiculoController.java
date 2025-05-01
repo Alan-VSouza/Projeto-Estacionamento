@@ -88,5 +88,16 @@ public class VeiculoController {
         return ResponseEntity.status(HttpStatus.OK).body(veiculoExistente);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deletarVeiculo(@PathVariable Long id) {
+        try {
+            veiculoService.deletarVeiculo(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (IllegalArgumentException e) {
+            ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
 
 }
