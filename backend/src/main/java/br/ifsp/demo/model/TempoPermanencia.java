@@ -38,8 +38,7 @@ public class TempoPermanencia {
 
     public double calculaMaisDeVinteQuatroHoras(int horas) {
 
-        double custo = valorPermanencia.getValorVinteEQuatroHoras() + (valorPermanencia.getHoraAdicional() * (horas - 24));
-        return custo;
+        return valorPermanencia.getValorVinteEQuatroHoras() + (valorPermanencia.getHoraAdicional() * (horas - 24));
 
     }
 
