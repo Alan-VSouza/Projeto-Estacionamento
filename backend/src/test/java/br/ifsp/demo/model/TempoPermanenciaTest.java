@@ -100,6 +100,19 @@ class TempoPermanenciaTest {
 
         }
 
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Testando valor de hora invalido")
+        void testandoValorDeHoraInvalido() {
+
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+                tempoPermanencia.calcularValorDaPermanencia(-1);
+            });
+
+            assertEquals("Horas deve ser maior que zero", ex.getMessage());
+
+        }
+
     }
 
 }
