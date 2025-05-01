@@ -70,6 +70,7 @@ class PagamentoServiceTest {
 
             verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
             verify(veiculoService).deletarVeiculo(pagamento.getVeiculo().getId());
+            verify(tempoPermanencia, times(1)).calcularValorDaPermanencia(anyInt());
 
 
         }
