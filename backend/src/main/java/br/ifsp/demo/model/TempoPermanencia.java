@@ -52,6 +52,9 @@ public class TempoPermanencia {
         else if(horas <= 24)
             return calculaVinteQuatroHoras(horas);
 
+        else
+            return calculaMaisDeVinteQuatroHoras(horas);
+
         return 0.0;
     }
 }

@@ -62,6 +62,16 @@ class TempoPermanenciaTest {
 
         }
 
+        @Test
+        @Tag("UnitTest")
+        @Tag("TDD")
+        @DisplayName("Calcular o valor a partir de vinte e quatro horas de permanencia")
+        void calcularOValorAPartirDeVinteQuatroHorasDePermanencia() {
+
+            assertEquals(160.0, tempoPermanencia.calcularValorDaPermanencia(29));
+
+        }
+
 
     }
 
