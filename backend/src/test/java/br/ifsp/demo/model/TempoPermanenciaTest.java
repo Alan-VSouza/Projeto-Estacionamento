@@ -8,12 +8,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class TempoPermanenciaTest {
 
     private TempoPermanencia tempoPermanencia;
-    private ValorPermanencia valorPermanencia;
 
     @BeforeEach
     void setUp() {
 
-        valorPermanencia = new ValorPermanencia();
+        ValorPermanencia valorPermanencia = new ValorPermanencia();
         tempoPermanencia = new TempoPermanencia(valorPermanencia);
 
     }
@@ -74,5 +73,7 @@ class TempoPermanenciaTest {
 
 
     }
+
+
 
 }
