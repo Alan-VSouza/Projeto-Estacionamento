@@ -39,6 +39,11 @@ public class VeiculoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
+        if (veiculoService.verificarPlacaCadastrada(veiculo.getPlaca())) {
+            ErrorResponse errorResponse = new ErrorResponse("Placa já cadastrada");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
         try {
             Veiculo veiculoCadastrado = veiculoService.cadastrarVeiculo(
                     veiculo.getPlaca(), veiculo.getHoraEntrada(),

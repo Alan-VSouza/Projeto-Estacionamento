@@ -71,4 +71,8 @@ public class VeiculoService {
         veiculoRepository.delete(veiculo);
     }
 
+    public boolean verificarPlacaCadastrada(String placa) {
+        return veiculoRepository.findByPlaca(placa).isPresent();
+    }
+
 }
