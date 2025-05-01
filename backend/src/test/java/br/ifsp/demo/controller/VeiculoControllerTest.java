@@ -12,9 +12,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
@@ -168,6 +170,31 @@ class VeiculoControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Placa já cadastrada"));
     }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve atualizar o veículo com sucesso")
+    void deveAtualizarVeiculoComSucesso() throws Exception {
+        Long idExistente = 1L;
+        Veiculo veiculoAtualizado = new Veiculo();
+        veiculoAtualizado.setPlaca("DEF5678");
+        veiculoAtualizado.setModelo("Civic");
+        veiculoAtualizado.setTipoVeiculo("carro");
+        veiculoAtualizado.setCor("preto");
+        veiculoAtualizado.setHoraEntrada(LocalDateTime.now());
+
+        when(veiculoService.atualizarVeiculo(eq(idExistente), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(veiculoAtualizado);
+
+        mockMvc.perform(put("/api/veiculos/{id}", idExistente)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(veiculoAtualizado)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.placa").value("DEF5678"))
+                .andExpect(jsonPath("$.modelo").value("Civic"));
+    }
+
 
 
 
