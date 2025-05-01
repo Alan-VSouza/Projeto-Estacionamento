@@ -27,6 +27,14 @@ public class TempoPermanencia {
 
     }
 
+    public double calculaVinteQuatroHoras(int horas) {
+
+        double custo = valorPermanencia.getValorDozeHoras() + (valorPermanencia.getHoraAdicional() * (horas - 12));
+
+        return Math.min(custo, valorPermanencia.getValorVinteEQuatroHoras());
+
+    }
+
     public double calcularValorDaPermanencia(int horas) {
 
         if(horas <= 0)
@@ -40,6 +48,9 @@ public class TempoPermanencia {
 
         else if(horas <= 12)
             return calculaDozeHoras(horas);
+
+        else if(horas <= 24)
+            return calculaVinteQuatroHoras(horas);
 
         return 0.0;
     }
