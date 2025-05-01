@@ -210,6 +210,22 @@ class VeiculoControllerTest {
         verify(veiculoService, times(1)).deletarVeiculo(eq(idExistente));
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve retornar 404 quando tentar deletar um veículo não encontrado")
+    void deveRetornarNotFoundQuandoVeiculoNaoExistirParaDeletar() throws Exception {
+        Long idInexistente = 999L;
+
+        doThrow(new IllegalArgumentException("Veículo não encontrado")).when(veiculoService).deletarVeiculo(eq(idInexistente));
+
+        mockMvc.perform(delete("/api/veiculos/{id}", idInexistente))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Veículo não encontrado"));
+    }
+
+
+
 
 
 
