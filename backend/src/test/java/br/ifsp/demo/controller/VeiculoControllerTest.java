@@ -3,13 +3,18 @@ package br.ifsp.demo.controller;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.service.VeiculoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 
@@ -20,10 +25,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class VeiculoControllerTest {
 
-    private MockMvc mockMvc;
-
     @Mock
     private VeiculoService veiculoService;
+
+    @InjectMocks
+    private VeiculoController veiculoController;
+
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    void setup() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
+        mockMvc = MockMvcBuilders.standaloneSetup(veiculoController)
+                .defaultRequest(get("/").accept(MediaType.APPLICATION_JSON))
+                .build();
+    }
 
     @Test
     @Tag("TDD")
@@ -37,16 +55,18 @@ class VeiculoControllerTest {
         veiculo.setCor("azul");
         veiculo.setHoraEntrada(LocalDateTime.now());
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
         when(veiculoService.cadastrarVeiculo(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(veiculo);
 
         mockMvc.perform(post("/api/veiculos")
                         .contentType("application/json")
-                        .content(new ObjectMapper().writeValueAsString(veiculo)))
+                        .content(objectMapper.writeValueAsString(veiculo)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.placa").value("ABC1234"))
                 .andExpect(jsonPath("$.modelo").value("Fusca"));
 
         verify(veiculoService, times(1)).cadastrarVeiculo(anyString(), any(), anyString(), anyString(), anyString());
     }
-
 }
