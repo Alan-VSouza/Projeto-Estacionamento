@@ -32,10 +32,11 @@ class VeiculoControllerTest {
     private VeiculoController veiculoController;
 
     private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
         mockMvc = MockMvcBuilders.standaloneSetup(veiculoController)
@@ -68,5 +69,24 @@ class VeiculoControllerTest {
                 .andExpect(jsonPath("$.modelo").value("Fusca"));
 
         verify(veiculoService, times(1)).cadastrarVeiculo(anyString(), any(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve retornar 400 quando a placa for vazia")
+    void deveRetornarBadRequestQuandoPlacaVazia() throws Exception {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca("");
+        veiculo.setModelo("Fusca");
+        veiculo.setTipoVeiculo("carro");
+        veiculo.setCor("azul");
+        veiculo.setHoraEntrada(LocalDateTime.now());
+
+        mockMvc.perform(post("/api/veiculos")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(veiculo)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Placa não pode ser vazia"));
     }
 }
