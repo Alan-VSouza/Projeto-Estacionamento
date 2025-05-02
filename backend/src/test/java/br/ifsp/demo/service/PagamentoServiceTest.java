@@ -14,7 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.Nested;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -160,6 +162,28 @@ class PagamentoServiceTest {
             verify(veiculoService, times(1)).deletarVeiculo(pagamento.getVeiculo().getId());
 
         }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve buscar pagamento por data")
+        void deveBuscarPagamentoPorData() {
+            LocalDate data = LocalDate.of(2025, 5, 2);
+            Pagamento pagamento = new Pagamento(new Veiculo());
+            pagamento.setUuid(UUID.randomUUID());
+            pagamento.setHoraEntrada(data.atTime(9, 0));
+            pagamento.setHoraSaida(data.atTime(10, 0));
+
+            when(pagamentoRepository.findByHoraSaidaBetween(
+                    data.atStartOfDay(),
+                    data.atTime(23, 59, 59 ))
+            ).thenReturn(List.of(pagamento));
+
+            List<Pagamento> resultado = service.buscarPorData(data);
+
+            assertThat(resultado).hasSize(1).containsExactly(pagamento);
+        }
+
     }
 
     @Nested
