@@ -224,6 +224,25 @@ class VeiculoControllerTest {
                 .andExpect(jsonPath("$.message").value("Veículo não encontrado"));
     }
 
+    @Test
+    @Tag("TDD")
+    @DisplayName("Deve retornar 400 quando o tipoVeiculo for vazio")
+    void deveRetornarBadRequestQuandoTipoVeiculoVazio() throws Exception {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca("ABC1234");
+        veiculo.setTipoVeiculo("");
+        veiculo.setModelo("Fusca");
+        veiculo.setCor("azul");
+        veiculo.setHoraEntrada(LocalDateTime.now());
+
+        mockMvc.perform(post("/api/veiculos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(veiculo)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Tipo de veículo não pode ser vazio"));
+    }
+
+
 
 
 
