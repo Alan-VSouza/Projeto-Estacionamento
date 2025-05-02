@@ -19,90 +19,82 @@ public class VeiculoController {
 
     @PostMapping
     public ResponseEntity<Object> cadastrarVeiculo(@RequestBody Veiculo veiculo) {
-        if (veiculo.getPlaca() == null || veiculo.getPlaca().trim().isEmpty()) {
-            ErrorResponse errorResponse = new ErrorResponse("Placa não pode ser vazia");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-
-        if (veiculo.getModelo() == null || veiculo.getModelo().trim().isEmpty()) {
-            ErrorResponse errorResponse = new ErrorResponse("Modelo não pode ser vazio");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-
-        if (veiculo.getCor() == null || veiculo.getCor().trim().isEmpty()) {
-            ErrorResponse errorResponse = new ErrorResponse("Cor não pode ser vazia");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-
-        if (veiculo.getHoraEntrada() == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Hora de entrada não pode ser nula");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        ResponseEntity<Object> validacao = validarCampos(veiculo, true);
+        if (validacao != null) {
+            return validacao;
         }
 
         if (veiculoService.verificarPlacaCadastrada(veiculo.getPlaca())) {
-            ErrorResponse errorResponse = new ErrorResponse("Placa já cadastrada");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-
-        if (veiculo.getTipoVeiculo() == null || veiculo.getTipoVeiculo().trim().isEmpty()) {
-            ErrorResponse errorResponse = new ErrorResponse("Tipo de veículo não pode ser vazio");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            return erro("Placa já cadastrada", HttpStatus.BAD_REQUEST);
         }
 
         try {
             Veiculo veiculoCadastrado = veiculoService.cadastrarVeiculo(
-                    veiculo.getPlaca(), veiculo.getHoraEntrada(),
-                    veiculo.getTipoVeiculo(), veiculo.getModelo(), veiculo.getCor());
+                    veiculo.getPlaca(),
+                    veiculo.getHoraEntrada(),
+                    veiculo.getTipoVeiculo(),
+                    veiculo.getModelo(),
+                    veiculo.getCor()
+            );
             return ResponseEntity.status(HttpStatus.CREATED).body(veiculoCadastrado);
         } catch (IllegalArgumentException e) {
-            ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            return erro(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> atualizarVeiculo(@PathVariable Long id, @RequestBody Veiculo veiculo) {
-        if (veiculo.getPlaca() == null || veiculo.getPlaca().trim().isEmpty()) {
-            ErrorResponse errorResponse = new ErrorResponse("Placa não pode ser vazia");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    public ResponseEntity<Object> atualizarVeiculo(@PathVariable Long id,
+                                                   @RequestBody Veiculo veiculo) {
+        ResponseEntity<Object> validacao = validarCampos(veiculo, false);
+        if (validacao != null) {
+            return validacao;
         }
 
-        if (veiculo.getModelo() == null || veiculo.getModelo().trim().isEmpty()) {
-            ErrorResponse errorResponse = new ErrorResponse("Modelo não pode ser vazio");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-
-        if (veiculo.getCor() == null || veiculo.getCor().trim().isEmpty()) {
-            ErrorResponse errorResponse = new ErrorResponse("Cor não pode ser vazia");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-
-        if (veiculo.getHoraEntrada() == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Hora de entrada não pode ser nula");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-
-        Veiculo veiculoExistente = veiculoService.atualizarVeiculo(id, veiculo.getPlaca(),
-                veiculo.getTipoVeiculo(), veiculo.getModelo(), veiculo.getCor());
+        Veiculo veiculoExistente = veiculoService.atualizarVeiculo(
+                id,
+                veiculo.getPlaca(),
+                veiculo.getTipoVeiculo(),
+                veiculo.getModelo(),
+                veiculo.getCor()
+        );
 
         if (veiculoExistente == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Veículo não encontrado");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            return erro("Veículo não encontrado", HttpStatus.NOT_FOUND);
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(veiculoExistente);
+        return ResponseEntity.ok(veiculoExistente);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deletarVeiculo(@PathVariable Long id) {
         try {
             veiculoService.deletarVeiculo(id);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
-            ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            return erro(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
+    private ResponseEntity<Object> validarCampos(Veiculo veiculo, boolean validarTipo) {
+        if (veiculo.getPlaca() == null || veiculo.getPlaca().trim().isEmpty()) {
+            return erro("Placa não pode ser vazia", HttpStatus.BAD_REQUEST);
+        }
+        if (validarTipo && (veiculo.getTipoVeiculo() == null || veiculo.getTipoVeiculo().trim().isEmpty())) {
+            return erro("Tipo de veículo não pode ser vazio", HttpStatus.BAD_REQUEST);
+        }
+        if (veiculo.getModelo() == null || veiculo.getModelo().trim().isEmpty()) {
+            return erro("Modelo não pode ser vazio", HttpStatus.BAD_REQUEST);
+        }
+        if (veiculo.getCor() == null || veiculo.getCor().trim().isEmpty()) {
+            return erro("Cor não pode ser vazia", HttpStatus.BAD_REQUEST);
+        }
+        if (veiculo.getHoraEntrada() == null) {
+            return erro("Hora de entrada não pode ser nula", HttpStatus.BAD_REQUEST);
+        }
+        return null;
+    }
 
+    private ResponseEntity<Object> erro(String mensagem, HttpStatus status) {
+        return ResponseEntity.status(status).body(new ErrorResponse(mensagem));
+    }
 }
