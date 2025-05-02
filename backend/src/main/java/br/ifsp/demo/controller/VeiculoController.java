@@ -44,6 +44,11 @@ public class VeiculoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
+        if (veiculo.getTipoVeiculo() == null || veiculo.getTipoVeiculo().trim().isEmpty()) {
+            ErrorResponse errorResponse = new ErrorResponse("Tipo de veículo não pode ser vazio");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
         try {
             Veiculo veiculoCadastrado = veiculoService.cadastrarVeiculo(
                     veiculo.getPlaca(), veiculo.getHoraEntrada(),
