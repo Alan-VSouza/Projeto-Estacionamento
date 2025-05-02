@@ -76,4 +76,33 @@ public class PagamentoController {
 
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> atualizarPagamento(@PathVariable UUID id, @RequestBody Pagamento pagamentoAtualizado) {
+
+        if(id == null) {
+            ErrorResponse errorResponse = new ErrorResponse("Id do pagamento não pode ser nulo");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        if(pagamentoAtualizado == null) {
+            ErrorResponse errorResponse = new ErrorResponse("Pagamento atualizado não pode ser nulo");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        try {
+            Pagamento pagamento = pagamentoService.atualizarPagamento(
+                    pagamentoAtualizado.getUuid(),
+                    pagamentoAtualizado.getHoraEntrada(),
+                    pagamentoAtualizado.getHoraSaida(),
+                    pagamentoAtualizado.getVeiculo(),
+                    pagamentoAtualizado.getValor()
+            );
+            return ResponseEntity.ok(pagamento);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+        }
+
+    }
+
 }
