@@ -112,5 +112,13 @@ public class PagamentoService {
         return pagamentoRepository.findById(uuid).get();
     }
 
+    public List<Pagamento> buscarPorData(LocalDate data) {
+
+        LocalDateTime inicio = data.atStartOfDay();
+        LocalDateTime fim = data.atTime(23, 59, 59);
+
+        return pagamentoRepository.findByHoraSaidaBetween(inicio, fim);
+
+    }
 
 }
