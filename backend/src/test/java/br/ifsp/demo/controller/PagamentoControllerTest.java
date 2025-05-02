@@ -123,6 +123,23 @@ class PagamentoControllerTest {
                     .andExpect(jsonPath("$.valor").value(35.0));
         }
 
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar um pagamento ao pesquisar por id")
+        void deveRetornarUmPagamentoAoPesquisarPorId() throws Exception {
+            Pagamento pagamento = new Pagamento(veiculo);
+            pagamento.setUuid(UUID.randomUUID());
+            pagamento.setValor(35.0);
+
+            when(pagamentoService.buscarPorId(pagamento.getUuid())).thenReturn(pagamento);
+
+            mockMvc.perform(get("/api/pagamento/{id}", pagamento.getUuid()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.valor").value(35.0));
+
+        }
+
     }
 
 }
