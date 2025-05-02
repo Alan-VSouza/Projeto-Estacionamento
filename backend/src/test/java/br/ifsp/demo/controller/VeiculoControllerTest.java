@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -240,6 +241,31 @@ class VeiculoControllerTest {
                         .content(objectMapper.writeValueAsString(veiculo)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Tipo de veículo não pode ser vazio"));
+    }
+
+    @Test
+    @Tag("TDD")
+    @DisplayName("Deve buscar veículo por placa com sucesso")
+    void deveBuscarVeiculoPorPlacaComSucesso() throws Exception {
+        String placa = "ABC1234";
+        Veiculo veiculo = new Veiculo();
+        veiculo.setId(1L);
+        veiculo.setPlaca(placa);
+        veiculo.setTipoVeiculo("carro");
+        veiculo.setModelo("Fusca");
+        veiculo.setCor("azul");
+        veiculo.setHoraEntrada(LocalDateTime.now());
+
+        when(veiculoService.buscarPorPlaca(eq(placa))).thenReturn(Optional.of(veiculo));
+
+        mockMvc.perform(get("/api/veiculos/search")
+                        .param("placa", placa)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.placa").value(placa))
+                .andExpect(jsonPath("$.modelo").value("Fusca"));
+
+        verify(veiculoService, times(1)).buscarPorPlaca(placa);
     }
 
 
