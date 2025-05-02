@@ -1,6 +1,6 @@
 package br.ifsp.demo.controller;
 
-import br.ifsp.demo.dto.ErrorResponse;
+import br.ifsp.demo.exception.ErrorResponse;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.service.PagamentoService;
 import org.springframework.http.HttpStatus;
@@ -51,5 +51,4 @@ public class PagamentoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
-
 }

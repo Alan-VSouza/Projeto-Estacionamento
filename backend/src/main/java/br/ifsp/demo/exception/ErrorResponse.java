@@ -1,4 +1,4 @@
-package br.ifsp.demo.dto;
+package br.ifsp.demo.exception;
 
 import lombok.Getter;
 import lombok.Setter;

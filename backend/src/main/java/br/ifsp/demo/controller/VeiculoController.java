@@ -1,7 +1,7 @@
 package br.ifsp.demo.controller;
 
 import br.ifsp.demo.model.Veiculo;
-import br.ifsp.demo.dto.ErrorResponse;
+import br.ifsp.demo.exception.ErrorResponse;
 import br.ifsp.demo.service.VeiculoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
