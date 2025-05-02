@@ -54,6 +54,11 @@ public class PagamentoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> excluirPagamento(@PathVariable UUID id) {
 
+        if(id == null) {
+            ErrorResponse errorResponse = new ErrorResponse("Id do pagamento não pode ser nulo");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
         try {
             Pagamento pagamento = pagamentoService.buscarPorId(id);
             pagamentoService.deletarPagamento(pagamento);
