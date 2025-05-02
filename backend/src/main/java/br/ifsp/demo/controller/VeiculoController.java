@@ -75,6 +75,16 @@ public class VeiculoController {
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Object> buscarPorPlaca(@RequestParam String placa) {
+        return veiculoService.buscarPorPlaca(placa)
+                .<ResponseEntity<Object>>map(ResponseEntity::ok)
+                .orElseGet(() ->
+                        ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(new ErrorResponse("Veículo não encontrado"))
+                );
+    }
+
     private ResponseEntity<Object> validarCampos(Veiculo veiculo, boolean validarTipo) {
         if (veiculo.getPlaca() == null || veiculo.getPlaca().trim().isEmpty()) {
             return erro("Placa não pode ser vazia", HttpStatus.BAD_REQUEST);
