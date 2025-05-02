@@ -51,5 +51,22 @@ public class PagamentoController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> excluirPagamento(@PathVariable UUID id) {
+
+        try {
+            Pagamento pagamento = pagamentoService.buscarPorId(id);
+            pagamentoService.deletarPagamento(pagamento);
+
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        catch(Exception e) {
+
+            ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+
+        }
+
+    }
 
 }
