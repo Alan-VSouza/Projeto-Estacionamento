@@ -99,6 +99,30 @@ class PagamentoControllerTest {
                     .andExpect(status().isNoContent());
         }
 
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve atualizar o pagamento com sucesso")
+        void deveAtualizarPagamentoComSucesso() throws Exception {
+            Pagamento pagamento = new Pagamento(veiculo);
+            pagamento.setUuid(UUID.randomUUID());
+            pagamento.setValor(35.0);
+
+            when(pagamentoService.atualizarPagamento(
+                    any(UUID.class),
+                    any(LocalDateTime.class),
+                    any(LocalDateTime.class),
+                    any(Veiculo.class),
+                    any(Double.class)
+                    )).thenReturn(pagamento);
+
+            mockMvc.perform(put("/api/pagamento/{id}", pagamento.getUuid())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(pagamento)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.valor").value(35.0));
+        }
+
     }
 
 }
