@@ -105,4 +105,22 @@ public class PagamentoController {
 
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> buscarPagamentoPorId(@PathVariable UUID id) {
+
+        if(id == null) {
+            ErrorResponse errorResponse = new ErrorResponse("Id do pagamento não pode ser nulo");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        try {
+            Pagamento pagamento = pagamentoService.buscarPorId(id);
+            return ResponseEntity.ok(pagamento);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }
+
+    }
+
 }
