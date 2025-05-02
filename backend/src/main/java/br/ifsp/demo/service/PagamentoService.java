@@ -114,6 +114,9 @@ public class PagamentoService {
 
     public List<Pagamento> buscarPorData(LocalDate data) {
 
+        if(data == null)
+            throw new IllegalArgumentException("Data nao pode ser nulo");
+
         LocalDateTime inicio = data.atStartOfDay();
         LocalDateTime fim = data.atTime(23, 59, 59);
 
