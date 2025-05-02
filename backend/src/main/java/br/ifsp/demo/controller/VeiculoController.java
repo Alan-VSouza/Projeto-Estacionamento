@@ -19,24 +19,18 @@ public class VeiculoController {
 
     @PostMapping
     public ResponseEntity<Object> cadastrarVeiculo(@RequestBody Veiculo veiculo) {
-        ResponseEntity<Object> validacao = validarCampos(veiculo, true);
-        if (validacao != null) {
-            return validacao;
-        }
+        ResponseEntity<Object> valid = validarCampos(veiculo, true);
+        if (valid != null) return valid;
 
-        if (veiculoService.verificarPlacaCadastrada(veiculo.getPlaca())) {
+        if (veiculoService.buscarPorPlaca(veiculo.getPlaca()).isPresent()) {
             return erro("Placa já cadastrada", HttpStatus.BAD_REQUEST);
         }
 
         try {
-            Veiculo veiculoCadastrado = veiculoService.cadastrarVeiculo(
-                    veiculo.getPlaca(),
-                    veiculo.getHoraEntrada(),
-                    veiculo.getTipoVeiculo(),
-                    veiculo.getModelo(),
-                    veiculo.getCor()
-            );
-            return ResponseEntity.status(HttpStatus.CREATED).body(veiculoCadastrado);
+            Veiculo saved = veiculoService.cadastrarVeiculo(
+                    veiculo.getPlaca(), veiculo.getHoraEntrada(),
+                    veiculo.getTipoVeiculo(), veiculo.getModelo(), veiculo.getCor());
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
         } catch (IllegalArgumentException e) {
             return erro(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

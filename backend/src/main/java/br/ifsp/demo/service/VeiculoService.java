@@ -20,67 +20,47 @@ public class VeiculoService {
         this.veiculoRepository = veiculoRepository;
     }
 
-    public Veiculo cadastrarVeiculo(String placa, LocalDateTime horaEntrada, String tipoVeiculo, String modelo, String cor) {
+    public Veiculo cadastrarVeiculo(String placa, LocalDateTime horaEntrada,
+                                    String tipoVeiculo, String modelo, String cor) {
         if (placa == null || placa.trim().isEmpty()) {
             throw new IllegalArgumentException("Placa não pode ser vazia");
         }
-
-        if (modelo == null || modelo.trim().isEmpty()) {
-            throw new IllegalArgumentException("Modelo não pode ser vazio");
-        }
-
-        if (cor == null || cor.trim().isEmpty()) {
-            throw new IllegalArgumentException("Cor não pode ser vazia");
-        }
-
         if (horaEntrada == null || horaEntrada.isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Hora de entrada não pode ser nula");
         }
-
         if (veiculoRepository.findByPlaca(placa).isPresent()) {
             throw new IllegalArgumentException("Placa já cadastrada");
         }
-
-        Veiculo veiculo = new Veiculo();
-        veiculo.setPlaca(placa);
-        veiculo.setTipoVeiculo(tipoVeiculo);
-        veiculo.setModelo(modelo);
-        veiculo.setCor(cor);
-        veiculo.setHoraEntrada(horaEntrada);
-
-        return veiculoRepository.save(veiculo);
+        Veiculo v = new Veiculo();
+        v.setPlaca(placa);
+        v.setTipoVeiculo(tipoVeiculo);
+        v.setModelo(modelo);
+        v.setCor(cor);
+        v.setHoraEntrada(horaEntrada);
+        return veiculoRepository.save(v);
     }
 
-    public Veiculo atualizarVeiculo(Long id, String placa, String tipoVeiculo, String modelo, String cor) {
+    public Veiculo atualizarVeiculo(Long id, String placa,
+                                    String tipoVeiculo, String modelo, String cor) {
         if (placa == null || placa.trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Placa não pode ser vazia");
         }
-
-        Optional<Veiculo> veiculoOptional = veiculoRepository.findById(id);
-        Veiculo veiculo = veiculoOptional.orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Veículo não encontrado")
-        );
-
-        veiculo.setPlaca(placa);
-        veiculo.setTipoVeiculo(tipoVeiculo);
-        veiculo.setModelo(modelo);
-        veiculo.setCor(cor);
-
-        return veiculoRepository.save(veiculo);
+        Veiculo v = veiculoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veículo não encontrado"));
+        v.setPlaca(placa);
+        v.setTipoVeiculo(tipoVeiculo);
+        v.setModelo(modelo);
+        v.setCor(cor);
+        return veiculoRepository.save(v);
     }
 
     public void deletarVeiculo(Long id) {
-        Veiculo veiculo = veiculoRepository.findById(id)
+        Veiculo v = veiculoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
-        veiculoRepository.delete(veiculo);
+        veiculoRepository.delete(v);
     }
 
     public Optional<Veiculo> buscarPorPlaca(String placa) {
         return veiculoRepository.findByPlaca(placa);
     }
-
-    public boolean verificarPlacaCadastrada(String placa) {
-        return veiculoRepository.findByPlaca(placa).isPresent();
-    }
-
 }
