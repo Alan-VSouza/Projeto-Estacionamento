@@ -21,16 +21,16 @@ public class Pagamento {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID uuid;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String placa;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private LocalDateTime horaEntrada;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private LocalDateTime horaSaida;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private double valor;
 
     @Override
