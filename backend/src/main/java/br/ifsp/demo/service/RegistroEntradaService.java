@@ -22,11 +22,8 @@ public class RegistroEntradaService {
     }
 
     public RegistroEntrada registrarEntrada(String placa) {
-        Veiculo veiculo = veiculoRepository.findByPlaca(placa).orElse(null);
-
-        if (veiculo == null) {
-            return null;
-        }
+        Veiculo veiculo = veiculoRepository.findByPlaca(placa)
+                .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
 
         boolean veiculoRegistrado = registroEntradaRepository.findByVeiculo(veiculo).isPresent();
         if (veiculoRegistrado) {
