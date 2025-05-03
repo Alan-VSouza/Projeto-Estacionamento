@@ -124,4 +124,28 @@ public class PagamentoController {
 
     }
 
+    @GetMapping("/data")
+    public ResponseEntity<Object> buscarPagamentoPorData(@RequestParam("data") String data) {
+
+        if(data == null || data.isBlank()) {
+            ErrorResponse errorResponse = new ErrorResponse("Data não pode ser nula nem vazia");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        try {
+            LocalDate dataFormatada = LocalDate.parse(data);
+            var pagamentos = pagamentoService.buscarPorData(dataFormatada);
+
+            if(pagamentos.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Nenhum pagamento encontrado nessa data"));
+            }
+
+            return ResponseEntity.ok(pagamentos);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+        }
+
+    }
+
 }
