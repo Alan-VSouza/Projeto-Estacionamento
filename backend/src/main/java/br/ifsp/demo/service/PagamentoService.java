@@ -124,4 +124,16 @@ public class PagamentoService {
 
     }
 
+    public double calcularTotalArrecadadoPorData(LocalDate data) {
+        if (data == null)
+            throw new IllegalArgumentException("Data não pode ser nula");
+
+        LocalDateTime inicio = data.atStartOfDay();
+        LocalDateTime fim = data.atTime(23, 59, 59);
+
+        Double total = pagamentoRepository.somarPagamentosPorData(inicio, fim);
+        return total != null ? total : 0.0;
+    }
+
+
 }
