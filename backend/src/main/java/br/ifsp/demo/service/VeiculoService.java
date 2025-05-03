@@ -31,13 +31,15 @@ public class VeiculoService {
         if (veiculoRepository.findByPlaca(placa).isPresent()) {
             throw new IllegalArgumentException("Placa já cadastrada");
         }
-        Veiculo v = new Veiculo();
-        v.setPlaca(placa);
-        v.setTipoVeiculo(tipoVeiculo);
-        v.setModelo(modelo);
-        v.setCor(cor);
-        v.setHoraEntrada(horaEntrada);
-        return veiculoRepository.save(v);
+
+        Veiculo novoVeiculo = new Veiculo();
+        novoVeiculo.setPlaca(placa);
+        novoVeiculo.setTipoVeiculo(tipoVeiculo);
+        novoVeiculo.setModelo(modelo);
+        novoVeiculo.setCor(cor);
+        novoVeiculo.setHoraEntrada(horaEntrada);
+
+        return veiculoRepository.save(novoVeiculo);
     }
 
     public Veiculo atualizarVeiculo(Long id, String placa,
@@ -45,19 +47,22 @@ public class VeiculoService {
         if (placa == null || placa.trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Placa não pode ser vazia");
         }
-        Veiculo v = veiculoRepository.findById(id)
+
+        Veiculo veiculoExistente = veiculoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veículo não encontrado"));
-        v.setPlaca(placa);
-        v.setTipoVeiculo(tipoVeiculo);
-        v.setModelo(modelo);
-        v.setCor(cor);
-        return veiculoRepository.save(v);
+
+        veiculoExistente.setPlaca(placa);
+        veiculoExistente.setTipoVeiculo(tipoVeiculo);
+        veiculoExistente.setModelo(modelo);
+        veiculoExistente.setCor(cor);
+
+        return veiculoRepository.save(veiculoExistente);
     }
 
     public void deletarVeiculo(Long id) {
-        Veiculo v = veiculoRepository.findById(id)
+        Veiculo veiculoParaDeletar = veiculoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
-        veiculoRepository.delete(v);
+        veiculoRepository.delete(veiculoParaDeletar);
     }
 
     public Optional<Veiculo> buscarPorPlaca(String placa) {
