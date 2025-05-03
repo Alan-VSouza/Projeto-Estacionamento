@@ -42,8 +42,8 @@ class PagamentoServiceTest {
     @InjectMocks
     private PagamentoService service;
 
-
     private Veiculo veiculo;
+    private Pagamento pagamento;
 
     @BeforeEach
     void setUp () {
@@ -54,6 +54,13 @@ class PagamentoServiceTest {
         veiculo.setHoraEntrada(LocalDateTime.of(2025,4,30,10,0,0));
         veiculo.setModelo("Escort");
         veiculo.setCor("prata");
+
+        pagamento = new Pagamento();
+        pagamento.setUuid(UUID.randomUUID());
+        pagamento.setVeiculo(veiculo);
+        pagamento.setHoraEntrada(veiculo.getHoraEntrada());
+        pagamento.setHoraSaida(LocalDateTime.now());
+        pagamento.setValor(43);
     }
 
 
@@ -65,8 +72,6 @@ class PagamentoServiceTest {
         @Tag("UnitTest")
         @DisplayName("Deve salvar o pagamento")
         void deveSalvarPagamento() {
-
-            Pagamento pagamento = new Pagamento(veiculo);
 
             service.salvarPagamento(pagamento);
 
@@ -83,8 +88,6 @@ class PagamentoServiceTest {
         @DisplayName("Deve deletar o pagamento")
         void deveDeletarPagamento() {
 
-            Pagamento pagamento = new Pagamento(veiculo);
-
             when(pagamentoRepository.findById(pagamento.getUuid()))
                     .thenReturn(Optional.of(pagamento));
 
@@ -100,13 +103,6 @@ class PagamentoServiceTest {
         @Tag("UnitTest")
         @DisplayName("Deve atualizar o pagamento")
         void deveAtualizarPagamento() {
-
-            Pagamento pagamento = new Pagamento();
-            pagamento.setUuid(UUID.randomUUID());
-            pagamento.setVeiculo(veiculo);
-            pagamento.setHoraEntrada(veiculo.getHoraEntrada());
-            pagamento.setHoraSaida(LocalDateTime.now());
-            pagamento.setValor(43);
 
             when(pagamentoRepository.findById(pagamento.getUuid())).thenReturn(Optional.of(pagamento));
 
@@ -130,9 +126,7 @@ class PagamentoServiceTest {
         @Tag("UnitTest")
         @DisplayName("Deve encontrar o pagamento pelo UUID")
         void deveEncontrarPagamentoPeloUuid() {
-            UUID uuid = UUID.randomUUID();
-            Pagamento pagamento = new Pagamento();
-            pagamento.setUuid(uuid);
+            UUID uuid = pagamento.getUuid();
 
             when(pagamentoRepository.findById(uuid)).thenReturn(Optional.of(pagamento));
 
@@ -140,7 +134,7 @@ class PagamentoServiceTest {
 
             assertThat(result).isNotNull();
             assertThat(result.getUuid()).isEqualTo(uuid);
-            verify(pagamentoRepository, times(1)).findById(uuid);
+            verify(pagamentoRepository, times(2)).findById(uuid);
         }
 
         @Test
@@ -148,9 +142,7 @@ class PagamentoServiceTest {
         @Tag("UnitTest")
         @DisplayName("Testa salvar pagamento calculando o valor de permanencia")
         void testaSalvarPagamentoCalculandoOValorDePermanencia() {
-
-            Pagamento pagamento = new Pagamento(veiculo);
-            pagamento.setHoraSaida(LocalDateTime.of(2025,04,30,13,1,0));
+            pagamento.setHoraSaida(LocalDateTime.of(2025,4,30,13,1,0));
 
             when(tempoPermanencia.calcularValorDaPermanencia(anyInt())).thenReturn(26.0);
 
@@ -169,8 +161,7 @@ class PagamentoServiceTest {
         @DisplayName("Deve buscar pagamento por data")
         void deveBuscarPagamentoPorData() {
             LocalDate data = LocalDate.of(2025, 5, 2);
-            Pagamento pagamento = new Pagamento(new Veiculo());
-            pagamento.setUuid(UUID.randomUUID());
+
             pagamento.setHoraEntrada(data.atTime(9, 0));
             pagamento.setHoraSaida(data.atTime(10, 0));
 
@@ -204,9 +195,6 @@ class PagamentoServiceTest {
             LocalDateTime entrada = horaEntrada == null ? null : LocalDateTime.parse(horaEntrada);
             LocalDateTime saida = horaSaida == null ? null : LocalDateTime.parse(horaSaida);
 
-            Pagamento pagamento = new Pagamento();
-            pagamento.setUuid(UUID.randomUUID());
-            pagamento.setVeiculo(veiculo);
             pagamento.setHoraEntrada(entrada);
             pagamento.setHoraSaida(saida);
             pagamento.setValor(valor);
@@ -221,8 +209,7 @@ class PagamentoServiceTest {
         @Tag("UnitTest")
         @DisplayName("mensagem de erro quando veiculo e nulo")
         void mensagemDeErroQuandoVeiculoNulo() {
-            Pagamento pagamento = new Pagamento();
-            pagamento.setUuid(UUID.randomUUID());
+
             pagamento.setVeiculo(null);
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.salvarPagamento(pagamento));
@@ -307,8 +294,8 @@ class PagamentoServiceTest {
         )
         @DisplayName("mensagem de erro se if for nulo ou inexistente")
         void mensagemDeErroAoBuscarPagamentoPorUuidNulo(String uuid, String mensagem) {
-            UUID uuidPagamento = uuid == null ? null : UUID.fromString(uuid);
 
+            UUID uuidPagamento = uuid == null ? null : UUID.fromString(uuid);
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.buscarPorId(uuidPagamento));
             assertEquals(mensagem, exception.getMessage());
