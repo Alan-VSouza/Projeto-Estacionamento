@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -128,6 +129,26 @@ class PagamentoControllerTest {
             mockMvc.perform(get("/api/pagamento/{id}", pagamento.getUuid()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.valor").value(35.0));
+
+        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve buscar pagamentos por data com sucesso")
+        void deveBuscarPagamentosPorDataComSucesso() throws Exception {
+
+            LocalDate data = LocalDate.of(2025,4,1);
+            LocalDateTime hora = data.atTime(10,0);
+
+            pagamento.setHoraSaida(hora);
+
+            when(pagamentoService.buscarPorData(data)).thenReturn(Collections.singletonList(pagamento));
+
+            mockMvc.perform(get("/api/pagamento/data")
+                            .param("data", "2025-04-01"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(1));
 
         }
 
