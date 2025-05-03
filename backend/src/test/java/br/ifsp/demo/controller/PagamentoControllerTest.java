@@ -14,7 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -37,7 +39,7 @@ class PagamentoControllerTest {
     private ObjectMapper objectMapper;
 
     private Veiculo veiculo;
-
+    private Pagamento pagamento;
     @BeforeEach
     void setUp() {
 
@@ -58,6 +60,9 @@ class PagamentoControllerTest {
         veiculo.setCor("prata");
         veiculo.setHoraEntrada(LocalDateTime.now().minusHours(6));
 
+        pagamento = new Pagamento(veiculo);
+        pagamento.setUuid(UUID.randomUUID());
+        pagamento.setValor(35.0);
     }
 
     @Nested
@@ -69,9 +74,6 @@ class PagamentoControllerTest {
         @Tag("UnitTest")
         @DisplayName("Deve criar o pagamento com sucesso")
         void deveCriarPagamentoComSucesso() throws Exception {
-
-            Pagamento pagamento = new Pagamento(veiculo);
-            pagamento.setValor(35.0);
 
             doNothing().when(pagamentoService).salvarPagamento(any(Pagamento.class));
 
@@ -88,10 +90,6 @@ class PagamentoControllerTest {
         @DisplayName("Deve deletar o pagamento com sucesso")
         void deveDeletarPagamentoComSucesso() throws Exception {
 
-            Pagamento pagamento = new Pagamento(veiculo);
-            pagamento.setUuid(UUID.randomUUID());
-            pagamento.setValor(35.0);
-
             when(pagamentoService.buscarPorId(pagamento.getUuid())).thenReturn(pagamento);
             doNothing().when(pagamentoService).deletarPagamento(pagamento);
 
@@ -104,9 +102,6 @@ class PagamentoControllerTest {
         @Tag("UnitTest")
         @DisplayName("Deve atualizar o pagamento com sucesso")
         void deveAtualizarPagamentoComSucesso() throws Exception {
-            Pagamento pagamento = new Pagamento(veiculo);
-            pagamento.setUuid(UUID.randomUUID());
-            pagamento.setValor(35.0);
 
             when(pagamentoService.atualizarPagamento(
                     any(UUID.class),
@@ -128,9 +123,6 @@ class PagamentoControllerTest {
         @Tag("UnitTest")
         @DisplayName("Deve retornar um pagamento ao pesquisar por id")
         void deveRetornarUmPagamentoAoPesquisarPorId() throws Exception {
-            Pagamento pagamento = new Pagamento(veiculo);
-            pagamento.setUuid(UUID.randomUUID());
-            pagamento.setValor(35.0);
 
             when(pagamentoService.buscarPorId(pagamento.getUuid())).thenReturn(pagamento);
 
