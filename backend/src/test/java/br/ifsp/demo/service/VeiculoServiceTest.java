@@ -44,8 +44,8 @@ class VeiculoServiceTest {
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
-    @DisplayName("Deve salvar o veículo corretamente")
-    void deveSalvarVeiculoComSucesso() {
+    @DisplayName("Salvar veículo com dados válidos deve ter sucesso")
+    void salvarVeiculo_quandoDadosValidos_deveTerSucesso() {
         when(veiculoRepository.findByPlaca("ABC1234")).thenReturn(Optional.empty());
         when(veiculoRepository.save(any(Veiculo.class))).thenReturn(veiculoValido);
 
@@ -64,8 +64,8 @@ class VeiculoServiceTest {
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
-    @DisplayName("Não deve salvar sem placa válida")
-    void naoDeveSalvarSemPlacaValida() {
+    @DisplayName("Salvar veículo sem placa válida deve lançar exceção")
+    void salvarVeiculo_quandoPlacaVazia_deveLancarIllegalArgumentException() {
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> veiculoService.cadastrarVeiculo("", entradaValida, "carro", "Fusca", "azul")
@@ -75,8 +75,8 @@ class VeiculoServiceTest {
     }
 
     @Test
-    @DisplayName("Não deve salvar com hora de entrada passada")
-    void naoDeveSalvarComHoraEntradaPassada() {
+    @DisplayName("Salvar veículo com hora de entrada passada deve lançar exceção")
+    void salvarVeiculo_quandoHoraEntradaPassada_deveLancarIllegalArgumentException() {
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> veiculoService.cadastrarVeiculo("ABC1234", LocalDateTime.now().minusDays(1), "carro", "Fusca", "azul")
@@ -86,8 +86,8 @@ class VeiculoServiceTest {
     }
 
     @Test
-    @DisplayName("Não deve salvar placa duplicada")
-    void naoDeveSalvarPlacaDuplicada() {
+    @DisplayName("Salvar veículo com placa duplicada deve lançar exceção")
+    void salvarVeiculo_quandoPlacaDuplicada_deveLancarIllegalArgumentException() {
         when(veiculoRepository.findByPlaca("ABC1234")).thenReturn(Optional.of(veiculoValido));
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
@@ -100,8 +100,8 @@ class VeiculoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve atualizar veículo existente")
-    void deveAtualizarVeiculoComSucesso() {
+    @DisplayName("Atualizar veículo existente deve retornar veículo atualizado")
+    void atualizarVeiculo_quandoExistente_deveRetornarVeiculoAtualizado() {
         when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculoValido));
         when(veiculoRepository.save(any())).thenReturn(veiculoValido);
 
@@ -114,8 +114,8 @@ class VeiculoServiceTest {
     }
 
     @Test
-    @DisplayName("Não deve atualizar veículo inexistente")
-    void naoDeveAtualizarVeiculoInexistente() {
+    @DisplayName("Atualizar veículo inexistente deve lançar exceção")
+    void atualizarVeiculo_quandoInexistente_deveLancarResponseStatusException() {
         when(veiculoRepository.findById(2L)).thenReturn(Optional.empty());
         ResponseStatusException ex = assertThrows(
                 ResponseStatusException.class,
@@ -126,16 +126,16 @@ class VeiculoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve deletar veículo existente")
-    void deveDeletarVeiculoComSucesso() {
+    @DisplayName("Deletar veículo existente deve remover veículo")
+    void deletarVeiculo_quandoExistente_deveRemoverVeiculo() {
         when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculoValido));
         veiculoService.deletarVeiculo(1L);
         verify(veiculoRepository).delete(veiculoValido);
     }
 
     @Test
-    @DisplayName("Não deve deletar veículo inexistente")
-    void naoDeveDeletarVeiculoInexistente() {
+    @DisplayName("Deletar veículo inexistente deve lançar exceção")
+    void deletarVeiculo_quandoInexistente_deveLancarIllegalArgumentException() {
         when(veiculoRepository.findById(3L)).thenReturn(Optional.empty());
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
