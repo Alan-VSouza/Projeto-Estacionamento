@@ -1,6 +1,8 @@
 package br.ifsp.demo.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.persistence.*;
 
@@ -11,30 +13,25 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class Pagamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID uuid;
 
-    @ManyToOne
-    @JoinColumn(name = "placa", referencedColumnName = "placa", nullable = false)
-    private Veiculo veiculo;
+    @Column(unique = true, nullable = false)
+    private String placa;
 
+    @Column(unique = true, nullable = false)
     private LocalDateTime horaEntrada;
 
+    @Column(unique = true, nullable = false)
     private LocalDateTime horaSaida;
 
+    @Column(unique = true, nullable = false)
     private double valor;
-
-    public Pagamento() {}
-
-    public Pagamento(Veiculo veiculo) {
-        this.veiculo = veiculo;
-        this.horaEntrada = veiculo.getHoraEntrada();
-        this.horaSaida = LocalDateTime.now();
-        this.valor = 0.0;
-    }
 
     @Override
     public boolean equals(Object o) {
