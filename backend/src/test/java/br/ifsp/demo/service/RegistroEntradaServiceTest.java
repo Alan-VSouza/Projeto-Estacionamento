@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -92,5 +93,26 @@ public class RegistroEntradaServiceTest {
 
         assertEquals(MENSAGEM_VEICULO_JA_REGISTRADO, ex.getMessage());
         verify(registroEntradaRepository, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve registrar corretamente o horário de entrada do veículo")
+    public void registrarEntrada_comHorarioCorreto() {
+        when(veiculoRepository.findByPlaca("ABC1234")).thenReturn(Optional.of(veiculo));
+
+        when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
+
+        when(registroEntradaRepository.save(any())).thenAnswer(invocation -> {
+            RegistroEntrada entrada = invocation.getArgument(0);
+            entrada.setHoraEntrada(LocalDateTime.now());
+            return entrada;
+        });
+
+        RegistroEntrada resultado = registroEntradaService.registrarEntrada("ABC1234");
+
+        assertNotNull(resultado);
+        assertEquals(veiculo, resultado.getVeiculo());
+        assertNotNull(resultado.getHoraEntrada());
+        verify(registroEntradaRepository, times(1)).save(any());
     }
 }
