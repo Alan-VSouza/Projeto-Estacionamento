@@ -6,6 +6,7 @@ import br.ifsp.demo.repository.RegistroEntradaRepository;
 import br.ifsp.demo.repository.VeiculoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,7 +23,6 @@ import static org.mockito.Mockito.*;
 public class RegistroEntradaServiceTest {
 
     private static final String PLACA_VEICULO = "ABC1234";
-    private static final String MENSAGEM_VEICULO_NAO_ENCONTRADO = "Veículo não encontrado";
     private static final String MENSAGEM_VEICULO_JA_REGISTRADO = "Veículo já registrado no estacionamento";
 
     @Mock
@@ -59,6 +59,8 @@ public class RegistroEntradaServiceTest {
     }
 
     @Test
+    @Tag("UnitTest")
+    @Tag("TDD")
     @DisplayName("Deve registrar entrada com sucesso quando veículo não estiver registrado")
     public void registrarEntrada_comSucesso() {
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
@@ -72,6 +74,8 @@ public class RegistroEntradaServiceTest {
     }
 
     @Test
+    @Tag("UnitTest")
+    @Tag("TDD")
     @DisplayName("Deve lançar IllegalArgumentException quando o veículo já estiver registrado")
     public void registrarEntrada_veiculoJaRegistrado() {
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
@@ -84,6 +88,7 @@ public class RegistroEntradaServiceTest {
     }
 
     @Test
+    @Tag("UnitTest")
     @DisplayName("Deve registrar corretamente o horário de entrada do veículo")
     public void registrarEntrada_comHorarioCorreto() {
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
