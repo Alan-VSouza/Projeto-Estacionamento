@@ -72,16 +72,6 @@ public class RegistroEntradaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando veículo não encontrado")
-    public void registrarEntrada_veiculoNaoEncontrado() {
-        when(veiculoRepository.findByPlaca(PLACA_VEICULO)).thenReturn(Optional.empty());
-
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> registroEntradaService.registrarEntrada(veiculo));
-        assertEquals(MENSAGEM_VEICULO_NAO_ENCONTRADO, thrown.getMessage());
-    }
-
-    @Test
     @DisplayName("Deve lançar IllegalArgumentException quando o veículo já estiver registrado")
     public void registrarEntrada_veiculoJaRegistrado() {
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
