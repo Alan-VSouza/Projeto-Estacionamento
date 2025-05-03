@@ -61,11 +61,10 @@ public class RegistroEntradaServiceTest {
     @Test
     @DisplayName("Deve registrar entrada com sucesso quando veículo não estiver registrado")
     public void registrarEntrada_comSucesso() {
-        when(veiculoRepository.findByPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
         when(registroEntradaRepository.save(any())).thenReturn(registroEntrada);
 
-        RegistroEntrada resultado = registroEntradaService.registrarEntrada(PLACA_VEICULO);
+        RegistroEntrada resultado = registroEntradaService.registrarEntrada(veiculo);
 
         assertNotNull(resultado);
         assertEquals(veiculo, resultado.getVeiculo());
@@ -78,18 +77,17 @@ public class RegistroEntradaServiceTest {
         when(veiculoRepository.findByPlaca(PLACA_VEICULO)).thenReturn(Optional.empty());
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> registroEntradaService.registrarEntrada(PLACA_VEICULO));
+                () -> registroEntradaService.registrarEntrada(veiculo));
         assertEquals(MENSAGEM_VEICULO_NAO_ENCONTRADO, thrown.getMessage());
     }
 
     @Test
     @DisplayName("Deve lançar IllegalArgumentException quando o veículo já estiver registrado")
     public void registrarEntrada_veiculoJaRegistrado() {
-        when(veiculoRepository.findByPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> registroEntradaService.registrarEntrada(PLACA_VEICULO));
+                () -> registroEntradaService.registrarEntrada(veiculo));
 
         assertEquals(MENSAGEM_VEICULO_JA_REGISTRADO, ex.getMessage());
         verify(registroEntradaRepository, times(0)).save(any());
@@ -98,8 +96,6 @@ public class RegistroEntradaServiceTest {
     @Test
     @DisplayName("Deve registrar corretamente o horário de entrada do veículo")
     public void registrarEntrada_comHorarioCorreto() {
-        when(veiculoRepository.findByPlaca("ABC1234")).thenReturn(Optional.of(veiculo));
-
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
 
         when(registroEntradaRepository.save(any())).thenAnswer(invocation -> {
@@ -108,7 +104,7 @@ public class RegistroEntradaServiceTest {
             return entrada;
         });
 
-        RegistroEntrada resultado = registroEntradaService.registrarEntrada("ABC1234");
+        RegistroEntrada resultado = registroEntradaService.registrarEntrada(veiculo);
 
         assertNotNull(resultado);
         assertEquals(veiculo, resultado.getVeiculo());

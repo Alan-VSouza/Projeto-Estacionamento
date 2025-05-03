@@ -21,9 +21,7 @@ public class RegistroEntradaService {
         this.registroEntradaRepository = registroEntradaRepository;
     }
 
-    public RegistroEntrada registrarEntrada(String placa) {
-        Veiculo veiculo = veiculoRepository.findByPlaca(placa)
-                .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
+    public RegistroEntrada registrarEntrada(Veiculo veiculo) {
 
         registroEntradaRepository.findByVeiculo(veiculo)
                 .ifPresent(registro -> {
@@ -31,7 +29,6 @@ public class RegistroEntradaService {
                 });
 
         RegistroEntrada registroEntrada = new RegistroEntrada(veiculo);
-        registroEntrada.setHoraEntrada(LocalDateTime.now());
         return registroEntradaRepository.save(registroEntrada);
     }
 }
