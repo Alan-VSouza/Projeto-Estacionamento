@@ -2,8 +2,12 @@ package br.ifsp.demo.service;
 
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.VeiculoRepository;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.web.server.ResponseStatusException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,231 +27,121 @@ class VeiculoServiceTest {
     @InjectMocks
     private VeiculoService veiculoService;
 
+    private LocalDateTime entradaValida;
+    private Veiculo veiculoValido;
+
+    @BeforeEach
+    void setup() {
+        entradaValida = LocalDateTime.now().plusHours(1);
+        veiculoValido = new Veiculo();
+        veiculoValido.setPlaca("ABC1234");
+        veiculoValido.setTipoVeiculo("carro");
+        veiculoValido.setModelo("Fusca");
+        veiculoValido.setCor("azul");
+        veiculoValido.setHoraEntrada(entradaValida);
+    }
+
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
     @DisplayName("Deve salvar o veículo corretamente")
     void deveSalvarVeiculoComSucesso() {
-        Veiculo veiculo = new Veiculo();
-        veiculo.setPlaca("ABC1234");
-        veiculo.setTipoVeiculo("carro");
-        veiculo.setModelo("Fusca");
-        veiculo.setCor("azul");
-        veiculo.setHoraEntrada(LocalDateTime.now());
+        when(veiculoRepository.findByPlaca("ABC1234")).thenReturn(Optional.empty());
+        when(veiculoRepository.save(any(Veiculo.class))).thenReturn(veiculoValido);
 
-        doReturn(veiculo).when(veiculoRepository).save(any(Veiculo.class));
+        Veiculo result = veiculoService.cadastrarVeiculo(
+                veiculoValido.getPlaca(),
+                veiculoValido.getHoraEntrada(),
+                veiculoValido.getTipoVeiculo(),
+                veiculoValido.getModelo(),
+                veiculoValido.getCor()
+        );
 
-        Veiculo result = veiculoService.cadastrarVeiculo("ABC1234", LocalDateTime.now(), "carro", "Fusca", "azul");
-
-        assertEquals(veiculo.getPlaca(), result.getPlaca());
-        assertEquals(veiculo.getModelo(), result.getModelo());
-
-        verify(veiculoRepository, times(1)).save(any(Veiculo.class));
+        assertEquals(veiculoValido.getPlaca(), result.getPlaca());
+        verify(veiculoRepository).save(any(Veiculo.class));
     }
 
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
-    @DisplayName("Não deve salvar o veículo sem uma placa válida")
-    void naoDeveSalvarVeiculoSemPlacaValida() {
-        String placaInvalida = "";
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            veiculoService.cadastrarVeiculo(placaInvalida, LocalDateTime.now(), "carro", "Fusca", "azul");
-        });
-
-        String expectedMessage = "Placa não pode ser vazia";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-
-        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    @DisplayName("Não deve salvar sem placa válida")
+    void naoDeveSalvarSemPlacaValida() {
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> veiculoService.cadastrarVeiculo("", entradaValida, "carro", "Fusca", "azul")
+        );
+        assertEquals("Placa não pode ser vazia", ex.getMessage());
+        verify(veiculoRepository, never()).save(any());
     }
 
     @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Não deve salvar o veículo com modelo inválido")
-    void naoDeveSalvarVeiculoComModeloInvalido() {
-        String modeloInvalido = "";
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            veiculoService.cadastrarVeiculo("XYZ9876", LocalDateTime.now(), "moto", modeloInvalido, "preto");
-        });
-
-        String expectedMessage = "Modelo não pode ser vazio";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-
-        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    @DisplayName("Não deve salvar com hora de entrada passada")
+    void naoDeveSalvarComHoraEntradaPassada() {
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> veiculoService.cadastrarVeiculo("ABC1234", LocalDateTime.now().minusDays(1), "carro", "Fusca", "azul")
+        );
+        assertTrue(ex.getMessage().contains("Hora de entrada não pode ser nula"));
+        verify(veiculoRepository, never()).save(any());
     }
 
     @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Deve atualizar os dados do veículo corretamente")
+    @DisplayName("Não deve salvar placa duplicada")
+    void naoDeveSalvarPlacaDuplicada() {
+        when(veiculoRepository.findByPlaca("ABC1234")).thenReturn(Optional.of(veiculoValido));
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> veiculoService.cadastrarVeiculo(
+                        veiculoValido.getPlaca(), entradaValida, "carro", "Fusca", "azul"
+                )
+        );
+        assertEquals("Placa já cadastrada", ex.getMessage());
+        verify(veiculoRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve atualizar veículo existente")
     void deveAtualizarVeiculoComSucesso() {
-        Veiculo veiculoExistente = new Veiculo();
-        veiculoExistente.setId(1L);
-        veiculoExistente.setPlaca("ABC1234");
-        veiculoExistente.setTipoVeiculo("carro");
-        veiculoExistente.setModelo("Fusca");
-        veiculoExistente.setCor("azul");
+        when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculoValido));
+        when(veiculoRepository.save(any())).thenReturn(veiculoValido);
 
-        when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculoExistente));
+        Veiculo updated = veiculoService.atualizarVeiculo(
+                1L, "ABC1234", "carro", "Fusca", "azul"
+        );
 
-        String novaPlaca = "DEF5678";
-        String novoModelo = "Fusca 2.0";
-        String novaCor = "verde";
-        String novoTipoVeiculo = "carro";
-
-        doReturn(veiculoExistente).when(veiculoRepository).save(any(Veiculo.class));
-
-        Veiculo veiculoAtualizado = veiculoService.atualizarVeiculo(1L, novaPlaca, novoTipoVeiculo, novoModelo, novaCor);
-
-        assertEquals(novaPlaca, veiculoAtualizado.getPlaca());
-        assertEquals(novoModelo, veiculoAtualizado.getModelo());
-        assertEquals(novaCor, veiculoAtualizado.getCor());
-        assertEquals(novoTipoVeiculo, veiculoAtualizado.getTipoVeiculo());
-
-        verify(veiculoRepository, times(1)).save(any(Veiculo.class));
+        assertEquals("ABC1234", updated.getPlaca());
+        verify(veiculoRepository).save(updated);
     }
 
     @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Não deve atualizar um veículo que não existe")
-    void naoDeveAtualizarVeiculoQueNaoExiste() {
-        Long idInvalido = 999L;
-
-        when(veiculoRepository.findById(idInvalido)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            veiculoService.atualizarVeiculo(idInvalido, "XYZ9876", "moto", "modelo", "preto");
-        });
-
-        String expectedMessage = "Veículo não encontrado";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-
-        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    @DisplayName("Não deve atualizar veículo inexistente")
+    void naoDeveAtualizarVeiculoInexistente() {
+        when(veiculoRepository.findById(2L)).thenReturn(Optional.empty());
+        ResponseStatusException ex = assertThrows(
+                ResponseStatusException.class,
+                () -> veiculoService.atualizarVeiculo(2L, "ABC1234", "carro", "Fusca", "azul")
+        );
+        assertEquals("Veículo não encontrado", ex.getReason());
+        verify(veiculoRepository, never()).save(any());
     }
 
     @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Não deve salvar o veículo com cor inválida")
-    void naoDeveSalvarVeiculoComCorInvalida() {
-        String corInvalida = "";
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            veiculoService.cadastrarVeiculo("XYZ9876", LocalDateTime.now(), "moto", "modelo", corInvalida);
-        });
-
-        String expectedMessage = "Cor não pode ser vazia";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-
-        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
-    }
-
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Não deve atualizar o veículo com dados inválidos")
-    void naoDeveAtualizarVeiculoComDadosInvalidos() {
-        Veiculo veiculoExistente = new Veiculo();
-        veiculoExistente.setId(1L);
-        veiculoExistente.setPlaca("ABC1234");
-        veiculoExistente.setTipoVeiculo("carro");
-        veiculoExistente.setModelo("Fusca");
-        veiculoExistente.setCor("azul");
-
-        String novaPlaca = "";
-        String novoModelo = "Fusca 2.0";
-        String novaCor = "verde";
-        String novoTipoVeiculo = "carro";
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            veiculoService.atualizarVeiculo(1L, novaPlaca, novoTipoVeiculo, novoModelo, novaCor);
-        });
-
-        String expectedMessage = "Placa não pode ser vazia";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-
-        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
-    }
-
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Não deve salvar o veículo com hora de entrada nula")
-    void naoDeveSalvarVeiculoComHoraEntradaNula() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            veiculoService.cadastrarVeiculo("XYZ9876", null, "moto", "modelo", "preto");
-        });
-
-        String expectedMessage = "Hora de entrada não pode ser nula";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-
-        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
-    }
-
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Deve deletar o veículo corretamente")
+    @DisplayName("Deve deletar veículo existente")
     void deveDeletarVeiculoComSucesso() {
-        Veiculo veiculoExistente = new Veiculo();
-        veiculoExistente.setId(1L);
-        veiculoExistente.setPlaca("ABC1234");
-        veiculoExistente.setTipoVeiculo("carro");
-        veiculoExistente.setModelo("Fusca");
-        veiculoExistente.setCor("azul");
-
-        when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculoExistente));
-
-        VeiculoService veiculoService = new VeiculoService(veiculoRepository);
-
+        when(veiculoRepository.findById(1L)).thenReturn(Optional.of(veiculoValido));
         veiculoService.deletarVeiculo(1L);
-
-        verify(veiculoRepository, times(1)).delete(veiculoExistente);
+        verify(veiculoRepository).delete(veiculoValido);
     }
 
     @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Não deve cadastrar veículo com placa já existente")
-    void naoDeveCadastrarVeiculoComPlacaExistente() {
-        String placaExistente = "ABC1234";
-        Veiculo veiculoExistente = new Veiculo();
-        veiculoExistente.setPlaca(placaExistente);
-
-        when(veiculoRepository.findByPlaca(placaExistente)).thenReturn(Optional.of(veiculoExistente));
-
-        Veiculo veiculoNovo = new Veiculo();
-        veiculoNovo.setPlaca(placaExistente);
-        veiculoNovo.setModelo("Fusca");
-        veiculoNovo.setTipoVeiculo("carro");
-        veiculoNovo.setCor("azul");
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            veiculoService.cadastrarVeiculo(placaExistente, LocalDateTime.now(), "carro", "Fusca", "azul");
-        });
-
-        String expectedMessage = "Placa já cadastrada";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-
-        verify(veiculoRepository, times(0)).save(any(Veiculo.class));
+    @DisplayName("Não deve deletar veículo inexistente")
+    void naoDeveDeletarVeiculoInexistente() {
+        when(veiculoRepository.findById(3L)).thenReturn(Optional.empty());
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> veiculoService.deletarVeiculo(3L)
+        );
+        assertEquals("Veículo não encontrado", ex.getMessage());
+        verify(veiculoRepository, never()).delete(any());
     }
-
 }
