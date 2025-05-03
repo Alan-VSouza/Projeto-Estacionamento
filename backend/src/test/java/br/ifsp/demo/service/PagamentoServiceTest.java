@@ -175,6 +175,22 @@ class PagamentoServiceTest {
             assertThat(resultado).hasSize(1).containsExactly(pagamento);
         }
 
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar o total arrecadado quando existem pagamentos")
+        void deveRetornarTotalArrecadadoQuandoExistemPagamentos() {
+            LocalDate data = LocalDate.of(2025, 5, 3);
+            LocalDateTime inicio = data.atStartOfDay();
+            LocalDateTime fim = data.atTime(23, 59, 59);
+
+            when(pagamentoRepository.somarPagamentosPorData(inicio, fim)).thenReturn(100.0);
+
+            double total = service.calcularTotalArrecadadoPorData(data);
+
+            assertEquals(100.0, total);
+        }
+
     }
 
     @Nested
