@@ -14,16 +14,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RegistroEntradaServiceTest {
+
+    private static final String PLACA_VEICULO = "ABC1234";
+    private static final String MENSAGEM_VEICULO_NAO_ENCONTRADO = "Veículo não encontrado";
+    private static final String MENSAGEM_VEICULO_JA_REGISTRADO = "Veículo já registrado no estacionamento";
 
     @Mock
     private VeiculoRepository veiculoRepository;
@@ -39,24 +38,33 @@ public class RegistroEntradaServiceTest {
 
     @BeforeEach
     void setup() {
-        veiculo = new Veiculo();
-        veiculo.setPlaca("ABC1234");
+        veiculo = criarVeiculo();
+        registroEntrada = criarRegistroEntrada(veiculo);
+    }
+
+    private Veiculo criarVeiculo() {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca(PLACA_VEICULO);
         veiculo.setTipoVeiculo("Carro");
         veiculo.setModelo("Fusca");
         veiculo.setCor("Azul");
+        return veiculo;
+    }
 
-        registroEntrada = new RegistroEntrada();
+    private RegistroEntrada criarRegistroEntrada(Veiculo veiculo) {
+        RegistroEntrada registroEntrada = new RegistroEntrada();
         registroEntrada.setVeiculo(veiculo);
+        return registroEntrada;
     }
 
     @Test
     @DisplayName("Deve registrar entrada com sucesso quando veículo não estiver registrado")
     public void registrarEntrada_comSucesso() {
-        when(veiculoRepository.findByPlaca("ABC1234")).thenReturn(Optional.of(veiculo));
+        when(veiculoRepository.findByPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
         when(registroEntradaRepository.save(any())).thenReturn(registroEntrada);
 
-        RegistroEntrada resultado = registroEntradaService.registrarEntrada("ABC1234");
+        RegistroEntrada resultado = registroEntradaService.registrarEntrada(PLACA_VEICULO);
 
         assertNotNull(resultado);
         assertEquals(veiculo, resultado.getVeiculo());
@@ -66,24 +74,23 @@ public class RegistroEntradaServiceTest {
     @Test
     @DisplayName("Deve lançar exceção quando veículo não encontrado")
     public void registrarEntrada_veiculoNaoEncontrado() {
-        when(veiculoRepository.findByPlaca("ABC1234")).thenReturn(Optional.empty());
+        when(veiculoRepository.findByPlaca(PLACA_VEICULO)).thenReturn(Optional.empty());
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> registroEntradaService.registrarEntrada("ABC1234"));
-
-        assertEquals("Veículo não encontrado", thrown.getMessage());
+                () -> registroEntradaService.registrarEntrada(PLACA_VEICULO));
+        assertEquals(MENSAGEM_VEICULO_NAO_ENCONTRADO, thrown.getMessage());
     }
 
     @Test
     @DisplayName("Deve lançar IllegalArgumentException quando o veículo já estiver registrado")
     public void registrarEntrada_veiculoJaRegistrado() {
-        when(veiculoRepository.findByPlaca("ABC1234")).thenReturn(Optional.of(veiculo));
+        when(veiculoRepository.findByPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> registroEntradaService.registrarEntrada("ABC1234"));
+                () -> registroEntradaService.registrarEntrada(PLACA_VEICULO));
 
-        assertEquals("Veículo já registrado no estacionamento", ex.getMessage());
+        assertEquals(MENSAGEM_VEICULO_JA_REGISTRADO, ex.getMessage());
         verify(registroEntradaRepository, times(0)).save(any());
     }
 }
