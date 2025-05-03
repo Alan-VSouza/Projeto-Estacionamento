@@ -16,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDate;
+
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -47,16 +49,19 @@ class RelatorioControllerTest {
     @Tag("UnitTest")
     @DisplayName("Deve gerar o relatório de desempenho com sucesso")
     void deveGerarRelatorioDesempenhoComSucesso() throws Exception {
+        LocalDate data = LocalDate.of(2025, 5, 3);
         RelatorioDTO relatorioDTO = new RelatorioDTO(100, 2.5, 3500.00, 75.0);
-        when(relatorioService.gerarRelatorioDesempenho()).thenReturn(relatorioDTO);
+        when(relatorioService.gerarRelatorioDesempenho(data)).thenReturn(relatorioDTO);
 
-        mockMvc.perform(get("/api/relatorios/desempenho"))
+        mockMvc.perform(get("/api/relatorios/desempenho")
+                        .param("data", data.toString())
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.quantidadeVeiculos").value(100))
                 .andExpect(jsonPath("$.tempoMedioEstadia").value(2.5))
                 .andExpect(jsonPath("$.receitaTotal").value(3500.00))
                 .andExpect(jsonPath("$.ocupacaoMedia").value(75.0));
 
-        verify(relatorioService, times(1)).gerarRelatorioDesempenho();
+        verify(relatorioService, times(1)).gerarRelatorioDesempenho(data);
     }
 }
