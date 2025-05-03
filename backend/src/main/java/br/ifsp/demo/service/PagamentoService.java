@@ -29,28 +29,36 @@ public class PagamentoService {
     }
 
     public void salvarPagamento(Pagamento pagamento) {
-        if(pagamento == null)
+
+        if (pagamento == null)
             throw new IllegalArgumentException("Pagamento nao pode ser nulo");
 
-        if(pagamento.getVeiculo() == null)
-            throw new IllegalArgumentException("Veiculo nao pode ser nulo");
+        if(pagamento.getUuid() == null)
+            throw new IllegalArgumentException("Pagamento não encontrado");
 
-        if(pagamento.getHoraEntrada() == null)
+        if (pagamento.getHoraEntrada() == null)
             throw new IllegalArgumentException("Hora de entrada nao pode ser nula");
 
-        if(pagamento.getHoraSaida() == null)
+        if (pagamento.getHoraSaida() == null)
             throw new IllegalArgumentException("Hora de saida nao pode ser nula");
 
-        if(pagamento.getValor() < 0.0)
-            throw new IllegalArgumentException("Valor nao pode ser menor que zero");
+        if (pagamento.getPlaca() == null || pagamento.getPlaca().trim().isEmpty())
+            throw new IllegalArgumentException("Placa nao pode ser nula ou vazia");
+
+        Optional<Veiculo> veiculo = veiculoService.buscarPorPlaca(pagamento.getPlaca());
+
+        if (veiculo.isEmpty())
+            throw new IllegalArgumentException("Veiculo nao encontrado no estacionamento");
 
         int horasPermanencia = calcularHorasPermanencia(pagamento.getHoraEntrada(), pagamento.getHoraSaida());
         double valorPermanencia = tempoPermanencia.calcularValorDaPermanencia(horasPermanencia);
         pagamento.setValor(valorPermanencia);
 
         pagamentoRepository.save(pagamento);
-        veiculoService.deletarVeiculo(pagamento.getVeiculo().getId());
+
+        veiculoService.deletarVeiculo(veiculo.get().getId());
     }
+
 
     private int calcularHorasPermanencia(LocalDateTime horaEntrada, LocalDateTime horaSaida) {
 
@@ -71,7 +79,7 @@ public class PagamentoService {
 
     }
 
-    public Pagamento atualizarPagamento(UUID uuid, LocalDateTime novaEntrada, LocalDateTime novaSaida, Veiculo veiculo, double novoValor) {
+    public Pagamento atualizarPagamento(UUID uuid, LocalDateTime novaEntrada, LocalDateTime novaSaida, String placa, double novoValor) {
         if(uuid == null)
             throw new IllegalArgumentException("Uuid nao pode ser nulo");
 
@@ -81,18 +89,15 @@ public class PagamentoService {
         if(novaSaida == null)
             throw new IllegalArgumentException("Saida nao pode ser nulo");
 
-        if(veiculo == null || veiculo.getId() == null)
-            throw new IllegalArgumentException("Veiculo nao pode ser nulo");
-
-        if(novoValor < 0)
-            throw new IllegalArgumentException("Valor nao pode ser menor que zero");
+        if(veiculoService.buscarPorPlaca(placa).isEmpty())
+            throw new IllegalArgumentException("Veiculo nao existe no banco de dados");
 
         Optional<Pagamento> pagamentoOptional = pagamentoRepository.findById(uuid);
         Pagamento pagamento = pagamentoOptional.orElseThrow(() -> new IllegalArgumentException("Pagamento não encontrado"));
 
         pagamento.setHoraEntrada(novaEntrada);
         pagamento.setHoraSaida(novaSaida);
-        pagamento.setVeiculo(veiculo);
+        pagamento.setPlaca(placa);
         pagamento.setValor(novoValor);
 
         pagamentoRepository.save(pagamento);

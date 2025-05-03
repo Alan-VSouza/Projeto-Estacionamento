@@ -57,7 +57,7 @@ class PagamentoServiceTest {
 
         pagamento = new Pagamento();
         pagamento.setUuid(UUID.randomUUID());
-        pagamento.setVeiculo(veiculo);
+        pagamento.setPlaca(veiculo.getPlaca());
         pagamento.setHoraEntrada(veiculo.getHoraEntrada());
         pagamento.setHoraSaida(LocalDateTime.now());
         pagamento.setValor(43);
@@ -73,12 +73,13 @@ class PagamentoServiceTest {
         @DisplayName("Deve salvar o pagamento")
         void deveSalvarPagamento() {
 
+            when(veiculoService.buscarPorPlaca(pagamento.getPlaca())).thenReturn(Optional.ofNullable(veiculo));
+
             service.salvarPagamento(pagamento);
 
             verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
-            verify(veiculoService).deletarVeiculo(pagamento.getVeiculo().getId());
+            verify(veiculoService).deletarVeiculo(veiculo.getId());
             verify(tempoPermanencia, times(1)).calcularValorDaPermanencia(anyInt());
-
 
         }
 
@@ -104,17 +105,18 @@ class PagamentoServiceTest {
         @DisplayName("Deve atualizar o pagamento")
         void deveAtualizarPagamento() {
 
+            when(veiculoService.buscarPorPlaca(pagamento.getPlaca())).thenReturn(Optional.ofNullable(veiculo));
             when(pagamentoRepository.findById(pagamento.getUuid())).thenReturn(Optional.of(pagamento));
 
             LocalDateTime novaEntrada = LocalDateTime.now().minusHours(3);
             LocalDateTime novaSaida = LocalDateTime.now().minusHours(1);
             double novoValor = 44;
 
-            Pagamento pagamentoAtualizado = service.atualizarPagamento(pagamento.getUuid(), novaEntrada, novaSaida, veiculo, novoValor);
+            Pagamento pagamentoAtualizado = service.atualizarPagamento(pagamento.getUuid(), novaEntrada, novaSaida, veiculo.getPlaca(), novoValor);
 
             assertThat(pagamentoAtualizado.getHoraEntrada()).isEqualTo(novaEntrada);
             assertThat(pagamentoAtualizado.getHoraSaida()).isEqualTo(novaSaida);
-            assertThat(pagamentoAtualizado.getVeiculo()).isEqualTo(veiculo);
+            assertThat(pagamentoAtualizado.getPlaca()).isEqualTo(veiculo.getPlaca());
             assertThat(pagamentoAtualizado.getValor()).isEqualTo(44);
 
             verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
@@ -144,6 +146,7 @@ class PagamentoServiceTest {
         void testaSalvarPagamentoCalculandoOValorDePermanencia() {
             pagamento.setHoraSaida(LocalDateTime.of(2025,4,30,13,1,0));
 
+            when(veiculoService.buscarPorPlaca(pagamento.getPlaca())).thenReturn(Optional.ofNullable(veiculo));
             when(tempoPermanencia.calcularValorDaPermanencia(anyInt())).thenReturn(26.0);
 
             service.salvarPagamento(pagamento);
@@ -151,7 +154,7 @@ class PagamentoServiceTest {
             assertEquals(26.0, pagamento.getValor());
 
             verify(pagamentoRepository, times(1)).save(pagamento);
-            verify(veiculoService, times(1)).deletarVeiculo(pagamento.getVeiculo().getId());
+            verify(veiculoService, times(1)).deletarVeiculo(veiculo.getId());
 
         }
 
@@ -219,7 +222,6 @@ class PagamentoServiceTest {
                 value = {
                         "null, 2025-04-30T17:00:00, 20.0, Hora de entrada nao pode ser nula",
                         "2025-04-30T15:30:00, null, 20.0, Hora de saida nao pode ser nula",
-                        "2025-04-30T15:30:00, 2025-04-30T17:00:00, -10.0, Valor nao pode ser menor que zero"
                 },
                 nullValues = "null"
         )
@@ -242,10 +244,10 @@ class PagamentoServiceTest {
         @DisplayName("mensagem de erro quando veiculo e nulo")
         void mensagemDeErroQuandoVeiculoNulo() {
 
-            pagamento.setVeiculo(null);
+            pagamento.setPlaca(null);
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.salvarPagamento(pagamento));
-            assertEquals("Veiculo nao pode ser nulo", exception.getMessage());
+            assertEquals("Placa nao pode ser nula ou vazia", exception.getMessage());
         }
 
         @Test
@@ -265,7 +267,6 @@ class PagamentoServiceTest {
                         "null, 2025-04-30T15:30:00, 2025-04-30T17:00:00, 15.0, Uuid nao pode ser nulo",
                         "123e4567-e89b-12d3-a456-426614174000, null, 2025-04-30T17:00:00, 15.0, Entrada nao pode ser nulo",
                         "123e4567-e89b-12d3-a456-426614174000, 2025-04-30T17:00:00, null, 10.0, Saida nao pode ser nulo",
-                        "123e4567-e89b-12d3-a456-426614174000, 2025-04-30T15:30:00, 2025-04-30T17:00:00, -10.0, Valor nao pode ser menor que zero"
                 },
                 nullValues = "null"
         )
@@ -275,7 +276,7 @@ class PagamentoServiceTest {
             UUID uuidPagamento = uuid == null ? null : UUID.fromString(uuid);
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.atualizarPagamento(
-                    uuidPagamento, entrada, saida, veiculo, valor
+                    uuidPagamento, entrada, saida, veiculo.getPlaca(), valor
             ));
             assertEquals(mensagem, exception.getMessage());
 
@@ -289,7 +290,7 @@ class PagamentoServiceTest {
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()-> service.atualizarPagamento(
                     UUID.randomUUID(), LocalDateTime.now().minusHours(2), LocalDateTime.now(), null, 0
             ));
-            assertEquals("Veiculo nao pode ser nulo", exception.getMessage());
+            assertEquals("Veiculo nao existe no banco de dados", exception.getMessage());
 
         }
 
@@ -299,6 +300,7 @@ class PagamentoServiceTest {
         void mensagemDeErroAoAtualizarPagamentoInexistente() {
             UUID uuidInexistente = UUID.randomUUID();
 
+            when(veiculoService.buscarPorPlaca(pagamento.getPlaca())).thenReturn(Optional.ofNullable(veiculo));
             when(pagamentoRepository.findById(uuidInexistente)).thenReturn(Optional.empty());
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
@@ -306,7 +308,7 @@ class PagamentoServiceTest {
                             uuidInexistente,
                             LocalDateTime.now().minusHours(1),
                             LocalDateTime.now(),
-                            veiculo,
+                            veiculo.getPlaca(),
                             10.0
                     )
             );
