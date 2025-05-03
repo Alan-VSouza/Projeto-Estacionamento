@@ -38,7 +38,6 @@ class PagamentoControllerTest {
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
 
-    private Veiculo veiculo;
     private Pagamento pagamento;
     @BeforeEach
     void setUp() {
@@ -52,7 +51,7 @@ class PagamentoControllerTest {
                 .defaultRequest(get("/").accept(MediaType.APPLICATION_JSON))
                 .build();
 
-        veiculo = new Veiculo();
+        Veiculo veiculo = new Veiculo();
         veiculo.setId(1L);
         veiculo.setPlaca("QBC-2994");
         veiculo.setTipoVeiculo("carro");
