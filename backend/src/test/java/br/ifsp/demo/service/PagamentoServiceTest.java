@@ -191,6 +191,22 @@ class PagamentoServiceTest {
             assertEquals(100.0, total);
         }
 
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar zero quando nao existirem pagamentos")
+        void deveRetornarZeroQuandoNaoExistemPagamentos() {
+            LocalDate data = LocalDate.of(2025, 5, 3);
+            LocalDateTime inicio = data.atStartOfDay();
+            LocalDateTime fim = data.atTime(23, 59, 59);
+
+            when(pagamentoRepository.somarPagamentosPorData(inicio, fim)).thenReturn(null);
+
+            double total = service.calcularTotalArrecadadoPorData(data);
+
+            assertEquals(0.0, total);
+        }
+
     }
 
     @Nested
