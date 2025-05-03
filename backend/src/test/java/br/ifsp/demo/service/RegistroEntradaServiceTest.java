@@ -73,4 +73,17 @@ public class RegistroEntradaServiceTest {
 
         assertEquals("Veículo não encontrado", thrown.getMessage());
     }
+
+    @Test
+    @DisplayName("Deve lançar IllegalArgumentException quando o veículo já estiver registrado")
+    public void registrarEntrada_veiculoJaRegistrado() {
+        when(veiculoRepository.findByPlaca("ABC1234")).thenReturn(Optional.of(veiculo));
+        when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> registroEntradaService.registrarEntrada("ABC1234"));
+
+        assertEquals("Veículo já registrado no estacionamento", ex.getMessage());
+        verify(registroEntradaRepository, times(0)).save(any());
+    }
 }
