@@ -6,6 +6,7 @@ import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.EstacionamentoRepository;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -44,6 +45,8 @@ public class EstacionamentoServiceTest {
     }
 
     @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
     public void registrarEntrada_comSucesso() {
         when(estacionamentoRepository.findById(1L)).thenReturn(Optional.of(estacionamento));
         when(registroEntradaRepository.save(any(RegistroEntrada.class))).thenReturn(new RegistroEntrada(veiculo));
@@ -55,4 +58,16 @@ public class EstacionamentoServiceTest {
 
         verify(registroEntradaRepository, times(1)).save(any(RegistroEntrada.class));
     }
+
+    @Test
+    public void cancelarEntrada_comSucesso() {
+        when(estacionamentoRepository.findById(1L)).thenReturn(Optional.of(estacionamento));
+        when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
+
+        boolean sucesso = estacionamentoService.cancelarEntrada("ABC1234");
+
+        assertTrue(sucesso);
+        verify(registroEntradaRepository, times(1)).delete(registroEntrada);
+    }
+
 }
