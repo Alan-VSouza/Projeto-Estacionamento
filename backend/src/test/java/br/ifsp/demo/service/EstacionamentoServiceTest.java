@@ -58,31 +58,41 @@ public class EstacionamentoServiceTest {
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
+    @DisplayName("Registrar entrada com sucesso deve salvar registro no repositório")
     public void registrarEntrada_comSucesso() {
-        when(estacionamentoRepository.findById(1L)).thenReturn(Optional.of(estacionamento));
-        when(registroEntradaRepository.save(any(RegistroEntrada.class))).thenReturn(new RegistroEntrada(veiculo));
+        when(estacionamentoRepository.findById(1L))
+                .thenReturn(Optional.of(estacionamento));
+        when(registroEntradaRepository.save(any(RegistroEntrada.class)))
+                .thenReturn(new RegistroEntrada(veiculo));
 
         RegistroEntrada resultado = estacionamentoService.registrarEntrada(veiculo);
 
         assertNotNull(resultado);
         assertEquals(veiculo, resultado.getVeiculo());
-
-        verify(registroEntradaRepository, times(1)).save(any(RegistroEntrada.class));
+        verify(registroEntradaRepository, times(1))
+                .save(any(RegistroEntrada.class));
     }
 
     @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Cancelar entrada com sucesso deve deletar registro e retornar true")
     public void cancelarEntrada_comSucesso() {
-        when(veiculoService.buscarPorPlaca(veiculo.getPlaca())).thenReturn(Optional.of(veiculo));
-
-        when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
+        when(veiculoService.buscarPorPlaca(veiculo.getPlaca()))
+                .thenReturn(Optional.of(veiculo));
+        when(registroEntradaRepository.findByVeiculo(veiculo))
+                .thenReturn(Optional.of(registroEntrada));
 
         boolean sucesso = estacionamentoService.cancelarEntrada(veiculo);
 
         assertTrue(sucesso);
-        verify(registroEntradaRepository, times(1)).delete(registroEntrada);
+        verify(registroEntradaRepository, times(1))
+                .delete(registroEntrada);
     }
 
     @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
     @DisplayName("Deve lançar IllegalArgumentException quando o veículo não estiver registrado ao cancelar entrada")
     public void cancelarEntrada_veiculoNaoRegistrado() {
         when(veiculoService.buscarPorPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
