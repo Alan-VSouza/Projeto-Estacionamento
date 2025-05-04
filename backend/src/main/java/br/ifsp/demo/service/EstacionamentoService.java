@@ -82,6 +82,9 @@ public class EstacionamentoService {
         return estacionamentoRepository.save(estacionamento);
     }
 
-
+    public Estacionamento buscarEstacionamento() {
+        return estacionamentoRepository.findById(1L)
+                .orElseThrow(() -> new IllegalArgumentException("Estacionamento não encontrado"));
+    }
 
 }

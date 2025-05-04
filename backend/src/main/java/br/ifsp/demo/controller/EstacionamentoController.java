@@ -61,4 +61,11 @@ public class EstacionamentoController {
         var criado = estacionamentoService.criarEstacionamento(estacionamento);
         return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
+
+    @GetMapping
+    public ResponseEntity<Estacionamento> buscar() {
+        var est = estacionamentoService.buscarEstacionamento();
+        return ResponseEntity.ok(est);
+    }
+
 }
