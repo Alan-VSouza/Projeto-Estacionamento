@@ -220,6 +220,30 @@ class PagamentoControllerTest {
                     .andExpect(status().isBadRequest());
         }
 
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar erro quando a hora de saída for nula")
+        void deveRetornarErroQuandoHoraDeSaidaForNula() throws Exception {
+            pagamento.setHoraSaida(null);
+
+            mockMvc.perform(post("/api/pagamentos")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(pagamento)))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar erro quando hora de entrada for depois da hora de saída")
+        void deveRetornarErroQuandoHoraDeEntradaForDepoisDaHoraDeSaida() throws Exception {
+            pagamento.setHoraEntrada(LocalDateTime.now().plusHours(2));
+
+            mockMvc.perform(post("/api/pagamentos")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(pagamento)))
+                    .andExpect(status().isBadRequest());
+        }
+
 
 
     }
