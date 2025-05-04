@@ -162,4 +162,19 @@ class PagamentoControllerTest {
 
     }
 
+    @Nested
+    @DisplayName("Testes de Sucesso Extras")
+    class SucessoExtras {
+
+        @Test
+        void deveBuscarPagamentoPorIdComSucesso() throws Exception {
+            UUID pagamentoId = pagamento.getUuid();
+            when(pagamentoService.buscarPorId(pagamentoId)).thenReturn(pagamento);
+
+            mockMvc.perform(get("/api/pagamentos/{id}", pagamentoId))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.placa").value("QBC-2994"));
+        }
+    }
+
 }
