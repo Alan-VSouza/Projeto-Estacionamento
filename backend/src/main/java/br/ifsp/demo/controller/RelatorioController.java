@@ -1,5 +1,6 @@
 package br.ifsp.demo.controller;
 
+import br.ifsp.demo.dto.HistoricoDTO;
 import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.service.RelatorioService;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/relatorios")
@@ -32,5 +34,10 @@ public class RelatorioController {
         ReciboDTO recibo = relatorioService.gerarRecibo(placa);
         if (recibo == null) {return ResponseEntity.notFound().build();}
         return ResponseEntity.ok(recibo);
+    }
+
+    @GetMapping("/historico/{placa}")
+    public ResponseEntity<List<HistoricoDTO>> getHistoricoPorPlaca(@PathVariable String placa) {
+        return ResponseEntity.ok(relatorioService.gerarHistorico(placa));
     }
 }

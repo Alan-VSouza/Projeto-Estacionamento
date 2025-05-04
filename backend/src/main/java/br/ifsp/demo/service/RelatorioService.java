@@ -1,5 +1,6 @@
 package br.ifsp.demo.service;
 
+import br.ifsp.demo.dto.HistoricoDTO;
 import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.model.Pagamento;
@@ -63,5 +64,9 @@ public class RelatorioService {
                 .max(Comparator.comparing(Pagamento::getHoraSaida))
                 .map(p -> new ReciboDTO(p.getPlaca(), p.getHoraEntrada(), p.getHoraSaida(), p.getValor()))
                 .orElse(null);
+    }
+
+    public List<HistoricoDTO> gerarHistorico(String placa) {
+        return null;
     }
 }
