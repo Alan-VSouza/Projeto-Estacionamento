@@ -58,6 +58,7 @@ class EstacionamentoControllerTest {
 
     @Test
     @Tag("TDD")
+    @Tag("UnitTest")
     @DisplayName("POST /estacionamento/entrada -> 200 e retorna registro de entrada")
     void whenPostEntrada_thenReturnsRegistro() throws Exception {
         Veiculo veiculo = new Veiculo();
@@ -81,6 +82,7 @@ class EstacionamentoControllerTest {
 
     @Test
     @Tag("TDD")
+    @Tag("UnitTest")
     @DisplayName("DELETE /estacionamento/entrada -> 200 OK quando sucesso")
     void whenDeleteEntrada_thenReturns200() throws Exception {
         Veiculo veiculo = new Veiculo();
@@ -115,6 +117,7 @@ class EstacionamentoControllerTest {
 
     @Test
     @Tag("TDD")
+    @Tag("UnitTest")
     @DisplayName("POST /estacionamento/saida -> 200 OK quando sucesso")
     void whenPostSaida_thenReturns200() throws Exception {
         Veiculo veiculo = new Veiculo();
@@ -149,6 +152,7 @@ class EstacionamentoControllerTest {
 
     @Test
     @Tag("TDD")
+    @Tag("UnitTest")
     @DisplayName("GET /estacionamento/entrada?placa= -> 200 OK e retorna registro de entrada")
     void whenGetEntrada_thenReturnsRegistro() throws Exception {
         Veiculo veiculo = new Veiculo();
