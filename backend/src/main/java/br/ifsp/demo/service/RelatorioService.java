@@ -60,7 +60,7 @@ public class RelatorioService {
                 })
                 .sum();
 
-        double ocupacaoMedia = minutosOcupadosTotal / minutosNoDia;
+        double ocupacaoMedia = minutosOcupadosTotal / (minutosNoDia * NumeroVagas);
 
         return new RelatorioDTO(
                 quantidade,
