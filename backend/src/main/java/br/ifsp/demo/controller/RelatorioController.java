@@ -1,5 +1,7 @@
 package br.ifsp.demo.controller;
 
+import br.ifsp.demo.dto.HistoricoDTO;
+import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.service.RelatorioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/relatorios")
@@ -24,5 +27,17 @@ public class RelatorioController {
     public ResponseEntity<RelatorioDTO> gerarRelatorioDesempenho(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
         RelatorioDTO relatorio = relatorioService.gerarRelatorioDesempenho(data);
         return ResponseEntity.ok(relatorio);
+    }
+
+    @GetMapping("/recibo")
+    public ResponseEntity<ReciboDTO> gerarRecibo(@RequestParam("placa") String placa) {
+        ReciboDTO recibo = relatorioService.gerarRecibo(placa);
+        if (recibo == null) {return ResponseEntity.notFound().build();}
+        return ResponseEntity.ok(recibo);
+    }
+
+    @GetMapping("/historico/{placa}")
+    public ResponseEntity<List<HistoricoDTO>> getHistoricoPorPlaca(@PathVariable String placa) {
+        return ResponseEntity.ok(relatorioService.gerarHistorico(placa));
     }
 }
