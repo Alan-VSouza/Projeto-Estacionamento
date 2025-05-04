@@ -65,4 +65,29 @@ class RelatorioServiceTest {
         assertEquals(75.0, relatorio.getReceitaTotal(), 0.01);
         assertEquals(0.0, relatorio.getOcupacaoMedia(), 0.01);
     }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve gerar recibo corretamente com base na placa")
+    void deveGerarReciboCorretamenteComBaseNaPlaca() {
+        String placa = "ABC1234";
+
+        Pagamento pagamento = new Pagamento();
+        pagamento.setPlaca(placa);
+        pagamento.setHoraEntrada(LocalDateTime.of(2025, 5, 3, 9, 0));
+        pagamento.setHoraSaida(LocalDateTime.of(2025, 5, 3, 11, 30));
+        pagamento.setValor(30.0);
+        List<Pagamento> pagamentoList = List.of(pagamento);
+
+        when(pagamentoRepository.findAll()).thenReturn(pagamentoList);
+
+        var recibo = relatorioService.gerarRecibo(placa);
+
+        assertNotNull(recibo);
+        assertEquals("ABC1234", recibo.getPlaca());
+        assertEquals(LocalDateTime.of(2025, 5, 3, 9, 0), recibo.getEntrada());
+        assertEquals(LocalDateTime.of(2025, 5, 3, 11, 30), recibo.getSaida());
+        assertEquals(30.0, recibo.getValorTotal(), 0.01);
+    }
 }
