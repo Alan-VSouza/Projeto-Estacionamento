@@ -41,6 +41,7 @@ class RelatorioControllerTest {
     void setup() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         mockMvc = MockMvcBuilders.standaloneSetup(relatorioController)
                 .defaultRequest(get("/").accept(MediaType.APPLICATION_JSON))
