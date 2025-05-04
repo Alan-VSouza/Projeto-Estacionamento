@@ -4,6 +4,7 @@ import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.PagamentoRepository;
+import br.ifsp.demo.repository.VeiculoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -26,6 +27,9 @@ class RelatorioServiceTest {
 
     @Mock
     private PagamentoRepository pagamentoRepository;
+
+    @Mock
+    private VeiculoRepository veiculoRepository;
 
     @InjectMocks
     private RelatorioService relatorioService;
@@ -134,5 +138,33 @@ class RelatorioServiceTest {
         assertEquals(LocalDateTime.of(2025, 5, 4, 9, 0), historico.get(1).getEntrada());
         assertEquals(LocalDateTime.of(2025, 5, 4, 11, 30), historico.get(1).getSaida());
         assertEquals(30.0, historico.get(1).getValorTotal(), 0.01);
+    }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve retornar corretamente o número de vagas disponíveis")
+    void deveRetornarCorretamenteONumeroDeVagasDisponiveis() {
+        Veiculo v1 = new Veiculo();
+        v1.setPlaca("ABC1234");
+        v1.setTipoVeiculo("carro");
+        v1.setModelo("Fusca");
+        v1.setCor("azul");
+        v1.setHoraEntrada(LocalDateTime.of(2025, 5, 3, 10, 0));
+
+        Veiculo v2 = new Veiculo();
+        v2.setPlaca("XYZ5678");
+        v2.setTipoVeiculo("carro");
+        v2.setModelo("gol");
+        v2.setCor("vermelho");
+        v2.setHoraEntrada(LocalDateTime.of(2025, 5, 3, 14, 0));
+
+        List<Veiculo> veiculosDeTeste = List.of(v1, v2);
+
+        when(veiculoRepository.findAll()).thenReturn(veiculosDeTeste);
+
+        int vagasDisponiveis = relatorioService.vagasDisponiveis();
+
+        assertEquals(198, vagasDisponiveis);
     }
 }
