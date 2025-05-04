@@ -32,8 +32,6 @@ class RelatorioServiceTest {
 
     private final LocalDate dataReferencia = LocalDate.of(2025, 5, 3);
 
-    private List<Pagamento> pagamentosDeTeste;
-
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
@@ -51,7 +49,7 @@ class RelatorioServiceTest {
         p2.setHoraSaida(LocalDateTime.of(2025, 5, 3, 16, 30));
         p2.setValor(40.0);
 
-        pagamentosDeTeste = List.of(p1, p2);
+        List<Pagamento> pagamentosDeTeste = List.of(p1, p2);
 
         double minutosOcupadosTotal = Duration.between(p1.getHoraEntrada(), p1.getHoraSaida()).toMinutes()
                 + Duration.between(p2.getHoraEntrada(), p2.getHoraSaida()).toMinutes();
