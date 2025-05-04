@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,6 +56,10 @@ class RelatorioServiceTest {
     @Tag("UnitTest")
     @DisplayName("Deve calcular corretamente o relatório com base nos pagamentos da data")
     void deveCalcularCorretamenteORelatorioComBaseNosPagamentosDaData() {
+        double minutosOcupadosTotal = Duration.between(pagamentosDeTeste.get(0).getHoraEntrada(), pagamentosDeTeste.get(0).getHoraSaida()).toMinutes()
+                + Duration.between(pagamentosDeTeste.get(1).getHoraEntrada(), pagamentosDeTeste.get(1).getHoraSaida()).toMinutes();
+        double ocupacaoEsperada = minutosOcupadosTotal / 1440.0;
+
         when(pagamentoRepository.findAll()).thenReturn(pagamentosDeTeste);
 
         RelatorioDTO relatorio = relatorioService.gerarRelatorioDesempenho(dataReferencia);
@@ -63,7 +68,7 @@ class RelatorioServiceTest {
         assertEquals(2, relatorio.getQuantidadeVeiculos());
         assertEquals(2.25, relatorio.getTempoMedioEstadia(), 0.01);
         assertEquals(75.0, relatorio.getReceitaTotal(), 0.01);
-        assertEquals(0.0, relatorio.getOcupacaoMedia(), 0.01);
+        assertEquals(ocupacaoEsperada, relatorio.getOcupacaoMedia(), 0.01);
     }
 
     @Test
