@@ -1,8 +1,10 @@
 package br.ifsp.demo.controller;
 
+import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.service.RelatorioService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -63,5 +66,28 @@ class RelatorioControllerTest {
                 .andExpect(jsonPath("$.ocupacaoMedia").value(75.0));
 
         verify(relatorioService, times(1)).gerarRelatorioDesempenho(data);
+    }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve retornar recibo com os detalhes da estadia e pagamento")
+    void deveRetornarReciboComOsDetalhesDaEstadiaEPagamento() throws Exception {
+        String placa = "ABC1234";
+        ReciboDTO reciboDTO = new ReciboDTO(placa, "Carro", LocalDateTime.of(2025, 5, 3, 9, 0), LocalDateTime.of(2025, 5, 3, 11, 30), 30.0, "Débito");
+        when(relatorioService.gerarRecibo(placa)).thenReturn(reciboDTO);
+
+        mockMvc.perform(get("/api/relatorios/recibo")
+                        .param("placa", placa)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.placa").value("ABC1234"))
+                .andExpect(jsonPath("$.tipoVeiculo").value("Carro"))
+                .andExpect(jsonPath("$.entrada").value("2025-05-03T09:00:00"))
+                .andExpect(jsonPath("$.saida").value("2025-05-03T11:30:00"))
+                .andExpect(jsonPath("$.valorTotal").value(30.0))
+                .andExpect(jsonPath("$.formaPagamento").value("Débito"));
+
+        verify(relatorioService, times(1)).gerarRecibo(placa);
     }
 }
