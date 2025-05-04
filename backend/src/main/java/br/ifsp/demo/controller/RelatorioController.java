@@ -30,6 +30,7 @@ public class RelatorioController {
     @GetMapping("/recibo")
     public ResponseEntity<ReciboDTO> gerarRecibo(@RequestParam("placa") String placa) {
         ReciboDTO recibo = relatorioService.gerarRecibo(placa);
+        if (recibo == null) {return ResponseEntity.notFound().build();}
         return ResponseEntity.ok(recibo);
     }
 }
