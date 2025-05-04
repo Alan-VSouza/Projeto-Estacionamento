@@ -96,4 +96,21 @@ class RelatorioControllerTest {
 
         verify(relatorioService, times(1)).gerarRecibo(placa);
     }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve retornar 404 quando recibo não for encontrado")
+    void deveRetornar404QuandoReciboNaoForEncontrado() throws Exception {
+        String placa = "XYZ9999";
+
+        when(relatorioService.gerarRecibo(placa)).thenReturn(null);
+
+        mockMvc.perform(get("/api/relatorios/recibo")
+                        .param("placa", placa)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        verify(relatorioService, times(1)).gerarRecibo(placa);
+    }
 }
