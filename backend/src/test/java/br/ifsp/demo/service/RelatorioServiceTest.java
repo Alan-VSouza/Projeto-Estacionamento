@@ -34,8 +34,11 @@ class RelatorioServiceTest {
 
     private List<Pagamento> pagamentosDeTeste;
 
-    @BeforeEach
-    void setup() {
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve calcular corretamente o relatório com base nos pagamentos da data")
+    void deveCalcularCorretamenteORelatorioComBaseNosPagamentosDaData() {
         Pagamento p1 = new Pagamento();
         p1.setPlaca("ABC1234");
         p1.setHoraEntrada(LocalDateTime.of(2025, 5, 3, 10, 0));
@@ -49,15 +52,9 @@ class RelatorioServiceTest {
         p2.setValor(40.0);
 
         pagamentosDeTeste = List.of(p1, p2);
-    }
 
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Deve calcular corretamente o relatório com base nos pagamentos da data")
-    void deveCalcularCorretamenteORelatorioComBaseNosPagamentosDaData() {
-        double minutosOcupadosTotal = Duration.between(pagamentosDeTeste.get(0).getHoraEntrada(), pagamentosDeTeste.get(0).getHoraSaida()).toMinutes()
-                + Duration.between(pagamentosDeTeste.get(1).getHoraEntrada(), pagamentosDeTeste.get(1).getHoraSaida()).toMinutes();
+        double minutosOcupadosTotal = Duration.between(p1.getHoraEntrada(), p1.getHoraSaida()).toMinutes()
+                + Duration.between(p2.getHoraEntrada(), p2.getHoraSaida()).toMinutes();
         double ocupacaoEsperada = minutosOcupadosTotal / (1440.0 * 200);
 
         when(pagamentoRepository.findAll()).thenReturn(pagamentosDeTeste);
