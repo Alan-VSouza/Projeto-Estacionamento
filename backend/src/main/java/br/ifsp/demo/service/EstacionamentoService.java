@@ -8,17 +8,24 @@ import br.ifsp.demo.repository.RegistroEntradaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class EstacionamentoService {
 
     private final EstacionamentoRepository estacionamentoRepository;
     private final RegistroEntradaRepository registroEntradaRepository;
+    private final VeiculoService veiculoService;
 
     @Autowired
     public EstacionamentoService(EstacionamentoRepository estacionamentoRepository,
-                                 RegistroEntradaRepository registroEntradaRepository) {
+                                 RegistroEntradaRepository registroEntradaRepository,
+                                 RegistroEntradaService registroEntradaService,
+                                 VeiculoService veiculoService,
+                                 Estacionamento estacionamento) {
         this.estacionamentoRepository = estacionamentoRepository;
         this.registroEntradaRepository = registroEntradaRepository;
+        this.veiculoService = veiculoService;
     }
 
     public RegistroEntrada registrarEntrada(Veiculo veiculo) {
@@ -28,4 +35,19 @@ public class EstacionamentoService {
         RegistroEntrada registroEntrada = new RegistroEntrada(veiculo);
         return registroEntradaRepository.save(registroEntrada);
     }
+
+    public boolean cancelarEntrada(Veiculo veiculo) {
+        if (veiculoService.buscarPorPlaca(veiculo.getPlaca()).isEmpty()) {
+            return false;
+        }
+
+        Optional<RegistroEntrada> registroOpt = registroEntradaRepository.findByVeiculo(veiculo);
+        if (registroOpt.isEmpty()) {
+            return false;
+        }
+
+        registroEntradaRepository.delete(registroOpt.get());
+        return true;
+    }
+
 }

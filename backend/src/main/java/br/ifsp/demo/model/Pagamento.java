@@ -33,6 +33,9 @@ public class Pagamento {
     @Column(nullable = false)
     private double valor;
 
+    public Pagamento(RegistroEntrada registroEntrada) {
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

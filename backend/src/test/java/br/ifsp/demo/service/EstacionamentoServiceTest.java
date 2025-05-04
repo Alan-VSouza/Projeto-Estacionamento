@@ -5,9 +5,7 @@ import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.EstacionamentoRepository;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -25,23 +23,36 @@ public class EstacionamentoServiceTest {
     @Mock
     private RegistroEntradaRepository registroEntradaRepository;
 
+    @Mock
+    private VeiculoService veiculoService;
+
+
     @InjectMocks
     private EstacionamentoService estacionamentoService;
 
     private Estacionamento estacionamento;
     private Veiculo veiculo;
+    private RegistroEntrada registroEntrada;
+
+    private static final String PLACA_VEICULO = "ABC1234";
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
 
         veiculo = new Veiculo();
-        veiculo.setPlaca("ABC1234");
+        veiculo.setPlaca(PLACA_VEICULO);
+        veiculo.setTipoVeiculo("Carro");
+        veiculo.setModelo("Fusca");
+        veiculo.setCor("Azul");
 
         estacionamento = new Estacionamento();
         estacionamento.setId(1L);
         estacionamento.setNome("Estacionamento Central");
         estacionamento.setEndereco("Rua X");
+
+        registroEntrada = new RegistroEntrada();
+        registroEntrada.setVeiculo(veiculo);
     }
 
     @Test
@@ -61,10 +72,11 @@ public class EstacionamentoServiceTest {
 
     @Test
     public void cancelarEntrada_comSucesso() {
-        when(estacionamentoRepository.findById(1L)).thenReturn(Optional.of(estacionamento));
+        when(veiculoService.buscarPorPlaca(veiculo.getPlaca())).thenReturn(Optional.of(veiculo));
+
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
 
-        boolean sucesso = estacionamentoService.cancelarEntrada("ABC1234");
+        boolean sucesso = estacionamentoService.cancelarEntrada(veiculo);
 
         assertTrue(sucesso);
         verify(registroEntradaRepository, times(1)).delete(registroEntrada);

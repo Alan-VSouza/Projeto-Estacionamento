@@ -8,9 +8,6 @@ import br.ifsp.demo.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
 @Service
 public class RegistroEntradaService {
 
@@ -36,9 +33,9 @@ public class RegistroEntradaService {
         return registroEntradaRepository.save(registroEntrada);
     }
 
-    public boolean cancelarCheckIn(String placa, String motivoCancelamento) {
+    public boolean cancelarCheckIn(Veiculo veiculo, String motivoCancelamento) {
 
-        Veiculo veiculo = veiculoService.buscarPorPlaca(placa)
+        veiculoService.buscarPorPlaca(veiculo.getPlaca())
                 .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
 
         RegistroEntrada registroEntrada = registroEntradaRepository.findByVeiculo(veiculo)
@@ -46,7 +43,7 @@ public class RegistroEntradaService {
 
         registroEntradaRepository.delete(registroEntrada);
 
-        logSistema.registrarCancelamento(placa, motivoCancelamento);
+        logSistema.registrarCancelamento(veiculo.getPlaca(), motivoCancelamento);
 
         return true;
     }

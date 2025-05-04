@@ -4,7 +4,6 @@ import br.ifsp.demo.components.LogSistema;
 import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
-import br.ifsp.demo.repository.VeiculoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -121,7 +120,7 @@ public class RegistroEntradaServiceTest {
         when(veiculoService.buscarPorPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
 
-        boolean sucesso = registroEntradaService.cancelarCheckIn(PLACA_VEICULO, MOTIVO_CANCELAMENTO);
+        boolean sucesso = registroEntradaService.cancelarCheckIn(veiculo, MOTIVO_CANCELAMENTO);
 
         assertTrue(sucesso);
 
