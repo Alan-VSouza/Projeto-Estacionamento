@@ -4,14 +4,20 @@ import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.service.EstacionamentoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 
@@ -20,21 +26,33 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(EstacionamentoController.class)
+@ExtendWith(MockitoExtension.class)
 class EstacionamentoControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @InjectMocks
+    @Mock
     private EstacionamentoService estacionamentoService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private EstacionamentoController estacionamentoController;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String BASE = "/estacionamento";
-
     private static final String PLACA = "ABC1234";
+
+    @BeforeEach
+    void setup() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(estacionamentoController)
+                .setMessageConverters(new MappingJackson2HttpMessageConverter(mapper))
+                .build();
+    }
 
     @Test
     @Tag("TDD")
@@ -51,6 +69,7 @@ class EstacionamentoControllerTest {
 
         mockMvc.perform(post(BASE + "/entrada")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(veiculo)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
