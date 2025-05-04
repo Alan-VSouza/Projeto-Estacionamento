@@ -1,5 +1,6 @@
 package br.ifsp.demo.controller;
 
+import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.service.RelatorioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,5 +25,11 @@ public class RelatorioController {
     public ResponseEntity<RelatorioDTO> gerarRelatorioDesempenho(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
         RelatorioDTO relatorio = relatorioService.gerarRelatorioDesempenho(data);
         return ResponseEntity.ok(relatorio);
+    }
+
+    @GetMapping("/recibo")
+    public ResponseEntity<ReciboDTO> gerarRecibo(@RequestParam("placa") String placa) {
+        ReciboDTO recibo = relatorioService.gerarRecibo(placa);
+        return ResponseEntity.ok(recibo);
     }
 }

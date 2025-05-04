@@ -1,5 +1,6 @@
 package br.ifsp.demo.service;
 
+import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.repository.PagamentoRepository;
@@ -53,5 +54,9 @@ public class RelatorioService {
                 receitaTotal,
                 ocupacaoMedia
         );
+    }
+
+    public ReciboDTO gerarRecibo(String placa) {
+        return null;
     }
 }
