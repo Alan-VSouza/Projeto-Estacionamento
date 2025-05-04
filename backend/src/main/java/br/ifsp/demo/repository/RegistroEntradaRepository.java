@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface RegistroEntradaRepository extends JpaRepository<RegistroEntrada, Long> {
 
     Optional<RegistroEntrada> findByVeiculo(Veiculo veiculo);
+    Optional<RegistroEntrada> findByVeiculo_Placa(String placa);
 }

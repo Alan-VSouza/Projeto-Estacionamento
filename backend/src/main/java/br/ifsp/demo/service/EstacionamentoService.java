@@ -39,8 +39,8 @@ public class EstacionamentoService {
         return registroEntradaRepository.save(registroEntrada);
     }
 
-    public boolean cancelarEntrada(Veiculo veiculo) {
-        veiculoService.buscarPorPlaca(veiculo.getPlaca())
+    public boolean cancelarEntrada(String placa) {
+        Veiculo veiculo = veiculoService.buscarPorPlaca(placa)
                 .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
 
         RegistroEntrada entrada = registroEntradaRepository.findByVeiculo(veiculo)
@@ -56,27 +56,33 @@ public class EstacionamentoService {
     }
 
 
-    public boolean registrarSaida(Veiculo veiculo) {
-        if (veiculoService.buscarPorPlaca(veiculo.getPlaca()).isEmpty()) {
+    public boolean registrarSaida(String placa) {
+        Optional<Veiculo> veiculoOpt = veiculoService.buscarPorPlaca(placa);
+        if (veiculoOpt.isEmpty()) {
             return false;
         }
 
+        Veiculo veiculo = veiculoOpt.get();
         Optional<RegistroEntrada> optEntrada = registroEntradaRepository.findByVeiculo(veiculo);
         if (optEntrada.isEmpty()) {
             return false;
         }
+
         RegistroEntrada entrada = optEntrada.get();
 
         registroEntradaRepository.delete(entrada);
 
         Pagamento pagamento = new Pagamento();
-        pagamento.setPlaca(veiculo.getPlaca());
+        pagamento.setPlaca(placa);
         pagamento.setHoraEntrada(entrada.getHoraEntrada());
         pagamento.setHoraSaida(LocalDateTime.now());
+
         pagamentoService.salvarPagamento(pagamento);
 
         return true;
     }
+
+
 
     public Estacionamento criarEstacionamento(Estacionamento estacionamento) {
         return estacionamentoRepository.save(estacionamento);
