@@ -244,6 +244,38 @@ class PagamentoControllerTest {
                     .andExpect(status().isBadRequest());
         }
 
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar not found quando tentar excluir pagamento inexistente")
+        void deveRetornarNotFoundQuandoExcluirPagamentoInexistente() throws Exception {
+            UUID idInexistente = UUID.randomUUID();
+
+            when(pagamentoService.buscarPorId(idInexistente)).thenReturn(null);
+
+            mockMvc.perform(delete("/api/pagamentos/{id}", idInexistente))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar not found quando tentar pesquisar pagamento inexistente")
+        void deveRetornarNotFoundQuandoPesquisarPagamentoInexistente() throws Exception {
+            UUID idInexistente = UUID.randomUUID();
+
+            when(pagamentoService.buscarPorId(idInexistente)).thenReturn(null);
+
+            mockMvc.perform(get("/api/pagamentos/{id}", idInexistente))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar erro quando data for nula ou vazia ao buscar pagamentos por data")
+        void deveRetornarErroQuandoDataForNulaOuVazia() throws Exception {
+            mockMvc.perform(get("/api/pagamentos/data")
+                            .param("data", ""))
+                    .andExpect(status().isBadRequest());
+        }
 
 
     }
