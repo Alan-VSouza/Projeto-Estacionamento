@@ -123,13 +123,13 @@ class EstacionamentoControllerTest {
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca(PLACA);
 
-        when(estacionamentoService.registrarSaida(any(Veiculo.class)))
+        when(estacionamentoService.registrarSaida(any()))
                 .thenReturn(true);
 
         mockMvc.perform(post(BASE + "/registrar-saida")
+                        .param("placa", PLACA)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(veiculo)))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -140,10 +140,11 @@ class EstacionamentoControllerTest {
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca(PLACA);
 
-        when(estacionamentoService.registrarSaida(any(Veiculo.class)))
+        when(estacionamentoService.registrarSaida(any()))
                 .thenReturn(false);
 
         mockMvc.perform(post(BASE + "/registrar-saida")
+                        .param("placa", PLACA)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(veiculo)))

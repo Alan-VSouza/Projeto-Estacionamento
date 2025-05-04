@@ -129,14 +129,20 @@ public class EstacionamentoServiceTest {
     @Tag("UnitTest")
     @DisplayName("Registrar saída com sucesso: gera pagamento e remove entrada")
     public void registrarSaida_comSucesso_salvaPagamentoERemoveEntrada() {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca(PLACA_VEICULO);
+
         when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
                 .thenReturn(Optional.of(veiculo));
+
+        RegistroEntrada registroEntrada = new RegistroEntrada(veiculo);
+        registroEntrada.setHoraEntrada(LocalDateTime.of(2025, 5, 4, 10, 0));
         when(registroEntradaRepository.findByVeiculo(veiculo))
                 .thenReturn(Optional.of(registroEntrada));
 
         doNothing().when(pagamentoService).salvarPagamento(any(Pagamento.class));
 
-        boolean resultado = estacionamentoService.registrarSaida(veiculo);
+        boolean resultado = estacionamentoService.registrarSaida(veiculo.getPlaca());
 
         assertTrue(resultado);
 
@@ -150,6 +156,7 @@ public class EstacionamentoServiceTest {
         ));
     }
 
+
     @Test
     @Tag("UnitTest")
     @DisplayName("Registrar saída retorna false quando não houver registro de entrada")
@@ -159,7 +166,7 @@ public class EstacionamentoServiceTest {
         when(registroEntradaRepository.findByVeiculo(veiculo))
                 .thenReturn(Optional.empty());
 
-        boolean resultado = estacionamentoService.registrarSaida(veiculo);
+        boolean resultado = estacionamentoService.registrarSaida(veiculo.getPlaca());
 
         assertFalse(resultado);
         verify(registroEntradaRepository, never()).delete(any());

@@ -37,8 +37,8 @@ public class EstacionamentoController {
     }
 
     @PostMapping("/registrar-saida")
-    public ResponseEntity<Void> registrarSaida(@RequestBody Veiculo veiculo) {
-        boolean sucesso = estacionamentoService.registrarSaida(veiculo);
+    public ResponseEntity<Void> registrarSaida(@RequestParam("placa") String placa) {
+        boolean sucesso = estacionamentoService.registrarSaida(placa);
         if (sucesso) {
             return ResponseEntity.ok().build();
         } else {
