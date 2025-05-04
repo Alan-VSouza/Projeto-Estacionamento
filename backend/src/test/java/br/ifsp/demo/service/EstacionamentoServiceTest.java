@@ -82,4 +82,20 @@ public class EstacionamentoServiceTest {
         verify(registroEntradaRepository, times(1)).delete(registroEntrada);
     }
 
+    @Test
+    @DisplayName("Deve lançar IllegalArgumentException quando o veículo não estiver registrado ao cancelar entrada")
+    public void cancelarEntrada_veiculoNaoRegistrado() {
+        when(veiculoService.buscarPorPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
+
+        when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
+
+        when(estacionamentoRepository.findById(1L)).thenReturn(Optional.of(estacionamento));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            estacionamentoService.cancelarEntrada(veiculo);
+        });
+
+        assertEquals("Veículo não registrado no estacionamento", exception.getMessage());
+    }
+
 }
