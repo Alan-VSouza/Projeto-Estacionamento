@@ -1,5 +1,6 @@
 package br.ifsp.demo.service;
 
+import br.ifsp.demo.components.LogSistema;
 import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
@@ -24,19 +25,25 @@ public class RegistroEntradaServiceTest {
 
     private static final String PLACA_VEICULO = "ABC1234";
     private static final String MENSAGEM_VEICULO_JA_REGISTRADO = "Veículo já registrado no estacionamento";
+    private static final String MOTIVO_CANCELAMENTO = "Cancelamento feito por engano";
+    private static final String MENSAGEM_VEICULO_NAO_ENCONTRADO = "Veículo não encontrado";
+    private static final String MENSAGEM_VEICULO_NAO_REGISTRADO = "Veículo não registrado no estacionamento";
+
 
     @Mock
-    private VeiculoRepository veiculoRepository;
+    private VeiculoService veiculoService;
 
     @Mock
     private RegistroEntradaRepository registroEntradaRepository;
+
+    @Mock
+    private LogSistema logSistema;
 
     @InjectMocks
     private RegistroEntradaService registroEntradaService;
 
     private Veiculo veiculo;
     private RegistroEntrada registroEntrada;
-
     @BeforeEach
     void setup() {
         veiculo = criarVeiculo();
@@ -111,11 +118,13 @@ public class RegistroEntradaServiceTest {
     @Tag("UnitTest")
     @DisplayName("Deve cancelar check-in com sucesso")
     public void cancelarCheckIn_comSucesso() {
+        when(veiculoService.buscarPorPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
 
         boolean sucesso = registroEntradaService.cancelarCheckIn(PLACA_VEICULO, MOTIVO_CANCELAMENTO);
 
         assertTrue(sucesso);
+
         verify(registroEntradaRepository, times(1)).delete(registroEntrada);
         verify(logSistema, times(1)).registrarCancelamento(PLACA_VEICULO, MOTIVO_CANCELAMENTO);
     }
