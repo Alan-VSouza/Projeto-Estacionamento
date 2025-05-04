@@ -35,20 +35,14 @@ class RelatorioServiceTest {
 
     @BeforeEach
     void setup() {
-        Veiculo veiculo1 = new Veiculo();
-        veiculo1.setPlaca("ABC1234");
-
-        Veiculo veiculo2 = new Veiculo();
-        veiculo2.setPlaca("XYZ5678");
-
         Pagamento p1 = new Pagamento();
-        p1.setVeiculo(veiculo1);
+        p1.setPlaca("ABC1234");
         p1.setHoraEntrada(LocalDateTime.of(2025, 5, 3, 10, 0));
         p1.setHoraSaida(LocalDateTime.of(2025, 5, 3, 12, 0));
         p1.setValor(35.0);
 
         Pagamento p2 = new Pagamento();
-        p2.setVeiculo(veiculo2);
+        p2.setPlaca("XYZ5678");
         p2.setHoraEntrada(LocalDateTime.of(2025, 5, 3, 14, 0));
         p2.setHoraSaida(LocalDateTime.of(2025, 5, 3, 16, 30));
         p2.setValor(40.0);
