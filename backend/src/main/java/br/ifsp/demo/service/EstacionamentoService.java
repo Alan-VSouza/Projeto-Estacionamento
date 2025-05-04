@@ -1,5 +1,6 @@
 package br.ifsp.demo.service;
 
+import br.ifsp.demo.model.Estacionamento;
 import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.model.Pagamento;
@@ -76,4 +77,11 @@ public class EstacionamentoService {
 
         return true;
     }
+
+    public Estacionamento criarEstacionamento(Estacionamento estacionamento) {
+        return estacionamentoRepository.save(estacionamento);
+    }
+
+
+
 }

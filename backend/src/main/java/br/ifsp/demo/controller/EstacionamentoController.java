@@ -1,5 +1,6 @@
 package br.ifsp.demo.controller;
 
+import br.ifsp.demo.model.Estacionamento;
 import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.service.EstacionamentoService;
@@ -53,5 +54,11 @@ public class EstacionamentoController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    @PostMapping
+    public ResponseEntity<Estacionamento> criar(@RequestBody Estacionamento estacionamento) {
+        var criado = estacionamentoService.criarEstacionamento(estacionamento);
+        return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 }
