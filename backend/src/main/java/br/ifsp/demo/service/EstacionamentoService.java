@@ -35,6 +35,20 @@ public class EstacionamentoService {
         estacionamentoRepository.findById(1L)
                 .orElseThrow(() -> new IllegalArgumentException("Estacionamento não encontrado"));
 
+        Optional<Veiculo> veiculoExistente = veiculoService.buscarPorPlaca(veiculo.getPlaca());
+
+        if (veiculoExistente.isEmpty()) {
+            veiculo = veiculoService.cadastrarVeiculo(
+                    veiculo.getPlaca(),
+                    LocalDateTime.now(),
+                    veiculo.getTipoVeiculo(),
+                    veiculo.getModelo(),
+                    veiculo.getCor()
+            );
+        } else {
+            veiculo = veiculoExistente.get();
+        }
+
         RegistroEntrada registroEntrada = new RegistroEntrada(veiculo);
         return registroEntradaRepository.save(registroEntrada);
     }
