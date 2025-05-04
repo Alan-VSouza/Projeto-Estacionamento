@@ -5,6 +5,7 @@ import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.repository.PagamentoRepository;
+import br.ifsp.demo.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,13 @@ import java.util.List;
 public class RelatorioService {
 
     private final PagamentoRepository pagamentoRepository;
-    private final int NumeroVagas = 200;
+    private final VeiculoRepository veiculoRepository;
+    private final int numeroVagas = 200;
 
     @Autowired
-    public RelatorioService(PagamentoRepository pagamentoRepository) {
+    public RelatorioService(PagamentoRepository pagamentoRepository, VeiculoRepository veiculoRepository) {
         this.pagamentoRepository = pagamentoRepository;
+        this.veiculoRepository = veiculoRepository;
     }
 
     public RelatorioDTO gerarRelatorioDesempenho(LocalDate dataReferencia) {
@@ -60,7 +63,7 @@ public class RelatorioService {
                 })
                 .sum();
 
-        double ocupacaoMedia = minutosOcupadosTotal / (minutosNoDia * NumeroVagas);
+        double ocupacaoMedia = minutosOcupadosTotal / (minutosNoDia * numeroVagas);
 
         return new RelatorioDTO(
                 quantidade,
@@ -86,6 +89,6 @@ public class RelatorioService {
     }
 
     public int vagasDisponiveis() {
-        return 0;
+        return numeroVagas - veiculoRepository.findAll().size();
     }
 }
