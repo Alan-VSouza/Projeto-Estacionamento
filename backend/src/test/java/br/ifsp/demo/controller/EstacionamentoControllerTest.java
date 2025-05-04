@@ -6,6 +6,7 @@ import br.ifsp.demo.service.EstacionamentoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -144,6 +145,27 @@ class EstacionamentoControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(veiculo)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Tag("TDD")
+    @DisplayName("GET /estacionamento/entrada?placa= -> 200 OK e retorna registro de entrada")
+    void whenGetEntrada_thenReturnsRegistro() throws Exception {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca(PLACA);
+
+        RegistroEntrada registro = new RegistroEntrada(veiculo);
+        registro.setHoraEntrada(LocalDateTime.of(2025, 5, 4, 10, 0));
+
+        when(estacionamentoService.buscarEntrada(PLACA)).thenReturn(registro);
+
+        mockMvc.perform(get(BASE + "/entrada")
+                        .param("placa", PLACA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.veiculo.placa").value(PLACA))
+                .andExpect(jsonPath("$.horaEntrada").value("2025-05-04T10:00:00"));
     }
 
 }
