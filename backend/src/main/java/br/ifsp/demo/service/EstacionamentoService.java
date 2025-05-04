@@ -1,9 +1,8 @@
 package br.ifsp.demo.service;
 
-import br.ifsp.demo.model.Estacionamento;
-import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
+import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.repository.EstacionamentoRepository;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +22,16 @@ public class EstacionamentoService {
     @Autowired
     public EstacionamentoService(EstacionamentoRepository estacionamentoRepository,
                                  RegistroEntradaRepository registroEntradaRepository,
-                                 RegistroEntradaService registroEntradaService,
-                                 VeiculoService veiculoService,
-                                 Estacionamento estacionamento, PagamentoService pagamentoService) {
+                                 PagamentoService pagamentoService,
+                                 VeiculoService veiculoService) {
         this.estacionamentoRepository = estacionamentoRepository;
         this.registroEntradaRepository = registroEntradaRepository;
-        this.veiculoService = veiculoService;
         this.pagamentoService = pagamentoService;
+        this.veiculoService = veiculoService;
     }
 
     public RegistroEntrada registrarEntrada(Veiculo veiculo) {
-        Estacionamento estacionamento = estacionamentoRepository.findById(1L)
+        estacionamentoRepository.findById(1L)
                 .orElseThrow(() -> new IllegalArgumentException("Estacionamento não encontrado"));
 
         RegistroEntrada registroEntrada = new RegistroEntrada(veiculo);
@@ -44,11 +42,10 @@ public class EstacionamentoService {
         veiculoService.buscarPorPlaca(veiculo.getPlaca())
                 .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
 
-        RegistroEntrada registroEntrada = registroEntradaRepository.findByVeiculo(veiculo)
+        RegistroEntrada entrada = registroEntradaRepository.findByVeiculo(veiculo)
                 .orElseThrow(() -> new IllegalArgumentException("Veículo não registrado no estacionamento"));
 
-        registroEntradaRepository.delete(registroEntrada);
-
+        registroEntradaRepository.delete(entrada);
         return true;
     }
 
@@ -73,5 +70,4 @@ public class EstacionamentoService {
 
         return true;
     }
-
 }
