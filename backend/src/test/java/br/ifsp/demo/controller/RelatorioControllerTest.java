@@ -169,4 +169,19 @@ class RelatorioControllerTest {
 
         verify(relatorioService, times(1)).gerarHistorico(placa);
     }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve relatar o numero de vagas disponíveis")
+    void deveRelatarONumeroDeVagasDisponiveis() throws Exception {
+        when(relatorioService.vagasDisponiveis()).thenReturn(60);
+
+        mockMvc.perform(get("/api/relatorios/vagas-disponiveis")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.vagasDisponiveis").value(60));
+
+        verify(relatorioService, times(1)).vagasDisponiveis();
+    }
 }
