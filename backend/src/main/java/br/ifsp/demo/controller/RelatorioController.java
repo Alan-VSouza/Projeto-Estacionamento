@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/relatorios")
@@ -39,5 +40,10 @@ public class RelatorioController {
     @GetMapping("/historico/{placa}")
     public ResponseEntity<List<HistoricoDTO>> gerarHistoricoPorPlaca(@PathVariable String placa) {
         return ResponseEntity.ok(relatorioService.gerarHistorico(placa));
+    }
+
+    @GetMapping("/vagas-disponiveis")
+    public ResponseEntity<Map<String, Integer>> vagasDisponiveis() {
+        return ResponseEntity.ok(Map.of("vagasDisponiveis", relatorioService.vagasDisponiveis()));
     }
 }

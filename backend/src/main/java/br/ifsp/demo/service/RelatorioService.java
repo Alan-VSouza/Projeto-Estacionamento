@@ -84,4 +84,8 @@ public class RelatorioService {
                 .map(p -> new HistoricoDTO(p.getPlaca(), p.getHoraEntrada(), p.getHoraSaida(), p.getValor()))
                 .toList();
     }
+
+    public int vagasDisponiveis() {
+        return 0;
+    }
 }
