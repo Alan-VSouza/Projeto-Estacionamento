@@ -37,7 +37,7 @@ public class RelatorioController {
     }
 
     @GetMapping("/historico/{placa}")
-    public ResponseEntity<List<HistoricoDTO>> getHistoricoPorPlaca(@PathVariable String placa) {
+    public ResponseEntity<List<HistoricoDTO>> gerarHistoricoPorPlaca(@PathVariable String placa) {
         return ResponseEntity.ok(relatorioService.gerarHistorico(placa));
     }
 }
