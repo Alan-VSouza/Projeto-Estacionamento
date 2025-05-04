@@ -95,4 +95,20 @@ class EstacionamentoControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @Tag("UnitTest")
+    @DisplayName("DELETE /estacionamento/entrada -> 404 Not Found quando falha")
+    void whenDeleteEntradaFails_thenReturns404() throws Exception {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca(PLACA);
+
+        when(estacionamentoService.cancelarEntrada(any(Veiculo.class)))
+                .thenReturn(false);
+
+        mockMvc.perform(delete(BASE + "/entrada")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(veiculo)))
+                .andExpect(status().isNotFound());
+    }
 }
