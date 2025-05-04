@@ -19,13 +19,13 @@ public class EstacionamentoController {
         this.estacionamentoService = estacionamentoService;
     }
 
-    @PostMapping("/entrada")
+    @PostMapping("/registar-entrada")
     public ResponseEntity<RegistroEntrada> registrarEntrada(@RequestBody Veiculo veiculo) {
         RegistroEntrada registro = estacionamentoService.registrarEntrada(veiculo);
         return ResponseEntity.ok(registro);
     }
 
-    @DeleteMapping("/entrada")
+    @DeleteMapping("/cancelar-entrada")
     public ResponseEntity<Void> cancelarEntrada(@RequestBody Veiculo veiculo) {
         boolean sucesso = estacionamentoService.cancelarEntrada(veiculo);
         if (sucesso) {
@@ -35,7 +35,7 @@ public class EstacionamentoController {
         }
     }
 
-    @PostMapping("/saida")
+    @PostMapping("/registrar-saida")
     public ResponseEntity<Void> registrarSaida(@RequestBody Veiculo veiculo) {
         boolean sucesso = estacionamentoService.registrarSaida(veiculo);
         if (sucesso) {
@@ -45,7 +45,7 @@ public class EstacionamentoController {
         }
     }
 
-    @GetMapping("/entrada")
+    @GetMapping("/buscar-entrada")
     public ResponseEntity<RegistroEntrada> buscarEntrada(@RequestParam("placa") String placa) {
         RegistroEntrada registro = estacionamentoService.buscarEntrada(placa);
         if (registro != null) {
