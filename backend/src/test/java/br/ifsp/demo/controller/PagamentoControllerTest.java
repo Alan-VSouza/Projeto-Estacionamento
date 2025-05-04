@@ -117,7 +117,7 @@ class PagamentoControllerTest {
                     any(LocalDateTime.class),
                     any(String.class),
                     any(Double.class)
-                    )).thenReturn(pagamento);
+            )).thenReturn(pagamento);
 
             mockMvc.perform(put("/api/pagamentos/{id}", pagamento.getUuid())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -182,22 +182,30 @@ class PagamentoControllerTest {
     class Erros {
 
         @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar not found quando pagamento nao existe")
         void deveRetornarNotFoundQuandoPagamentoNaoExiste() throws Exception {
             UUID idInexistente = UUID.randomUUID();
+
             when(pagamentoService.buscarPorId(idInexistente)).thenReturn(null);
 
             mockMvc.perform(get("/api/pagamentos/{id}", idInexistente))
                     .andExpect(status().isNotFound());
         }
 
+
         @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar not found quando deleter pagamento inexistente")
         void deveRetornarNotFoundQuandoDeletarPagamentoInexistente() throws Exception {
             UUID idInexistente = UUID.randomUUID();
+
             when(pagamentoService.buscarPorId(idInexistente)).thenReturn(null);
 
             mockMvc.perform(delete("/api/pagamentos/{id}", idInexistente))
                     .andExpect(status().isNotFound());
         }
+
 
 
 
