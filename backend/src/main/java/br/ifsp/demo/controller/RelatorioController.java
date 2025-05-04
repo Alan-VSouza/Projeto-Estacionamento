@@ -3,8 +3,11 @@ package br.ifsp.demo.controller;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.service.RelatorioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/relatorios")
@@ -18,8 +21,8 @@ public class RelatorioController {
     }
 
     @GetMapping("/desempenho")
-    public ResponseEntity<RelatorioDTO> gerarRelatorioDesempenho() {
-        RelatorioDTO relatorio = relatorioService.gerarRelatorioDesempenho();
+    public ResponseEntity<RelatorioDTO> gerarRelatorioDesempenho(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+        RelatorioDTO relatorio = relatorioService.gerarRelatorioDesempenho(data);
         return ResponseEntity.ok(relatorio);
     }
 }

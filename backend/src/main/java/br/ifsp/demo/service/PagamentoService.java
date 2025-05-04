@@ -33,9 +33,6 @@ public class PagamentoService {
         if (pagamento == null)
             throw new IllegalArgumentException("Pagamento nao pode ser nulo");
 
-        if(pagamento.getUuid() == null)
-            throw new IllegalArgumentException("Pagamento não encontrado");
-
         if (pagamento.getHoraEntrada() == null)
             throw new IllegalArgumentException("Hora de entrada nao pode ser nula");
 
