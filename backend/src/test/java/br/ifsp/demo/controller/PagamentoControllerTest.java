@@ -190,6 +190,17 @@ class PagamentoControllerTest {
                     .andExpect(status().isNotFound());
         }
 
+        @Test
+        void deveRetornarNotFoundQuandoDeletarPagamentoInexistente() throws Exception {
+            UUID idInexistente = UUID.randomUUID();
+            when(pagamentoService.buscarPorId(idInexistente)).thenReturn(null);
+
+            mockMvc.perform(delete("/api/pagamentos/{id}", idInexistente))
+                    .andExpect(status().isNotFound());
+        }
+
+
+
     }
 
 }
