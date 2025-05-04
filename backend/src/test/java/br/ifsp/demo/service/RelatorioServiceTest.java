@@ -58,7 +58,7 @@ class RelatorioServiceTest {
     void deveCalcularCorretamenteORelatorioComBaseNosPagamentosDaData() {
         double minutosOcupadosTotal = Duration.between(pagamentosDeTeste.get(0).getHoraEntrada(), pagamentosDeTeste.get(0).getHoraSaida()).toMinutes()
                 + Duration.between(pagamentosDeTeste.get(1).getHoraEntrada(), pagamentosDeTeste.get(1).getHoraSaida()).toMinutes();
-        double ocupacaoEsperada = minutosOcupadosTotal / 1440.0;
+        double ocupacaoEsperada = minutosOcupadosTotal / (1440.0 * 200);
 
         when(pagamentoRepository.findAll()).thenReturn(pagamentosDeTeste);
 
