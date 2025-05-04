@@ -14,9 +14,7 @@ import java.time.LocalDateTime;
 public class ReciboDTO {
 
     private String placa;
-    private String tipoVeiculo;
     private LocalDateTime entrada;
     private LocalDateTime saida;
     private double valorTotal;
-    private String formaPagamento;
 }

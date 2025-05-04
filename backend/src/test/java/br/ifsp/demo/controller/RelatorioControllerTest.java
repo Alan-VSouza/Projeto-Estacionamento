@@ -74,7 +74,7 @@ class RelatorioControllerTest {
     @DisplayName("Deve retornar recibo com os detalhes da estadia e pagamento")
     void deveRetornarReciboComOsDetalhesDaEstadiaEPagamento() throws Exception {
         String placa = "ABC1234";
-        ReciboDTO reciboDTO = new ReciboDTO(placa, "Carro", LocalDateTime.of(2025, 5, 3, 9, 0), LocalDateTime.of(2025, 5, 3, 11, 30), 30.0, "Débito");
+        ReciboDTO reciboDTO = new ReciboDTO(placa, LocalDateTime.of(2025, 5, 3, 9, 0), LocalDateTime.of(2025, 5, 3, 11, 30), 30.0);
         when(relatorioService.gerarRecibo(placa)).thenReturn(reciboDTO);
 
         mockMvc.perform(get("/api/relatorios/recibo")
@@ -82,7 +82,6 @@ class RelatorioControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.placa").value("ABC1234"))
-                .andExpect(jsonPath("$.tipoVeiculo").value("Carro"))
                 .andExpect(jsonPath("$.entrada[0]").value(2025))
                 .andExpect(jsonPath("$.entrada[1]").value(5))
                 .andExpect(jsonPath("$.entrada[2]").value(3))
@@ -93,8 +92,7 @@ class RelatorioControllerTest {
                 .andExpect(jsonPath("$.saida[2]").value(3))
                 .andExpect(jsonPath("$.saida[3]").value(11))
                 .andExpect(jsonPath("$.saida[4]").value(30))
-                .andExpect(jsonPath("$.valorTotal").value(30.0))
-                .andExpect(jsonPath("$.formaPagamento").value("Débito"));
+                .andExpect(jsonPath("$.valorTotal").value(30.0));
 
         verify(relatorioService, times(1)).gerarRecibo(placa);
     }
