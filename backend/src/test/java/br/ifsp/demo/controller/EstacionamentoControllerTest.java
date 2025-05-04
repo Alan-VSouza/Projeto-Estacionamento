@@ -129,4 +129,21 @@ class EstacionamentoControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @Tag("UnitTest")
+    @DisplayName("POST /estacionamento/saida -> 404 Not Found quando falha")
+    void whenPostSaidaFails_thenReturns404() throws Exception {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca(PLACA);
+
+        when(estacionamentoService.registrarSaida(any(Veiculo.class)))
+                .thenReturn(false);
+
+        mockMvc.perform(post(BASE + "/saida")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(veiculo)))
+                .andExpect(status().isNotFound());
+    }
+
 }
