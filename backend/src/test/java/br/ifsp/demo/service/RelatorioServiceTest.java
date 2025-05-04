@@ -90,4 +90,49 @@ class RelatorioServiceTest {
         assertEquals(LocalDateTime.of(2025, 5, 3, 11, 30), recibo.getSaida());
         assertEquals(30.0, recibo.getValorTotal(), 0.01);
     }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve gerar histórico corretamente com base na placa")
+    void deveGerarHistoricoCorretamenteComBaseNaPlaca() {
+        String placa = "ABC1234";
+
+        Pagamento pagamento1 = new Pagamento();
+        pagamento1.setPlaca(placa);
+        pagamento1.setHoraEntrada(LocalDateTime.of(2025, 5, 3, 8, 0));
+        pagamento1.setHoraSaida(LocalDateTime.of(2025, 5, 3, 10, 0));
+        pagamento1.setValor(20.0);
+
+        Pagamento pagamento2 = new Pagamento();
+        pagamento2.setPlaca(placa);
+        pagamento2.setHoraEntrada(LocalDateTime.of(2025, 5, 4, 9, 0));
+        pagamento2.setHoraSaida(LocalDateTime.of(2025, 5, 4, 11, 30));
+        pagamento2.setValor(30.0);
+
+        Pagamento pagamento3 = new Pagamento();
+        pagamento3.setPlaca("XYZ9999");
+        pagamento3.setHoraEntrada(LocalDateTime.of(2025, 5, 4, 12, 0));
+        pagamento3.setHoraSaida(LocalDateTime.of(2025, 5, 4, 14, 0));
+        pagamento3.setValor(40.0);
+
+        List<Pagamento> pagamentoList = List.of(pagamento1, pagamento2, pagamento3);
+
+        when(pagamentoRepository.findAll()).thenReturn(pagamentoList);
+
+        var historico = relatorioService.gerarHistorico(placa);
+
+        assertNotNull(historico);
+        assertEquals(2, historico.size());
+
+        assertEquals("ABC1234", historico.get(0).getPlaca());
+        assertEquals(LocalDateTime.of(2025, 5, 3, 8, 0), historico.get(0).getEntrada());
+        assertEquals(LocalDateTime.of(2025, 5, 3, 10, 0), historico.get(0).getSaida());
+        assertEquals(20.0, historico.get(0).getValorTotal(), 0.01);
+
+        assertEquals("ABC1234", historico.get(1).getPlaca());
+        assertEquals(LocalDateTime.of(2025, 5, 4, 9, 0), historico.get(1).getEntrada());
+        assertEquals(LocalDateTime.of(2025, 5, 4, 11, 30), historico.get(1).getSaida());
+        assertEquals(30.0, historico.get(1).getValorTotal(), 0.01);
+    }
 }
