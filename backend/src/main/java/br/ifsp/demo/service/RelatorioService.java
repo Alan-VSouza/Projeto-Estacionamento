@@ -67,6 +67,9 @@ public class RelatorioService {
     }
 
     public List<HistoricoDTO> gerarHistorico(String placa) {
-        return null;
+        return pagamentoRepository.findAll().stream()
+                .filter(p -> placa.equals(p.getPlaca()))
+                .map(p -> new HistoricoDTO(p.getPlaca(), p.getHoraEntrada(), p.getHoraSaida(), p.getValor()))
+                .toList();
     }
 }
