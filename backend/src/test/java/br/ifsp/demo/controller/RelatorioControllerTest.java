@@ -41,7 +41,6 @@ class RelatorioControllerTest {
     void setup() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         mockMvc = MockMvcBuilders.standaloneSetup(relatorioController)
                 .defaultRequest(get("/").accept(MediaType.APPLICATION_JSON))
@@ -84,8 +83,16 @@ class RelatorioControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.placa").value("ABC1234"))
                 .andExpect(jsonPath("$.tipoVeiculo").value("Carro"))
-                .andExpect(jsonPath("$.entrada").value("2025-05-03T09:00:00"))
-                .andExpect(jsonPath("$.saida").value("2025-05-03T11:30:00"))
+                .andExpect(jsonPath("$.entrada[0]").value(2025))
+                .andExpect(jsonPath("$.entrada[1]").value(5))
+                .andExpect(jsonPath("$.entrada[2]").value(3))
+                .andExpect(jsonPath("$.entrada[3]").value(9))
+                .andExpect(jsonPath("$.entrada[4]").value(0))
+                .andExpect(jsonPath("$.saida[0]").value(2025))
+                .andExpect(jsonPath("$.saida[1]").value(5))
+                .andExpect(jsonPath("$.saida[2]").value(3))
+                .andExpect(jsonPath("$.saida[3]").value(11))
+                .andExpect(jsonPath("$.saida[4]").value(30))
                 .andExpect(jsonPath("$.valorTotal").value(30.0))
                 .andExpect(jsonPath("$.formaPagamento").value("Débito"));
 
