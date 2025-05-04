@@ -106,4 +106,17 @@ public class RegistroEntradaServiceTest {
         assertNotNull(resultado.getHoraEntrada());
         verify(registroEntradaRepository, times(1)).save(any());
     }
+
+    @Test
+    @Tag("UnitTest")
+    @DisplayName("Deve cancelar check-in com sucesso")
+    public void cancelarCheckIn_comSucesso() {
+        when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
+
+        boolean sucesso = registroEntradaService.cancelarCheckIn(PLACA_VEICULO, MOTIVO_CANCELAMENTO);
+
+        assertTrue(sucesso);
+        verify(registroEntradaRepository, times(1)).delete(registroEntrada);
+        verify(logSistema, times(1)).registrarCancelamento(PLACA_VEICULO, MOTIVO_CANCELAMENTO);
+    }
 }
