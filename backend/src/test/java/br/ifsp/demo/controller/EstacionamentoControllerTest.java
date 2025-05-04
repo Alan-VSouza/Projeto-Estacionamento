@@ -60,7 +60,7 @@ class EstacionamentoControllerTest {
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
-    @DisplayName("POST /estacionamento/entrada -> 200 e retorna registro de entrada")
+    @DisplayName("POST /estacionamento/registar-entrada -> 200 e retorna registro de entrada")
     void whenPostEntrada_thenReturnsRegistro() throws Exception {
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca(PLACA);
@@ -71,7 +71,7 @@ class EstacionamentoControllerTest {
         when(estacionamentoService.registrarEntrada(any(Veiculo.class)))
                 .thenReturn(registro);
 
-        mockMvc.perform(post(BASE + "/entrada")
+        mockMvc.perform(post(BASE + "/registar-entrada")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(veiculo)))
@@ -84,35 +84,34 @@ class EstacionamentoControllerTest {
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
-    @DisplayName("DELETE /estacionamento/entrada -> 200 OK quando sucesso")
+    @DisplayName("DELETE /estacionamento/cancelar-entrada -> 200 OK quando sucesso")
     void whenDeleteEntrada_thenReturns200() throws Exception {
-        Veiculo veiculo = new Veiculo();
-        veiculo.setPlaca(PLACA);
+        String placa = PLACA;
 
-        when(estacionamentoService.cancelarEntrada(any(Veiculo.class)))
+        when(estacionamentoService.cancelarEntrada(placa))
                 .thenReturn(true);
 
-        mockMvc.perform(delete(BASE + "/entrada")
+        mockMvc.perform(delete(BASE + "/cancelar-entrada")
+                        .param("placa", placa)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(veiculo)))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
+
     @Test
     @Tag("UnitTest")
-    @DisplayName("DELETE /estacionamento/entrada -> 404 Not Found quando falha")
+    @DisplayName("DELETE /estacionamento/cancelar-entrada -> 404 Not Found quando falha")
     void whenDeleteEntradaFails_thenReturns404() throws Exception {
-        Veiculo veiculo = new Veiculo();
-        veiculo.setPlaca(PLACA);
+        String placa = PLACA;
 
-        when(estacionamentoService.cancelarEntrada(any(Veiculo.class)))
+        when(estacionamentoService.cancelarEntrada(placa))
                 .thenReturn(false);
 
-        mockMvc.perform(delete(BASE + "/entrada")
+        mockMvc.perform(delete(BASE + "/cancelar-entrada")
+                        .param("placa", placa)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(veiculo)))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
@@ -127,7 +126,7 @@ class EstacionamentoControllerTest {
         when(estacionamentoService.registrarSaida(any(Veiculo.class)))
                 .thenReturn(true);
 
-        mockMvc.perform(post(BASE + "/saida")
+        mockMvc.perform(post(BASE + "/registrar-saida")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(veiculo)))
@@ -144,7 +143,7 @@ class EstacionamentoControllerTest {
         when(estacionamentoService.registrarSaida(any(Veiculo.class)))
                 .thenReturn(false);
 
-        mockMvc.perform(post(BASE + "/saida")
+        mockMvc.perform(post(BASE + "/registrar-saida")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(veiculo)))
@@ -154,7 +153,7 @@ class EstacionamentoControllerTest {
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
-    @DisplayName("GET /estacionamento/entrada?placa= -> 200 OK e retorna registro de entrada")
+    @DisplayName("GET /buscar-entrada?placa= -> 200 OK e retorna registro de entrada")
     void whenGetEntrada_thenReturnsRegistro() throws Exception {
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca(PLACA);
@@ -164,7 +163,7 @@ class EstacionamentoControllerTest {
 
         when(estacionamentoService.buscarEntrada(PLACA)).thenReturn(registro);
 
-        mockMvc.perform(get(BASE + "/entrada")
+        mockMvc.perform(get(BASE + "/buscar-entrada")
                         .param("placa", PLACA)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -182,7 +181,7 @@ class EstacionamentoControllerTest {
         when(estacionamentoService.criarEstacionamento(any(Estacionamento.class)))
                 .thenReturn(estacionamento);
 
-        mockMvc.perform(post(BASE)
+        mockMvc.perform(post(BASE + "/criar-estacionamento")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(estacionamento)))
@@ -201,7 +200,7 @@ class EstacionamentoControllerTest {
         Estacionamento est = new Estacionamento(1L, "Central", "Rua X");
         when(estacionamentoService.buscarEstacionamento()).thenReturn(est);
 
-        mockMvc.perform(get(BASE)
+        mockMvc.perform(get(BASE + "/buscar-estacionamento")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))

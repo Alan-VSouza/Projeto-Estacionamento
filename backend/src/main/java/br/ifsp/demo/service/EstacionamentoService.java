@@ -39,8 +39,8 @@ public class EstacionamentoService {
         return registroEntradaRepository.save(registroEntrada);
     }
 
-    public boolean cancelarEntrada(Veiculo veiculo) {
-        veiculoService.buscarPorPlaca(veiculo.getPlaca())
+    public boolean cancelarEntrada(String placa) {
+        Veiculo veiculo = veiculoService.buscarPorPlaca(placa)
                 .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
 
         RegistroEntrada entrada = registroEntradaRepository.findByVeiculo(veiculo)

@@ -89,35 +89,40 @@ public class EstacionamentoServiceTest {
     @Tag("UnitTest")
     @DisplayName("Cancelar entrada com sucesso deve deletar registro e retornar true")
     public void cancelarEntrada_comSucesso() {
-        when(veiculoService.buscarPorPlaca(veiculo.getPlaca()))
+        String placa = veiculo.getPlaca();
+
+        when(veiculoService.buscarPorPlaca(placa))
                 .thenReturn(Optional.of(veiculo));
         when(registroEntradaRepository.findByVeiculo(veiculo))
                 .thenReturn(Optional.of(registroEntrada));
 
-        boolean sucesso = estacionamentoService.cancelarEntrada(veiculo);
+        boolean sucesso = estacionamentoService.cancelarEntrada(placa);
 
         assertTrue(sucesso);
-        verify(registroEntradaRepository, times(1))
-                .delete(registroEntrada);
+        verify(registroEntradaRepository, times(1)).delete(registroEntrada);
     }
+
 
     @Test
     @Tag("TDD")
     @Tag("UnitTest")
     @DisplayName("Deve lançar IllegalArgumentException quando o veículo não estiver registrado ao cancelar entrada")
     public void cancelarEntrada_veiculoNaoRegistrado() {
-        when(veiculoService.buscarPorPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
+        String placa = PLACA_VEICULO;
+
+        when(veiculoService.buscarPorPlaca(placa)).thenReturn(Optional.of(veiculo));
 
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
 
         when(estacionamentoRepository.findById(1L)).thenReturn(Optional.of(estacionamento));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            estacionamentoService.cancelarEntrada(veiculo);
+            estacionamentoService.cancelarEntrada(placa);
         });
 
         assertEquals("Veículo não registrado no estacionamento", exception.getMessage());
     }
+
 
     @Test
     @Tag("TDD")
