@@ -111,4 +111,22 @@ class EstacionamentoControllerTest {
                         .content(objectMapper.writeValueAsString(veiculo)))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @Tag("TDD")
+    @DisplayName("POST /estacionamento/saida -> 200 OK quando sucesso")
+    void whenPostSaida_thenReturns200() throws Exception {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca(PLACA);
+
+        when(estacionamentoService.registrarSaida(any(Veiculo.class)))
+                .thenReturn(true);
+
+        mockMvc.perform(post(BASE + "/saida")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(veiculo)))
+                .andExpect(status().isOk());
+    }
+
 }
