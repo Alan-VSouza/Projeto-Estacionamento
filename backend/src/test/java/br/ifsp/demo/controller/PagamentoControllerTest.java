@@ -4,6 +4,7 @@ package br.ifsp.demo.controller;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.service.PagamentoService;
+import br.ifsp.demo.service.VeiculoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.*;
@@ -16,8 +17,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +33,8 @@ class PagamentoControllerTest {
 
     @Mock
     private PagamentoService pagamentoService;
+    @Mock
+    private VeiculoService veiculoService;
 
     @InjectMocks
     private PagamentoController pagamentoController;
@@ -60,9 +63,12 @@ class PagamentoControllerTest {
         veiculo.setCor("prata");
         veiculo.setHoraEntrada(LocalDateTime.now().minusHours(6));
 
-        pagamento = new Pagamento(veiculo);
+        pagamento = new Pagamento();
         pagamento.setUuid(UUID.randomUUID());
-        pagamento.setValor(35.0);
+        pagamento.setPlaca(veiculo.getPlaca());
+        pagamento.setHoraEntrada(veiculo.getHoraEntrada());
+        pagamento.setHoraSaida(LocalDateTime.now());
+        pagamento.setValor(43.0);
     }
 
     @Nested
@@ -76,12 +82,13 @@ class PagamentoControllerTest {
         void deveCriarPagamentoComSucesso() throws Exception {
 
             doNothing().when(pagamentoService).salvarPagamento(any(Pagamento.class));
+            when(veiculoService.buscarPorPlaca(any(String.class))).thenReturn(Optional.of(new Veiculo()));
 
             mockMvc.perform(post("/api/pagamento")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(pagamento)))
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.valor").value(35.0));
+                    .andExpect(jsonPath("$.valor").value(43.0));
         }
 
         @Test
@@ -107,7 +114,7 @@ class PagamentoControllerTest {
                     any(UUID.class),
                     any(LocalDateTime.class),
                     any(LocalDateTime.class),
-                    any(Veiculo.class),
+                    any(String.class),
                     any(Double.class)
                     )).thenReturn(pagamento);
 
@@ -115,7 +122,7 @@ class PagamentoControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(pagamento)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.valor").value(35.0));
+                    .andExpect(jsonPath("$.valor").value(43.0));
         }
 
         @Test
@@ -128,7 +135,7 @@ class PagamentoControllerTest {
 
             mockMvc.perform(get("/api/pagamento/{id}", pagamento.getUuid()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.valor").value(35.0));
+                    .andExpect(jsonPath("$.valor").value(43.0));
 
         }
 

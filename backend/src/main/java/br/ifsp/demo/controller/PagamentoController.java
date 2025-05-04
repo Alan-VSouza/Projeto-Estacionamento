@@ -3,6 +3,7 @@ package br.ifsp.demo.controller;
 import br.ifsp.demo.exception.ErrorResponse;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.service.PagamentoService;
+import br.ifsp.demo.service.VeiculoService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +19,18 @@ import java.util.UUID;
 public class PagamentoController {
 
     private final PagamentoService pagamentoService;
+    private final VeiculoService veiculoService;
 
-    public PagamentoController(PagamentoService pagamentoService) {
+    public PagamentoController(PagamentoService pagamentoService, VeiculoService veiculoService) {
         this.pagamentoService = pagamentoService;
+        this.veiculoService = veiculoService;
     }
 
     @PostMapping
     public ResponseEntity<Object> criarPagamento(@RequestBody Pagamento pagamento) {
-        if (pagamento.getVeiculo() == null) {
-            ErrorResponse errorResponse = new ErrorResponse("Veículo não pode ser nulo");
+
+        if (veiculoService.buscarPorPlaca(pagamento.getPlaca()).isEmpty()) {
+            ErrorResponse errorResponse = new ErrorResponse("Veículo precisa estar registrado no banco");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
@@ -95,7 +99,7 @@ public class PagamentoController {
                     pagamentoAtualizado.getUuid(),
                     pagamentoAtualizado.getHoraEntrada(),
                     pagamentoAtualizado.getHoraSaida(),
-                    pagamentoAtualizado.getVeiculo(),
+                    pagamentoAtualizado.getPlaca(),
                     pagamentoAtualizado.getValor()
             );
             return ResponseEntity.ok(pagamento);
