@@ -4,6 +4,7 @@ import br.ifsp.demo.exception.ErrorResponse;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.service.PagamentoService;
 import br.ifsp.demo.service.VeiculoService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,15 +15,11 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/pagamentos")
+@AllArgsConstructor
 public class PagamentoController {
 
     private final PagamentoService pagamentoService;
     private final VeiculoService veiculoService;
-
-    public PagamentoController(PagamentoService pagamentoService, VeiculoService veiculoService) {
-        this.pagamentoService = pagamentoService;
-        this.veiculoService = veiculoService;
-    }
 
     @PostMapping
     public ResponseEntity<Object> criarPagamento(@RequestBody Pagamento pagamento) {
@@ -59,25 +56,27 @@ public class PagamentoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> excluirPagamento(@PathVariable UUID id) {
 
-        if(id == null) {
+        if (id == null) {
             ErrorResponse errorResponse = new ErrorResponse("Id do pagamento não pode ser nulo");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
         try {
             Pagamento pagamento = pagamentoService.buscarPorId(id);
+
+            if (pagamento == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Pagamento não encontrado"));
+            }
+
             pagamentoService.deletarPagamento(pagamento);
-
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
-        catch(Exception e) {
 
+        } catch (Exception e) {
             ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-
         }
-
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> atualizarPagamento(@PathVariable UUID id, @RequestBody Pagamento pagamentoAtualizado) {
@@ -111,20 +110,24 @@ public class PagamentoController {
     @GetMapping("/{id}")
     public ResponseEntity<Object> buscarPagamentoPorId(@PathVariable UUID id) {
 
-        if(id == null) {
+        if (id == null) {
             ErrorResponse errorResponse = new ErrorResponse("Id do pagamento não pode ser nulo");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
         try {
             Pagamento pagamento = pagamentoService.buscarPorId(id);
+
+            if (pagamento == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Pagamento não encontrado"));
+            }
+
             return ResponseEntity.ok(pagamento);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
         }
-
     }
+
 
     @GetMapping("/data")
     public ResponseEntity<Object> buscarPagamentoPorData(@RequestParam("data") String data) {
