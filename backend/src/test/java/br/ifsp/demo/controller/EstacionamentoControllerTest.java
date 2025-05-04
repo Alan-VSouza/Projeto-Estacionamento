@@ -193,4 +193,22 @@ class EstacionamentoControllerTest {
                 .andExpect(jsonPath("$.endereco").value("Rua X"));
     }
 
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("GET /estacionamento -> 200 OK e retorna estacionamento existente")
+    void whenGetEstacionamento_thenReturnsEstacionamento() throws Exception {
+        Estacionamento est = new Estacionamento(1L, "Central", "Rua X");
+        when(estacionamentoService.buscarEstacionamento()).thenReturn(est);
+
+        mockMvc.perform(get(BASE)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.nome").value("Central"))
+                .andExpect(jsonPath("$.endereco").value("Rua X"));
+    }
+
+
 }
