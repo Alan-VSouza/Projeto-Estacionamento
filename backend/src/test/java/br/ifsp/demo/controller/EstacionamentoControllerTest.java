@@ -210,5 +210,29 @@ class EstacionamentoControllerTest {
                 .andExpect(jsonPath("$.endereco").value("Rua X"));
     }
 
+    @Test
+    @Tag("UnitTest")
+    @DisplayName("POST /estacionamento/registrar-saida -> 200 OK quando veículo não registrado e entrada é registrada com sucesso")
+    void whenPostRegistrarEntrada_thenRegistersVehicleAndReturns200() throws Exception {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca("FUSCA");
+        veiculo.setTipoVeiculo("Carro");
+        veiculo.setModelo("Fusca");
+        veiculo.setCor("Azul");
+
+        when(estacionamentoService.registrarEntrada(any()))
+                .thenReturn(new RegistroEntrada(veiculo));
+
+        mockMvc.perform(post(BASE + "/registar-entrada")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(veiculo)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.veiculo.placa").value("FUSCA"))
+                .andExpect(jsonPath("$.veiculo.modelo").value("Fusca"))
+                .andExpect(jsonPath("$.veiculo.tipoVeiculo").value("Carro"))
+                .andExpect(jsonPath("$.veiculo.cor").value("Azul"));
+    }
+
 
 }
