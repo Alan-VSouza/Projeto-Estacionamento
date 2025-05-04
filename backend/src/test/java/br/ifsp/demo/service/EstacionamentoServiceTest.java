@@ -57,7 +57,6 @@ public class EstacionamentoServiceTest {
         veiculo.setCor("Azul");
 
         estacionamento = new Estacionamento();
-        estacionamento.setId(1L);
         estacionamento.setNome("Estacionamento Central");
         estacionamento.setEndereco("Rua X");
 

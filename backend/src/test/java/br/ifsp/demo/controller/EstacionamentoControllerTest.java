@@ -178,7 +178,7 @@ class EstacionamentoControllerTest {
     @Tag("UnitTest")
     @DisplayName("POST /estacionamento -> 201 Created e retorna estacionamento criado")
     void whenPostCriarEstacionamento_thenReturnsCreated() throws Exception {
-        Estacionamento estacionamento = new Estacionamento(1L, "Central", "Rua X");
+        Estacionamento estacionamento = new Estacionamento("Central", "Rua X");
         when(estacionamentoService.criarEstacionamento(any(Estacionamento.class)))
                 .thenReturn(estacionamento);
 
@@ -188,7 +188,6 @@ class EstacionamentoControllerTest {
                         .content(objectMapper.writeValueAsString(estacionamento)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.nome").value("Central"))
                 .andExpect(jsonPath("$.endereco").value("Rua X"));
     }
@@ -198,14 +197,13 @@ class EstacionamentoControllerTest {
     @Tag("UnitTest")
     @DisplayName("GET /estacionamento -> 200 OK e retorna estacionamento existente")
     void whenGetEstacionamento_thenReturnsEstacionamento() throws Exception {
-        Estacionamento est = new Estacionamento(1L, "Central", "Rua X");
+        Estacionamento est = new Estacionamento("Central", "Rua X");
         when(estacionamentoService.buscarEstacionamento()).thenReturn(est);
 
         mockMvc.perform(get(BASE + "/buscar-estacionamento")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.nome").value("Central"))
                 .andExpect(jsonPath("$.endereco").value("Rua X"));
     }
