@@ -29,5 +29,15 @@ public class EstacionamentoController {
         return ResponseEntity.ok(registro);
     }
 
+    @DeleteMapping("/entrada")
+    public ResponseEntity<Void> cancelarEntrada(@RequestBody Veiculo veiculo) {
+        boolean sucesso = estacionamentoService.cancelarEntrada(veiculo);
+        if (sucesso) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 
 }
