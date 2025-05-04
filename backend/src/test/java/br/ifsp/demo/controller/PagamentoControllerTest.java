@@ -206,6 +206,19 @@ class PagamentoControllerTest {
                     .andExpect(status().isNotFound());
         }
 
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar erro ao tentar criar pagamento com veículo não registrado")
+        void deveRetornarErroQuandoVeiculoNaoRegistrado() throws Exception {
+            pagamento.setPlaca("ABC-1234");
+
+            when(veiculoService.buscarPorPlaca(pagamento.getPlaca())).thenReturn(Optional.empty());
+
+            mockMvc.perform(post("/api/pagamentos")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(pagamento)))
+                    .andExpect(status().isBadRequest());
+        }
 
 
 
