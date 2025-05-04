@@ -6,11 +6,7 @@ import br.ifsp.demo.service.EstacionamentoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/estacionamento")
@@ -39,5 +35,13 @@ public class EstacionamentoController {
         }
     }
 
-
+    @PostMapping("/saida")
+    public ResponseEntity<Void> registrarSaida(@RequestBody Veiculo veiculo) {
+        boolean sucesso = estacionamentoService.registrarSaida(veiculo);
+        if (sucesso) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }
