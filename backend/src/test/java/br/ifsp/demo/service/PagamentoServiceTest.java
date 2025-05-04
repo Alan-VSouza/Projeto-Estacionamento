@@ -1,5 +1,7 @@
 package br.ifsp.demo.service;
 
+import br.ifsp.demo.exception.PagamentoNaoEncontradoException;
+import br.ifsp.demo.exception.VeiculoNaoEncontradoException;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.model.TempoPermanencia;
 import br.ifsp.demo.model.Veiculo;
@@ -136,7 +138,7 @@ class PagamentoServiceTest {
 
             assertThat(result).isNotNull();
             assertThat(result.getUuid()).isEqualTo(uuid);
-            verify(pagamentoRepository, times(2)).findById(uuid);
+            verify(pagamentoRepository, times(1)).findById(uuid);
         }
 
         @Test
@@ -220,8 +222,8 @@ class PagamentoServiceTest {
         @Tag("UnitTest")
         @CsvSource(
                 value = {
-                        "null, 2025-04-30T17:00:00, 20.0, Hora de entrada nao pode ser nula",
-                        "2025-04-30T15:30:00, null, 20.0, Hora de saida nao pode ser nula",
+                        "null, 2025-04-30T17:00:00, 20.0, Hora de entrada não pode ser nula",
+                        "2025-04-30T15:30:00, null, 20.0, Hora de saída não pode ser nula",
                 },
                 nullValues = "null"
         )
@@ -247,7 +249,7 @@ class PagamentoServiceTest {
             pagamento.setPlaca(null);
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.salvarPagamento(pagamento));
-            assertEquals("Placa nao pode ser nula ou vazia", exception.getMessage());
+            assertEquals("Placa não pode ser nula ou vazia", exception.getMessage());
         }
 
         @Test
@@ -256,7 +258,7 @@ class PagamentoServiceTest {
         void mensagemDeErroAoExcluirPagamentoNulo() {
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()-> service.deletarPagamento(null));
-            assertEquals("Pagamento nao pode ser nulo", exception.getMessage());
+            assertEquals("Pagamento não pode ser nulo", exception.getMessage());
 
         }
 
@@ -264,9 +266,9 @@ class PagamentoServiceTest {
         @Tag("UnitTest")
         @CsvSource(
                 value = {
-                        "null, 2025-04-30T15:30:00, 2025-04-30T17:00:00, 15.0, Uuid nao pode ser nulo",
-                        "123e4567-e89b-12d3-a456-426614174000, null, 2025-04-30T17:00:00, 15.0, Entrada nao pode ser nulo",
-                        "123e4567-e89b-12d3-a456-426614174000, 2025-04-30T17:00:00, null, 10.0, Saida nao pode ser nulo",
+                        "null, 2025-04-30T15:30:00, 2025-04-30T17:00:00, 15.0, Uuid não pode ser nulo",
+                        "123e4567-e89b-12d3-a456-426614174000, null, 2025-04-30T17:00:00, 15.0, Entrada não pode ser nulo",
+                        "123e4567-e89b-12d3-a456-426614174000, 2025-04-30T17:00:00, null, 10.0, Saída não pode ser nulo",
                 },
                 nullValues = "null"
         )
@@ -287,10 +289,10 @@ class PagamentoServiceTest {
         @DisplayName("mensagem de erro ao atualizar pagamento com veiculo nulo")
         void mensagemDeErroAoAtualizarPagamentoNulo() {
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()-> service.atualizarPagamento(
+            VeiculoNaoEncontradoException exception = assertThrows(VeiculoNaoEncontradoException.class, ()-> service.atualizarPagamento(
                     UUID.randomUUID(), LocalDateTime.now().minusHours(2), LocalDateTime.now(), null, 0
             ));
-            assertEquals("Veiculo nao existe no banco de dados", exception.getMessage());
+            assertEquals("Veículo não existe no banco de dados", exception.getMessage());
 
         }
 
@@ -303,7 +305,7 @@ class PagamentoServiceTest {
             when(veiculoService.buscarPorPlaca(pagamento.getPlaca())).thenReturn(Optional.ofNullable(veiculo));
             when(pagamentoRepository.findById(uuidInexistente)).thenReturn(Optional.empty());
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+            PagamentoNaoEncontradoException exception = assertThrows(PagamentoNaoEncontradoException.class, () ->
                     service.atualizarPagamento(
                             uuidInexistente,
                             LocalDateTime.now().minusHours(1),
@@ -321,8 +323,8 @@ class PagamentoServiceTest {
         @Tag("UnitTest")
         @CsvSource(
                 value ={
-                "null, Uuid nao pode ser nulo",
-                "123e4567-e89b-12d3-a456-426614174000, Esse pagamento nao existe"
+                "null, Uuid não pode ser nulo",
+                "123e4567-e89b-12d3-a456-426614174000, Esse pagamento não existe"
             },
                 nullValues = "null"
         )
