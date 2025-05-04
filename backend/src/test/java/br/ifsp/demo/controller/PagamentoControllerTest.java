@@ -177,4 +177,19 @@ class PagamentoControllerTest {
         }
     }
 
+    @Nested
+    @DisplayName("Testes de Erro")
+    class Erros {
+
+        @Test
+        void deveRetornarNotFoundQuandoPagamentoNaoExiste() throws Exception {
+            UUID idInexistente = UUID.randomUUID();
+            when(pagamentoService.buscarPorId(idInexistente)).thenReturn(null);
+
+            mockMvc.perform(get("/api/pagamentos/{id}", idInexistente))
+                    .andExpect(status().isNotFound());
+        }
+
+    }
+
 }
