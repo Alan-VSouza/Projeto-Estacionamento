@@ -1,5 +1,6 @@
 package br.ifsp.demo.controller;
 
+import br.ifsp.demo.dto.HistoricoDTO;
 import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.service.RelatorioService;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -112,5 +114,59 @@ class RelatorioControllerTest {
                 .andExpect(status().isNotFound());
 
         verify(relatorioService, times(1)).gerarRecibo(placa);
+    }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve retornar histórico com entrada e saída por placa")
+    void deveRetornarHistoricoComEntradasESaidasPorPlaca() throws Exception {
+        String placa = "ABC1234";
+
+        List<HistoricoDTO> historicoList = List.of(
+                new HistoricoDTO("ABC1234",
+                        LocalDateTime.of(2025, 5, 1, 10, 0),
+                        LocalDateTime.of(2025, 5, 1, 12, 30),
+                        15.0),
+                new HistoricoDTO("ABC1234",
+                        LocalDateTime.of(2025, 5, 3, 14, 15),
+                        LocalDateTime.of(2025, 5, 3, 17, 45),
+                        21.0)
+        );
+
+        when(relatorioService.gerarHistorico(placa)).thenReturn(historicoList);
+
+        mockMvc.perform(get("/api/relatorios/historico/{placa}", placa)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+
+                .andExpect(jsonPath("$[0].placa").value("ABC1234"))
+                .andExpect(jsonPath("$[0].entrada[0]").value(2025))
+                .andExpect(jsonPath("$[0].entrada[1]").value(5))
+                .andExpect(jsonPath("$[0].entrada[2]").value(1))
+                .andExpect(jsonPath("$[0].entrada[3]").value(10))
+                .andExpect(jsonPath("$[0].entrada[4]").value(0))
+                .andExpect(jsonPath("$[0].saida[0]").value(2025))
+                .andExpect(jsonPath("$[0].saida[1]").value(5))
+                .andExpect(jsonPath("$[0].saida[2]").value(1))
+                .andExpect(jsonPath("$[0].saida[3]").value(12))
+                .andExpect(jsonPath("$[0].saida[4]").value(30))
+                .andExpect(jsonPath("$[0].valorTotal").value(15.0))
+
+                .andExpect(jsonPath("$[1].placa").value("ABC1234"))
+                .andExpect(jsonPath("$[1].entrada[0]").value(2025))
+                .andExpect(jsonPath("$[1].entrada[1]").value(5))
+                .andExpect(jsonPath("$[1].entrada[2]").value(3))
+                .andExpect(jsonPath("$[1].entrada[3]").value(14))
+                .andExpect(jsonPath("$[1].entrada[4]").value(15))
+                .andExpect(jsonPath("$[1].saida[0]").value(2025))
+                .andExpect(jsonPath("$[1].saida[1]").value(5))
+                .andExpect(jsonPath("$[1].saida[2]").value(3))
+                .andExpect(jsonPath("$[1].saida[3]").value(17))
+                .andExpect(jsonPath("$[1].saida[4]").value(45))
+                .andExpect(jsonPath("$[1].valorTotal").value(21.0));
+
+        verify(relatorioService, times(1)).gerarHistorico(placa);
     }
 }
