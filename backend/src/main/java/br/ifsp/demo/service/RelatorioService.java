@@ -19,6 +19,7 @@ import java.util.List;
 public class RelatorioService {
 
     private final PagamentoRepository pagamentoRepository;
+    private final int NumeroVagas = 200;
 
     @Autowired
     public RelatorioService(PagamentoRepository pagamentoRepository) {
@@ -48,7 +49,18 @@ public class RelatorioService {
                 .mapToDouble(Pagamento::getValor)
                 .sum();
 
-        double ocupacaoMedia = 0.0;
+        long minutosNoDia = Duration.between(inicioDoDia, fimDoDia).toMinutes();
+
+        double minutosOcupadosTotal = pagamentosDoDia.stream()
+                .filter(p -> p.getHoraEntrada() != null && p.getHoraSaida() != null)
+                .mapToDouble(p -> {
+                    LocalDateTime entrada = p.getHoraEntrada().isBefore(inicioDoDia) ? inicioDoDia : p.getHoraEntrada();
+                    LocalDateTime saida = p.getHoraSaida().isAfter(fimDoDia) ? fimDoDia : p.getHoraSaida();
+                    return Duration.between(entrada, saida).toMinutes();
+                })
+                .sum();
+
+        double ocupacaoMedia = minutosOcupadosTotal / minutosNoDia;
 
         return new RelatorioDTO(
                 quantidade,
