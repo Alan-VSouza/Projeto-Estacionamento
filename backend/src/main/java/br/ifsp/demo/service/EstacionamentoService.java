@@ -49,6 +49,12 @@ public class EstacionamentoService {
         return true;
     }
 
+    public RegistroEntrada buscarEntrada(String placa) {
+        Optional<Veiculo> veiculoOpt = veiculoService.buscarPorPlaca(placa);
+        return veiculoOpt.flatMap(registroEntradaRepository::findByVeiculo).orElse(null);
+    }
+
+
     public boolean registrarSaida(Veiculo veiculo) {
         if (veiculoService.buscarPorPlaca(veiculo.getPlaca()).isEmpty()) {
             return false;

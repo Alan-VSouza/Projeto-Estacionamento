@@ -44,4 +44,14 @@ public class EstacionamentoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    @GetMapping("/entrada")
+    public ResponseEntity<RegistroEntrada> buscarEntrada(@RequestParam("placa") String placa) {
+        RegistroEntrada registro = estacionamentoService.buscarEntrada(placa);
+        if (registro != null) {
+            return ResponseEntity.ok(registro);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }
