@@ -5,6 +5,7 @@ import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.service.EstacionamentoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -75,6 +76,23 @@ class EstacionamentoControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.veiculo.placa").value(PLACA))
                 .andExpect(jsonPath("$.horaEntrada").value("2025-05-04T10:00:00"));
+    }
+
+    @Test
+    @Tag("TDD")
+    @DisplayName("DELETE /estacionamento/entrada -> 200 OK quando sucesso")
+    void whenDeleteEntrada_thenReturns200() throws Exception {
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca(PLACA);
+
+        when(estacionamentoService.cancelarEntrada(any(Veiculo.class)))
+                .thenReturn(true);
+
+        mockMvc.perform(delete(BASE + "/entrada")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(veiculo)))
+                .andExpect(status().isOk());
     }
 
 }
