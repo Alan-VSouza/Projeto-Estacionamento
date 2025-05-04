@@ -4,7 +4,6 @@ import br.ifsp.demo.exception.ErrorResponse;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.service.PagamentoService;
 import br.ifsp.demo.service.VeiculoService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +13,7 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/api/pagamento")
-@SecurityRequirement(name = "bearerAuth")
+@RequestMapping("/api/pagamentos")
 public class PagamentoController {
 
     private final PagamentoService pagamentoService;
