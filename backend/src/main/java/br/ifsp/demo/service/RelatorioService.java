@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -57,6 +58,10 @@ public class RelatorioService {
     }
 
     public ReciboDTO gerarRecibo(String placa) {
-        return null;
+        return pagamentoRepository.findAll().stream()
+                .filter(p -> placa.equals(p.getPlaca()))
+                .max(Comparator.comparing(Pagamento::getHoraSaida))
+                .map(p -> new ReciboDTO(p.getPlaca(), p.getHoraEntrada(), p.getHoraSaida(), p.getValor()))
+                .orElse(null);
     }
 }
