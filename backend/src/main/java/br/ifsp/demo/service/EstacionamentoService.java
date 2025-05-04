@@ -37,16 +37,14 @@ public class EstacionamentoService {
     }
 
     public boolean cancelarEntrada(Veiculo veiculo) {
-        if (veiculoService.buscarPorPlaca(veiculo.getPlaca()).isEmpty()) {
-            return false;
-        }
+        veiculoService.buscarPorPlaca(veiculo.getPlaca())
+                .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
 
-        Optional<RegistroEntrada> registroOpt = registroEntradaRepository.findByVeiculo(veiculo);
-        if (registroOpt.isEmpty()) {
-            return false;
-        }
+        RegistroEntrada registroEntrada = registroEntradaRepository.findByVeiculo(veiculo)
+                .orElseThrow(() -> new IllegalArgumentException("Veículo não registrado no estacionamento"));
 
-        registroEntradaRepository.delete(registroOpt.get());
+        registroEntradaRepository.delete(registroEntrada);
+
         return true;
     }
 
