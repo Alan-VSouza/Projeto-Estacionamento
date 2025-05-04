@@ -27,8 +27,8 @@ public class EstacionamentoController {
     }
 
     @DeleteMapping("/cancelar-entrada")
-    public ResponseEntity<Void> cancelarEntrada(@RequestBody Veiculo veiculo) {
-        boolean sucesso = estacionamentoService.cancelarEntrada(veiculo);
+    public ResponseEntity<Void> cancelarEntrada(@RequestParam("placa") String placa) {
+        boolean sucesso = estacionamentoService.cancelarEntrada(placa);
         if (sucesso) {
             return ResponseEntity.ok().build();
         } else {
@@ -56,13 +56,13 @@ public class EstacionamentoController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/criar-estacionamento")
     public ResponseEntity<Estacionamento> criar(@RequestBody Estacionamento estacionamento) {
         var criado = estacionamentoService.criarEstacionamento(estacionamento);
         return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 
-    @GetMapping
+    @GetMapping("/buscar-estacionamento")
     public ResponseEntity<Estacionamento> buscar() {
         var est = estacionamentoService.buscarEstacionamento();
         return ResponseEntity.ok(est);
