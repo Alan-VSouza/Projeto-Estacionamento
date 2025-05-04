@@ -1,5 +1,6 @@
 package br.ifsp.demo.controller;
 
+import br.ifsp.demo.model.Estacionamento;
 import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.service.EstacionamentoService;
@@ -170,6 +171,26 @@ class EstacionamentoControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.veiculo.placa").value(PLACA))
                 .andExpect(jsonPath("$.horaEntrada").value("2025-05-04T10:00:00"));
+    }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("POST /estacionamento -> 201 Created e retorna estacionamento criado")
+    void whenPostCriarEstacionamento_thenReturnsCreated() throws Exception {
+        Estacionamento estacionamento = new Estacionamento(1L, "Central", "Rua X");
+        when(estacionamentoService.criarEstacionamento(any(Estacionamento.class)))
+                .thenReturn(estacionamento);
+
+        mockMvc.perform(post(BASE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(estacionamento)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.nome").value("Central"))
+                .andExpect(jsonPath("$.endereco").value("Rua X"));
     }
 
 }
