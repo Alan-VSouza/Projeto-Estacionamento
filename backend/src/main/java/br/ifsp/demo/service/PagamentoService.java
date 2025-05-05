@@ -1,7 +1,7 @@
 package br.ifsp.demo.service;
 
 import br.ifsp.demo.model.Pagamento;
-import br.ifsp.demo.model.TempoPermanencia;
+import br.ifsp.demo.components.TempoPermanencia;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.exception.PagamentoNaoEncontradoException;
 import br.ifsp.demo.exception.VeiculoNaoEncontradoException;
