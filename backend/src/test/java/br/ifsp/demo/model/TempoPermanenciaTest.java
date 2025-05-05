@@ -1,6 +1,6 @@
 package br.ifsp.demo.model;
 
-import br.ifsp.demo.service.ValorPermanencia;
+import br.ifsp.demo.components.ValorPermanencia;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

@@ -1,4 +1,4 @@
-package br.ifsp.demo.service;
+package br.ifsp.demo.components;
 
 import org.springframework.stereotype.Component;
 

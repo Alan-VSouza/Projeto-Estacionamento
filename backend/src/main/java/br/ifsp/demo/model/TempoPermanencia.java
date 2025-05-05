@@ -1,6 +1,6 @@
 package br.ifsp.demo.model;
 
-import br.ifsp.demo.service.ValorPermanencia;
+import br.ifsp.demo.components.ValorPermanencia;
 import org.springframework.stereotype.Component;
 
 @Component
