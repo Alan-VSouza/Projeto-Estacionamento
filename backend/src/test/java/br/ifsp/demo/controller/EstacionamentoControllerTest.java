@@ -3,9 +3,12 @@ package br.ifsp.demo.controller;
 import br.ifsp.demo.model.Estacionamento;
 import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
+import br.ifsp.demo.repository.EstacionamentoRepository;
 import br.ifsp.demo.service.EstacionamentoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -23,6 +26,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -36,6 +41,9 @@ class EstacionamentoControllerTest {
 
     @Mock
     private EstacionamentoService estacionamentoService;
+
+    @Mock
+    private EstacionamentoRepository estacionamentoRepository;
 
     @InjectMocks
     private EstacionamentoController estacionamentoController;
@@ -62,19 +70,27 @@ class EstacionamentoControllerTest {
     @Tag("UnitTest")
     @DisplayName("POST /estacionamento/registar-entrada -> 200 e retorna registro de entrada")
     void whenPostEntrada_thenReturnsRegistro() throws Exception {
+        UUID estacionamentoId = UUID.randomUUID();
+
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca(PLACA);
+
+        Estacionamento estacionamento = new Estacionamento("Central", "Rua X");
+        estacionamento.setId(estacionamentoId);
 
         RegistroEntrada registro = new RegistroEntrada(veiculo);
         registro.setHoraEntrada(LocalDateTime.of(2025, 5, 4, 10, 0));
 
-        when(estacionamentoService.registrarEntrada(any(Veiculo.class)))
+        when(estacionamentoService.buscarEstacionamentoAtual()).thenReturn(estacionamento);
+
+        when(estacionamentoService.registrarEntrada(any(Veiculo.class), eq(estacionamentoId)))
                 .thenReturn(registro);
 
         mockMvc.perform(post(BASE + "/registar-entrada")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(veiculo)))
+                        .content(objectMapper.writeValueAsString(veiculo))
+                        .param("idEstacionamento", estacionamentoId.toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.veiculo.placa").value(PLACA))
@@ -197,10 +213,12 @@ class EstacionamentoControllerTest {
     @Tag("UnitTest")
     @DisplayName("GET /estacionamento -> 200 OK e retorna estacionamento existente")
     void whenGetEstacionamento_thenReturnsEstacionamento() throws Exception {
-        Estacionamento est = new Estacionamento("Central", "Rua X");
-        when(estacionamentoService.buscarEstacionamento()).thenReturn(est);
+        UUID idEstacionamento = UUID.randomUUID();
 
-        mockMvc.perform(get(BASE + "/buscar-estacionamento")
+        Estacionamento est = new Estacionamento("Central", "Rua X");
+        when(estacionamentoService.buscarEstacionamento(idEstacionamento)).thenReturn(est);
+
+        mockMvc.perform(get(BASE + "/buscar-estacionamento/" + idEstacionamento)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -212,25 +230,40 @@ class EstacionamentoControllerTest {
     @Tag("UnitTest")
     @DisplayName("POST /estacionamento/registrar-saida -> 200 OK quando veículo não registrado e entrada é registrada com sucesso")
     void whenPostRegistrarEntrada_thenRegistersVehicleAndReturns200() throws Exception {
+        UUID estacionamentoId = UUID.randomUUID();
+
         Veiculo veiculo = new Veiculo();
         veiculo.setPlaca("FUSCA");
         veiculo.setTipoVeiculo("Carro");
         veiculo.setModelo("Fusca");
         veiculo.setCor("Azul");
 
-        when(estacionamentoService.registrarEntrada(any()))
-                .thenReturn(new RegistroEntrada(veiculo));
+        Estacionamento estacionamento = new Estacionamento("Central", "Rua X");
+        estacionamento.setId(estacionamentoId);
+
+        when(estacionamentoService.buscarEstacionamentoAtual()).thenReturn(estacionamento);
+
+        RegistroEntrada registro = new RegistroEntrada(veiculo);
+
+        when(estacionamentoService.registrarEntrada(any(Veiculo.class), eq(estacionamentoId)))
+                .thenReturn(registro);
 
         mockMvc.perform(post(BASE + "/registar-entrada")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(veiculo)))
+                        .content(objectMapper.writeValueAsString(veiculo))
+                        .param("idEstacionamento", estacionamentoId.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.veiculo.placa").value("FUSCA"))
                 .andExpect(jsonPath("$.veiculo.modelo").value("Fusca"))
                 .andExpect(jsonPath("$.veiculo.tipoVeiculo").value("Carro"))
                 .andExpect(jsonPath("$.veiculo.cor").value("Azul"));
     }
+
+
+
+
+
 
 
 }

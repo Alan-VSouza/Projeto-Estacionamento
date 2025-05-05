@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/estacionamento")
 public class EstacionamentoController {
@@ -22,7 +24,9 @@ public class EstacionamentoController {
 
     @PostMapping("/registar-entrada")
     public ResponseEntity<RegistroEntrada> registrarEntrada(@RequestBody Veiculo veiculo) {
-        RegistroEntrada registro = estacionamentoService.registrarEntrada(veiculo);
+        Estacionamento estacionamento = estacionamentoService.buscarEstacionamentoAtual();
+
+        RegistroEntrada registro = estacionamentoService.registrarEntrada(veiculo, estacionamento.getId());
         return ResponseEntity.ok(registro);
     }
 
@@ -58,14 +62,20 @@ public class EstacionamentoController {
 
     @PostMapping("/criar-estacionamento")
     public ResponseEntity<Estacionamento> criar(@RequestBody Estacionamento estacionamento) {
-        var criado = estacionamentoService.criarEstacionamento(estacionamento);
+        Estacionamento criado = estacionamentoService.criarEstacionamento(estacionamento);
         return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 
-    @GetMapping("/buscar-estacionamento")
-    public ResponseEntity<Estacionamento> buscar() {
-        var est = estacionamentoService.buscarEstacionamento();
+    @GetMapping("/buscar-estacionamento/{id}")
+    public ResponseEntity<Estacionamento> buscar(@PathVariable UUID id) {
+        var est = estacionamentoService.buscarEstacionamento(id);
         return ResponseEntity.ok(est);
+    }
+
+    @GetMapping("/buscar-atual-estacionamento")
+    public ResponseEntity<Estacionamento> buscarEstacionamento() {
+        Estacionamento estacionamento = estacionamentoService.buscarEstacionamentoAtual();
+        return ResponseEntity.ok(estacionamento);
     }
 
 }

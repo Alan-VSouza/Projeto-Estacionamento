@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -34,7 +35,6 @@ public class EstacionamentoServiceTest {
 
     @Mock
     private VeiculoService veiculoService;
-
 
     @InjectMocks
     private EstacionamentoService estacionamentoService;
@@ -70,17 +70,28 @@ public class EstacionamentoServiceTest {
     @Tag("UnitTest")
     @DisplayName("Registrar entrada com sucesso deve salvar registro no repositório")
     public void registrarEntrada_comSucesso() {
-        when(estacionamentoRepository.findById(1L))
+        UUID estacionamentoId = UUID.randomUUID();
+
+        Estacionamento estacionamento = new Estacionamento();
+        estacionamento.setId(estacionamentoId);
+
+        when(estacionamentoRepository.findById(estacionamentoId))
                 .thenReturn(Optional.of(estacionamento));
+
+        Veiculo veiculo = new Veiculo();
+        veiculo.setPlaca("ABC1234");
+        veiculo.setTipoVeiculo("Carro");
+        veiculo.setModelo("Fusca");
+        veiculo.setCor("Azul");
+
         when(registroEntradaRepository.save(any(RegistroEntrada.class)))
                 .thenReturn(new RegistroEntrada(veiculo));
 
-        RegistroEntrada resultado = estacionamentoService.registrarEntrada(veiculo);
+        RegistroEntrada resultado = estacionamentoService.registrarEntrada(veiculo, estacionamentoId);
 
         assertNotNull(resultado);
         assertEquals(veiculo, resultado.getVeiculo());
-        verify(registroEntradaRepository, times(1))
-                .save(any(RegistroEntrada.class));
+        verify(registroEntradaRepository, times(1)).save(any(RegistroEntrada.class));
     }
 
     @Test
@@ -113,7 +124,7 @@ public class EstacionamentoServiceTest {
 
         when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
 
-        when(estacionamentoRepository.findById(1L)).thenReturn(Optional.of(estacionamento));
+        when(estacionamentoRepository.findById(estacionamento.getId())).thenReturn(Optional.of(estacionamento));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             estacionamentoService.cancelarEntrada(placa);

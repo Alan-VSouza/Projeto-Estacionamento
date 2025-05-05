@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class EstacionamentoService {
@@ -31,8 +32,8 @@ public class EstacionamentoService {
         this.veiculoService = veiculoService;
     }
 
-    public RegistroEntrada registrarEntrada(Veiculo veiculo) {
-        estacionamentoRepository.findById(1L)
+    public RegistroEntrada registrarEntrada(Veiculo veiculo, UUID idEstacionamento) {
+        Estacionamento estacionamento = estacionamentoRepository.findById(idEstacionamento)
                 .orElseThrow(() -> new IllegalArgumentException("Estacionamento não encontrado"));
 
         Optional<Veiculo> veiculoExistente = veiculoService.buscarPorPlaca(veiculo.getPlaca());
@@ -95,15 +96,17 @@ public class EstacionamentoService {
 
         return true;
     }
-
-
-
     public Estacionamento criarEstacionamento(Estacionamento estacionamento) {
         return estacionamentoRepository.save(estacionamento);
     }
 
-    public Estacionamento buscarEstacionamento() {
-        return estacionamentoRepository.findById(1L)
+    public Estacionamento buscarEstacionamento(UUID id) {
+        return estacionamentoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Estacionamento não encontrado"));
+    }
+
+    public Estacionamento buscarEstacionamentoAtual() {
+        return estacionamentoRepository.findAll().stream().findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Estacionamento não encontrado"));
     }
 
