@@ -289,4 +289,27 @@ public class EstacionamentoServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("Testes de Criação de Estacionamento")
+    class TestesDeCriacaoEstacionamento {
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Criar estacionamento com sucesso")
+        void criarEstacionamento_comSucesso() {
+            Estacionamento estacionamento = new Estacionamento();
+            estacionamento.setNome("Estacionamento Central");
+            estacionamento.setEndereco("Rua X");
+
+            when(estacionamentoRepository.save(any(Estacionamento.class)))
+                    .thenReturn(estacionamento);
+
+            Estacionamento resultado = estacionamentoService.criarEstacionamento(estacionamento);
+
+            assertNotNull(resultado);
+            assertEquals(estacionamento.getNome(), resultado.getNome());
+            assertEquals(estacionamento.getEndereco(), resultado.getEndereco());
+            verify(estacionamentoRepository, times(1)).save(any(Estacionamento.class));
+        }
+    }
 }
