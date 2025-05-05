@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -76,6 +77,12 @@ public class EstacionamentoController {
     public ResponseEntity<Estacionamento> buscarEstacionamento() {
         Estacionamento estacionamento = estacionamentoService.buscarEstacionamentoAtual();
         return ResponseEntity.ok(estacionamento);
+    }
+
+    @GetMapping("/entradas")
+    public ResponseEntity<List<RegistroEntrada>> getAllEntries() {
+        List<RegistroEntrada> entradas = estacionamentoService.getAllEntradas();
+        return ResponseEntity.ok(entradas);
     }
 
 }
