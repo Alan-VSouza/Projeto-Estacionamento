@@ -33,25 +33,24 @@ public class EstacionamentoService {
         this.veiculoService = veiculoService;
     }
 
+    private Veiculo obterOuCadastrarVeiculo(Veiculo veiculo) {
+        return veiculoService.buscarPorPlaca(veiculo.getPlaca())
+                .orElseGet(() -> veiculoService.cadastrarVeiculo(
+                        veiculo.getPlaca(),
+                        LocalDateTime.now(),
+                        veiculo.getTipoVeiculo(),
+                        veiculo.getModelo(),
+                        veiculo.getCor()
+                ));
+    }
+
     public RegistroEntrada registrarEntrada(Veiculo veiculo, UUID idEstacionamento) {
         Estacionamento estacionamento = estacionamentoRepository.findById(idEstacionamento)
                 .orElseThrow(() -> new IllegalArgumentException("Estacionamento não encontrado"));
 
-        Optional<Veiculo> veiculoExistente = veiculoService.buscarPorPlaca(veiculo.getPlaca());
+        Veiculo veiculoCadastrado = obterOuCadastrarVeiculo(veiculo);
 
-        if (veiculoExistente.isEmpty()) {
-            veiculo = veiculoService.cadastrarVeiculo(
-                    veiculo.getPlaca(),
-                    LocalDateTime.now(),
-                    veiculo.getTipoVeiculo(),
-                    veiculo.getModelo(),
-                    veiculo.getCor()
-            );
-        } else {
-            veiculo = veiculoExistente.get();
-        }
-
-        RegistroEntrada registroEntrada = new RegistroEntrada(veiculo);
+        RegistroEntrada registroEntrada = new RegistroEntrada(veiculoCadastrado);
         return registroEntradaRepository.save(registroEntrada);
     }
 
@@ -71,7 +70,6 @@ public class EstacionamentoService {
         return veiculoOpt.flatMap(registroEntradaRepository::findByVeiculo).orElse(null);
     }
 
-
     public boolean registrarSaida(String placa) {
         Optional<Veiculo> veiculoOpt = veiculoService.buscarPorPlaca(placa);
         if (veiculoOpt.isEmpty()) {
@@ -88,15 +86,21 @@ public class EstacionamentoService {
 
         registroEntradaRepository.delete(entrada);
 
-        Pagamento pagamento = new Pagamento();
-        pagamento.setPlaca(placa);
-        pagamento.setHoraEntrada(entrada.getHoraEntrada());
-        pagamento.setHoraSaida(LocalDateTime.now());
+        Pagamento pagamento = criarPagamento(placa, entrada);
 
         pagamentoService.salvarPagamento(pagamento);
 
         return true;
     }
+
+    private Pagamento criarPagamento(String placa, RegistroEntrada entrada) {
+        Pagamento pagamento = new Pagamento();
+        pagamento.setPlaca(placa);
+        pagamento.setHoraEntrada(entrada.getHoraEntrada());
+        pagamento.setHoraSaida(LocalDateTime.now());
+        return pagamento;
+    }
+
     public Estacionamento criarEstacionamento(Estacionamento estacionamento) {
         return estacionamentoRepository.save(estacionamento);
     }
@@ -114,5 +118,4 @@ public class EstacionamentoService {
     public List<RegistroEntrada> getAllEntradas() {
         return registroEntradaRepository.findAll();
     }
-
 }
