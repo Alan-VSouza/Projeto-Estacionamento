@@ -28,24 +28,29 @@ public class PagamentoService {
         if (pagamento == null)
             throw new IllegalArgumentException("Pagamento não pode ser nulo");
 
-        if (pagamento.getHoraEntrada() == null)
+        if (pagamento.getHoraEntrada() == null) {
             throw new IllegalArgumentException("Hora de entrada não pode ser nula");
+        }
 
-        if (pagamento.getHoraSaida() == null)
+        if (pagamento.getHoraSaida() == null) {
             throw new IllegalArgumentException("Hora de saída não pode ser nula");
+        }
 
-        if (pagamento.getPlaca() == null || pagamento.getPlaca().trim().isEmpty())
+        if (pagamento.getPlaca() == null || pagamento.getPlaca().trim().isEmpty()) {
             throw new IllegalArgumentException("Placa não pode ser nula ou vazia");
+        }
 
         Optional<Veiculo> veiculo = veiculoService.buscarPorPlaca(pagamento.getPlaca());
 
-        if (veiculo.isEmpty())
+        if (veiculo.isEmpty()) {
             throw new VeiculoNaoEncontradoException("Veículo não encontrado no estacionamento");
+        }
 
         int horasPermanencia = calcularHorasPermanencia(pagamento.getHoraEntrada(), pagamento.getHoraSaida());
         double valorPermanencia = tempoPermanencia.calcularValorDaPermanencia(horasPermanencia);
-        pagamento.setValor(valorPermanencia);
 
+        pagamento.setValor(valorPermanencia);
+        pagamento.setHoraEntrada(veiculo.get().getHoraEntrada());
         pagamentoRepository.save(pagamento);
 
         veiculoService.deletarVeiculo(veiculo.get().getId());
@@ -53,11 +58,11 @@ public class PagamentoService {
 
 
     private int calcularHorasPermanencia(LocalDateTime horaEntrada, LocalDateTime horaSaida) {
-
         double horas = java.time.Duration.between(horaEntrada, horaSaida).toMinutes() / 60.0;
+        System.out.println("Horas calculadas: " + horas);
         return (int) Math.ceil(horas);
-
     }
+
 
     public void deletarPagamento(Pagamento pagamento) {
 
