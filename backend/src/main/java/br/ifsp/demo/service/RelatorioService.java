@@ -21,7 +21,7 @@ public class RelatorioService {
 
     private final PagamentoRepository pagamentoRepository;
     private final VeiculoRepository veiculoRepository;
-    private final int numeroVagas = 200;
+    private static final int NUMERO_VAGAS = 200;
 
     @Autowired
     public RelatorioService(PagamentoRepository pagamentoRepository, VeiculoRepository veiculoRepository) {
@@ -33,44 +33,17 @@ public class RelatorioService {
         LocalDateTime inicioDoDia = dataReferencia.atStartOfDay();
         LocalDateTime fimDoDia = dataReferencia.atTime(LocalTime.MAX);
 
-        List<Pagamento> pagamentosDoDia = pagamentoRepository.findAll().stream()
-                .filter(p -> p.getHoraSaida() != null &&
-                        !p.getHoraSaida().isBefore(inicioDoDia) &&
-                        !p.getHoraSaida().isAfter(fimDoDia))
-                .toList();
+        List<Pagamento> pagamentosDoDia = getPagamentosDoDia(inicioDoDia, fimDoDia);
 
         int quantidade = pagamentosDoDia.size();
+        double tempoTotalMinutos = calcularTempoTotal(pagamentosDoDia);
+        double tempoMedioHoras = calcularTempoMedioHoras(quantidade, tempoTotalMinutos);
+        double receitaTotal = calcularReceitaTotal(pagamentosDoDia);
+        double minutosOcupadosTotal = calcularMinutosOcupados(pagamentosDoDia, inicioDoDia, fimDoDia);
 
-        double tempoTotalMinutos = pagamentosDoDia.stream()
-                .filter(p -> p.getHoraEntrada() != null && p.getHoraSaida() != null)
-                .mapToDouble(p -> Duration.between(p.getHoraEntrada(), p.getHoraSaida()).toMinutes())
-                .sum();
+        double ocupacaoMedia = calcularOcupacaoMedia(minutosOcupadosTotal);
 
-        double tempoMedioHoras = Math.round((quantidade > 0 ? (tempoTotalMinutos / quantidade) / 60.0 : 0.0) * 100.0) / 100.0;
-
-        double receitaTotal = pagamentosDoDia.stream()
-                .mapToDouble(Pagamento::getValor)
-                .sum();
-
-        long minutosNoDia = Duration.between(inicioDoDia, fimDoDia).toMinutes();
-
-        double minutosOcupadosTotal = pagamentosDoDia.stream()
-                .filter(p -> p.getHoraEntrada() != null && p.getHoraSaida() != null)
-                .mapToDouble(p -> {
-                    LocalDateTime entrada = p.getHoraEntrada().isBefore(inicioDoDia) ? inicioDoDia : p.getHoraEntrada();
-                    LocalDateTime saida = p.getHoraSaida().isAfter(fimDoDia) ? fimDoDia : p.getHoraSaida();
-                    return Duration.between(entrada, saida).toMinutes();
-                })
-                .sum();
-
-        double ocupacaoMedia = (double) Math.round(minutosOcupadosTotal / (minutosNoDia * numeroVagas) * 100) / 100;
-
-        return new RelatorioDTO(
-                quantidade,
-                tempoMedioHoras,
-                receitaTotal,
-                ocupacaoMedia
-        );
+        return new RelatorioDTO(quantidade, tempoMedioHoras, receitaTotal, ocupacaoMedia);
     }
 
     public ReciboDTO gerarRecibo(String placa) {
@@ -89,10 +62,51 @@ public class RelatorioService {
     }
 
     public int vagasDisponiveis() {
-        return numeroVagas - veiculoRepository.findAll().size();
+        return NUMERO_VAGAS - veiculoRepository.findAll().size();
     }
 
     public int vagasOcupadas() {
         return veiculoRepository.findAll().size();
+    }
+
+    private List<Pagamento> getPagamentosDoDia(LocalDateTime inicioDoDia, LocalDateTime fimDoDia) {
+        return pagamentoRepository.findAll().stream()
+                .filter(p -> p.getHoraSaida() != null &&
+                        !p.getHoraSaida().isBefore(inicioDoDia) &&
+                        !p.getHoraSaida().isAfter(fimDoDia))
+                .toList();
+    }
+
+    private double calcularTempoTotal(List<Pagamento> pagamentosDoDia) {
+        return pagamentosDoDia.stream()
+                .filter(p -> p.getHoraEntrada() != null && p.getHoraSaida() != null)
+                .mapToDouble(p -> Duration.between(p.getHoraEntrada(), p.getHoraSaida()).toMinutes())
+                .sum();
+    }
+
+    private double calcularTempoMedioHoras(int quantidade, double tempoTotalMinutos) {
+        return Math.round((quantidade > 0 ? (tempoTotalMinutos / quantidade) / 60.0 : 0.0) * 100.0) / 100.0;
+    }
+
+    private double calcularReceitaTotal(List<Pagamento> pagamentosDoDia) {
+        return pagamentosDoDia.stream()
+                .mapToDouble(Pagamento::getValor)
+                .sum();
+    }
+
+    private double calcularMinutosOcupados(List<Pagamento> pagamentosDoDia, LocalDateTime inicioDoDia, LocalDateTime fimDoDia) {
+        return pagamentosDoDia.stream()
+                .filter(p -> p.getHoraEntrada() != null && p.getHoraSaida() != null)
+                .mapToDouble(p -> {
+                    LocalDateTime entrada = p.getHoraEntrada().isBefore(inicioDoDia) ? inicioDoDia : p.getHoraEntrada();
+                    LocalDateTime saida = p.getHoraSaida().isAfter(fimDoDia) ? fimDoDia : p.getHoraSaida();
+                    return Duration.between(entrada, saida).toMinutes();
+                })
+                .sum();
+    }
+
+    private double calcularOcupacaoMedia(double minutosOcupadosTotal) {
+        long minutosNoDia = Duration.between(LocalDateTime.now().toLocalDate().atStartOfDay(), LocalDateTime.now()).toMinutes();
+        return (double) Math.round(minutosOcupadosTotal / (minutosNoDia * NUMERO_VAGAS) * 100) / 100;
     }
 }
