@@ -26,6 +26,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -258,6 +260,28 @@ class EstacionamentoControllerTest {
                 .andExpect(jsonPath("$.veiculo.modelo").value("Fusca"))
                 .andExpect(jsonPath("$.veiculo.tipoVeiculo").value("Carro"))
                 .andExpect(jsonPath("$.veiculo.cor").value("Azul"));
+    }
+
+    @Test
+    @DisplayName("GET /entradas -> retorna todas as entradas")
+    void whenGetEntradas_thenReturnsAllEntries() throws Exception {
+        Veiculo veiculo1 = new Veiculo();
+        veiculo1.setPlaca("ABC1234");
+        RegistroEntrada registro1 = new RegistroEntrada(veiculo1);
+
+        Veiculo veiculo2 = new Veiculo();
+        veiculo2.setPlaca("DEF5678");
+        RegistroEntrada registro2 = new RegistroEntrada(veiculo2);
+
+        List<RegistroEntrada> entradas = Arrays.asList(registro1, registro2);
+
+        when(estacionamentoService.getAllEntradas()).thenReturn(entradas);
+
+        mockMvc.perform(get("/estacionamento/entradas"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].veiculo.placa").value("ABC1234"))
+                .andExpect(jsonPath("$[1].veiculo.placa").value("DEF5678"));
     }
 
 
