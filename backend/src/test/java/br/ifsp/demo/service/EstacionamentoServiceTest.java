@@ -190,5 +190,23 @@ public class EstacionamentoServiceTest {
 
             assertEquals(veiculo, resultado);
         }
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve cadastrar e retornar um novo veículo quando ele não existir no sistema")
+        void obterOuCadastrarVeiculo_deveCadastrarNovoVeiculo() {
+            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
+                    .thenReturn(Optional.empty());
+
+            Veiculo novoVeiculo = new Veiculo();
+            novoVeiculo.setPlaca(PLACA_VEICULO);
+            when(veiculoService.cadastrarVeiculo(anyString(), any(), anyString(), anyString(), anyString()))
+                    .thenReturn(novoVeiculo);
+
+            Veiculo resultado = estacionamentoService.obterOuCadastrarVeiculo(veiculo);
+
+            assertNotNull(resultado);
+            assertEquals(PLACA_VEICULO, resultado.getPlaca());
+        }
     }
 }
