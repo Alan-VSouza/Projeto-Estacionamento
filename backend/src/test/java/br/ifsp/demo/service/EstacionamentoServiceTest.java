@@ -209,4 +209,24 @@ public class EstacionamentoServiceTest {
             assertEquals(PLACA_VEICULO, resultado.getPlaca());
         }
     }
+
+    @Nested
+    @DisplayName("Testes de Busca de Entrada")
+    class TestesDeBuscaEntrada {
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Buscar entrada retorna null quando não houver entrada registrada")
+        void buscarEntrada_retornaNull_quandoSemRegistroEntrada() {
+            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
+                    .thenReturn(Optional.of(veiculo));
+
+            when(registroEntradaRepository.findByVeiculo(veiculo))
+                    .thenReturn(Optional.empty());
+
+            RegistroEntrada resultado = estacionamentoService.buscarEntrada(PLACA_VEICULO);
+
+            assertNull(resultado);
+        }
+    }
 }
