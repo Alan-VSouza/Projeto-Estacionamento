@@ -121,14 +121,14 @@ class RelatorioControllerTest {
     @Tag("UnitTest")
     @DisplayName("Deve retornar histórico com entrada e saída por placa")
     void deveRetornarHistoricoComEntradasESaidasPorPlaca() throws Exception {
-        String placa = "ABC1234";
+        String placa = "ABC6969";
 
         List<HistoricoDTO> historicoList = List.of(
-                new HistoricoDTO("ABC1234",
+                new HistoricoDTO(placa,
                         LocalDateTime.of(2025, 5, 1, 10, 0),
                         LocalDateTime.of(2025, 5, 1, 12, 30),
                         15.0),
-                new HistoricoDTO("ABC1234",
+                new HistoricoDTO(placa,
                         LocalDateTime.of(2025, 5, 3, 14, 15),
                         LocalDateTime.of(2025, 5, 3, 17, 45),
                         21.0)
@@ -141,7 +141,7 @@ class RelatorioControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
 
-                .andExpect(jsonPath("$[0].placa").value("ABC1234"))
+                .andExpect(jsonPath("$[0].placa").value(placa))
                 .andExpect(jsonPath("$[0].entrada[0]").value(2025))
                 .andExpect(jsonPath("$[0].entrada[1]").value(5))
                 .andExpect(jsonPath("$[0].entrada[2]").value(1))
@@ -154,7 +154,7 @@ class RelatorioControllerTest {
                 .andExpect(jsonPath("$[0].saida[4]").value(30))
                 .andExpect(jsonPath("$[0].valorTotal").value(15.0))
 
-                .andExpect(jsonPath("$[1].placa").value("ABC1234"))
+                .andExpect(jsonPath("$[1].placa").value(placa))
                 .andExpect(jsonPath("$[1].entrada[0]").value(2025))
                 .andExpect(jsonPath("$[1].entrada[1]").value(5))
                 .andExpect(jsonPath("$[1].entrada[2]").value(3))
@@ -175,13 +175,28 @@ class RelatorioControllerTest {
     @Tag("UnitTest")
     @DisplayName("Deve relatar o numero de vagas disponíveis")
     void deveRelatarONumeroDeVagasDisponiveis() throws Exception {
-        when(relatorioService.vagasDisponiveis()).thenReturn(60);
+        when(relatorioService.vagasDisponiveis()).thenReturn(69);
 
         mockMvc.perform(get("/api/relatorios/vagas-disponiveis")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.vagasDisponiveis").value(60));
+                .andExpect(jsonPath("$.vagasDisponiveis").value(69));
 
         verify(relatorioService, times(1)).vagasDisponiveis();
+    }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve relatar o numero de vagas ocupadas")
+    void deveRelatarONumeroDeVagasOcupadas() throws Exception {
+        when(relatorioService.vagasOcupadas()).thenReturn(69);
+
+        mockMvc.perform(get("/api/relatorios/vagas-ocupadas")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.vagasOcupadas").value(69));
+
+        verify(relatorioService, times(1)).vagasOcupadas();
     }
 }
