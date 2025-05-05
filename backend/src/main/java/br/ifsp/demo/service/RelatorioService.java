@@ -93,6 +93,6 @@ public class RelatorioService {
     }
 
     public int vagasOcupadas() {
-        return 0;
+        return veiculoRepository.findAll().size();
     }
 }
