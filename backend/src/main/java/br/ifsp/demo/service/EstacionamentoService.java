@@ -33,7 +33,7 @@ public class EstacionamentoService {
         this.veiculoService = veiculoService;
     }
 
-    private Veiculo obterOuCadastrarVeiculo(Veiculo veiculo) {
+    public Veiculo obterOuCadastrarVeiculo(Veiculo veiculo) {
         return veiculoService.buscarPorPlaca(veiculo.getPlaca())
                 .orElseGet(() -> veiculoService.cadastrarVeiculo(
                         veiculo.getPlaca(),
