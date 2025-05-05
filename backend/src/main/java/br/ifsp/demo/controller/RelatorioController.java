@@ -46,4 +46,9 @@ public class RelatorioController {
     public ResponseEntity<Map<String, Integer>> vagasDisponiveis() {
         return ResponseEntity.ok(Map.of("vagasDisponiveis", relatorioService.vagasDisponiveis()));
     }
+
+    @GetMapping("/vagas-ocupadas")
+    public ResponseEntity<Map<String, Integer>> vagasOcupadas() {
+        return ResponseEntity.ok(Map.of("vagasOcupadas", relatorioService.vagasOcupadas()));
+    }
 }

@@ -91,4 +91,8 @@ public class RelatorioService {
     public int vagasDisponiveis() {
         return numeroVagas - veiculoRepository.findAll().size();
     }
+
+    public int vagasOcupadas() {
+        return 0;
+    }
 }
