@@ -4,10 +4,7 @@ import br.ifsp.demo.components.LogSistema;
 import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -25,9 +22,6 @@ public class RegistroEntradaServiceTest {
     private static final String PLACA_VEICULO = "ABC1234";
     private static final String MENSAGEM_VEICULO_JA_REGISTRADO = "Veículo já registrado no estacionamento";
     private static final String MOTIVO_CANCELAMENTO = "Cancelamento feito por engano";
-    private static final String MENSAGEM_VEICULO_NAO_ENCONTRADO = "Veículo não encontrado";
-    private static final String MENSAGEM_VEICULO_NAO_REGISTRADO = "Veículo não registrado no estacionamento";
-
 
     @Mock
     private VeiculoService veiculoService;
@@ -43,6 +37,7 @@ public class RegistroEntradaServiceTest {
 
     private Veiculo veiculo;
     private RegistroEntrada registroEntrada;
+
     @BeforeEach
     void setup() {
         veiculo = criarVeiculo();
@@ -64,67 +59,75 @@ public class RegistroEntradaServiceTest {
         return registroEntrada;
     }
 
-    @Test
-    @Tag("UnitTest")
-    @Tag("TDD")
-    @DisplayName("Deve registrar entrada com sucesso quando veículo não estiver registrado")
-    public void registrarEntrada_comSucesso() {
-        when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
-        when(registroEntradaRepository.save(any())).thenReturn(registroEntrada);
+    @Nested
+    @DisplayName("Testes de Registro de Entrada")
+    class TestesDeRegistroEntrada {
 
-        RegistroEntrada resultado = registroEntradaService.registrarEntrada(veiculo);
+        @Test
+        @Tag("UnitTest")
+        @Tag("TDD")
+        @DisplayName("Deve registrar entrada com sucesso quando veículo não estiver registrado")
+        void registrarEntrada_comSucesso() {
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
+            when(registroEntradaRepository.save(any())).thenReturn(registroEntrada);
 
-        assertNotNull(resultado);
-        assertEquals(veiculo, resultado.getVeiculo());
-        verify(registroEntradaRepository, times(1)).save(any());
+            RegistroEntrada resultado = registroEntradaService.registrarEntrada(veiculo);
+
+            assertNotNull(resultado);
+            assertEquals(veiculo, resultado.getVeiculo());
+            verify(registroEntradaRepository, times(1)).save(any());
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("TDD")
+        @DisplayName("Deve lançar IllegalArgumentException quando o veículo já estiver registrado")
+        void registrarEntrada_veiculoJaRegistrado() {
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
+
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                    () -> registroEntradaService.registrarEntrada(veiculo));
+
+            assertEquals(MENSAGEM_VEICULO_JA_REGISTRADO, ex.getMessage());
+            verify(registroEntradaRepository, times(0)).save(any());
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve registrar corretamente o horário de entrada do veículo")
+        void registrarEntrada_comHorarioCorreto() {
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
+            when(registroEntradaRepository.save(any())).thenAnswer(invocation -> {
+                RegistroEntrada entrada = invocation.getArgument(0);
+                entrada.setHoraEntrada(LocalDateTime.now());
+                return entrada;
+            });
+
+            RegistroEntrada resultado = registroEntradaService.registrarEntrada(veiculo);
+
+            assertNotNull(resultado);
+            assertEquals(veiculo, resultado.getVeiculo());
+            assertNotNull(resultado.getHoraEntrada());
+            verify(registroEntradaRepository, times(1)).save(any());
+        }
     }
 
-    @Test
-    @Tag("UnitTest")
-    @Tag("TDD")
-    @DisplayName("Deve lançar IllegalArgumentException quando o veículo já estiver registrado")
-    public void registrarEntrada_veiculoJaRegistrado() {
-        when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
+    @Nested
+    @DisplayName("Testes de Cancelamento de Entrada")
+    class TestesDeCancelamentoEntrada {
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> registroEntradaService.registrarEntrada(veiculo));
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve cancelar check-in com sucesso")
+        void cancelarCheckIn_comSucesso() {
+            when(veiculoService.buscarPorPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
 
-        assertEquals(MENSAGEM_VEICULO_JA_REGISTRADO, ex.getMessage());
-        verify(registroEntradaRepository, times(0)).save(any());
-    }
+            boolean sucesso = registroEntradaService.cancelarCheckIn(veiculo, MOTIVO_CANCELAMENTO);
 
-    @Test
-    @Tag("UnitTest")
-    @DisplayName("Deve registrar corretamente o horário de entrada do veículo")
-    public void registrarEntrada_comHorarioCorreto() {
-        when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
-
-        when(registroEntradaRepository.save(any())).thenAnswer(invocation -> {
-            RegistroEntrada entrada = invocation.getArgument(0);
-            entrada.setHoraEntrada(LocalDateTime.now());
-            return entrada;
-        });
-
-        RegistroEntrada resultado = registroEntradaService.registrarEntrada(veiculo);
-
-        assertNotNull(resultado);
-        assertEquals(veiculo, resultado.getVeiculo());
-        assertNotNull(resultado.getHoraEntrada());
-        verify(registroEntradaRepository, times(1)).save(any());
-    }
-
-    @Test
-    @Tag("UnitTest")
-    @DisplayName("Deve cancelar check-in com sucesso")
-    public void cancelarCheckIn_comSucesso() {
-        when(veiculoService.buscarPorPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
-        when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
-
-        boolean sucesso = registroEntradaService.cancelarCheckIn(veiculo, MOTIVO_CANCELAMENTO);
-
-        assertTrue(sucesso);
-
-        verify(registroEntradaRepository, times(1)).delete(registroEntrada);
-        verify(logSistema, times(1)).registrarCancelamento(PLACA_VEICULO, MOTIVO_CANCELAMENTO);
+            assertTrue(sucesso);
+            verify(registroEntradaRepository, times(1)).delete(registroEntrada);
+            verify(logSistema, times(1)).registrarCancelamento(PLACA_VEICULO, MOTIVO_CANCELAMENTO);
+        }
     }
 }
