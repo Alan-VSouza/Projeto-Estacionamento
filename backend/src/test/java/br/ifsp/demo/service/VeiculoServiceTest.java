@@ -4,6 +4,7 @@ import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.VeiculoRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -173,6 +174,25 @@ class VeiculoServiceTest {
             );
 
             assertEquals("Veículo não encontrado", ex.getReason());
+            verify(veiculoRepository, never()).save(any());
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Atualizar veículo com placa vazia deve lançar ResponseStatusException")
+        void atualizarVeiculo_quandoPlacaVazia_deveLancarResponseStatusException() {
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                    veiculoService.atualizarVeiculo(
+                            1L,
+                            "",
+                            "carro",
+                            "Fusca",
+                            "azul"
+                    )
+            );
+
+            assertEquals("Placa não pode ser vazia", exception.getReason());
+            assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
             verify(veiculoRepository, never()).save(any());
         }
     }
