@@ -46,7 +46,7 @@ public class RelatorioService {
                 .mapToDouble(p -> Duration.between(p.getHoraEntrada(), p.getHoraSaida()).toMinutes())
                 .sum();
 
-        double tempoMedioHoras = quantidade > 0 ? (tempoTotalMinutos / quantidade) / 60.0 : 0.0;
+        double tempoMedioHoras = Math.round((quantidade > 0 ? (tempoTotalMinutos / quantidade) / 60.0 : 0.0) * 100.0) / 100.0;
 
         double receitaTotal = pagamentosDoDia.stream()
                 .mapToDouble(Pagamento::getValor)
@@ -63,7 +63,7 @@ public class RelatorioService {
                 })
                 .sum();
 
-        double ocupacaoMedia = minutosOcupadosTotal / (minutosNoDia * numeroVagas);
+        double ocupacaoMedia = (double) Math.round(minutosOcupadosTotal / (minutosNoDia * numeroVagas) * 100) / 100;
 
         return new RelatorioDTO(
                 quantidade,
