@@ -314,4 +314,34 @@ public class EstacionamentoServiceTest {
             verify(estacionamentoRepository, times(1)).save(any(Estacionamento.class));
         }
     }
+
+    @Nested
+    @DisplayName("Testes de Obtenção de Entradas")
+    class TestesDeGetAllEntradas {
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar uma lista de entradas quando houver registros")
+        void getAllEntradas_comRegistros() {
+            RegistroEntrada registro1 = new RegistroEntrada();
+            registro1.setVeiculo(veiculo);
+            registro1.setHoraEntrada(LocalDateTime.now().minusHours(2));
+
+            RegistroEntrada registro2 = new RegistroEntrada();
+            registro2.setVeiculo(veiculo);
+            registro2.setHoraEntrada(LocalDateTime.now().minusHours(1));
+
+            when(registroEntradaRepository.findAll())
+                    .thenReturn(List.of(registro1, registro2));
+
+            List<RegistroEntrada> entradas = estacionamentoService.getAllEntradas();
+
+            assertNotNull(entradas);
+            assertEquals(2, entradas.size());
+            assertEquals(registro1, entradas.get(0));
+            assertEquals(registro2, entradas.get(1));
+        }
+
+    }
+
 }
