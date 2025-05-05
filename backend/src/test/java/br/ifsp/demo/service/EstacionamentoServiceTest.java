@@ -44,7 +44,6 @@ public class EstacionamentoServiceTest {
     private RegistroEntrada registroEntrada;
 
     private static final String PLACA_VEICULO = "ABC1234";
-    private static final String PLACA = PLACA_VEICULO;
 
     @BeforeEach
     void setup() {
@@ -65,123 +64,113 @@ public class EstacionamentoServiceTest {
         registroEntrada.setHoraEntrada(LocalDateTime.now().minusHours(2));
     }
 
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Registrar entrada com sucesso deve salvar registro no repositório")
-    public void registrarEntrada_comSucesso() {
-        UUID estacionamentoId = UUID.randomUUID();
+    @Nested
+    @DisplayName("Testes de Registro de Entrada")
+    class TestesDeRegistroEntrada {
 
-        Estacionamento estacionamento = new Estacionamento();
-        estacionamento.setId(estacionamentoId);
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Registrar entrada com sucesso deve salvar registro no repositório")
+        void registrarEntrada_comSucesso() {
+            UUID estacionamentoId = UUID.randomUUID();
 
-        when(estacionamentoRepository.findById(estacionamentoId))
-                .thenReturn(Optional.of(estacionamento));
+            when(estacionamentoRepository.findById(estacionamentoId))
+                    .thenReturn(Optional.of(estacionamento));
 
-        Veiculo veiculo = new Veiculo();
-        veiculo.setPlaca("ABC1234");
-        veiculo.setTipoVeiculo("Carro");
-        veiculo.setModelo("Fusca");
-        veiculo.setCor("Azul");
+            when(registroEntradaRepository.save(any(RegistroEntrada.class)))
+                    .thenReturn(new RegistroEntrada(veiculo));
 
-        when(registroEntradaRepository.save(any(RegistroEntrada.class)))
-                .thenReturn(new RegistroEntrada(veiculo));
+            RegistroEntrada resultado = estacionamentoService.registrarEntrada(veiculo, estacionamentoId);
 
-        RegistroEntrada resultado = estacionamentoService.registrarEntrada(veiculo, estacionamentoId);
-
-        assertNotNull(resultado);
-        assertEquals(veiculo, resultado.getVeiculo());
-        verify(registroEntradaRepository, times(1)).save(any(RegistroEntrada.class));
+            assertNotNull(resultado);
+            assertEquals(veiculo, resultado.getVeiculo());
+            verify(registroEntradaRepository, times(1)).save(any(RegistroEntrada.class));
+        }
     }
 
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Cancelar entrada com sucesso deve deletar registro e retornar true")
-    public void cancelarEntrada_comSucesso() {
-        String placa = veiculo.getPlaca();
+    @Nested
+    @DisplayName("Testes de Cancelamento de Entrada")
+    class TestesDeCancelamentoEntrada {
 
-        when(veiculoService.buscarPorPlaca(placa))
-                .thenReturn(Optional.of(veiculo));
-        when(registroEntradaRepository.findByVeiculo(veiculo))
-                .thenReturn(Optional.of(registroEntrada));
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Cancelar entrada com sucesso deve deletar registro e retornar true")
+        void cancelarEntrada_comSucesso() {
+            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
+                    .thenReturn(Optional.of(veiculo));
 
-        boolean sucesso = estacionamentoService.cancelarEntrada(placa);
+            when(registroEntradaRepository.findByVeiculo(veiculo))
+                    .thenReturn(Optional.of(registroEntrada));
 
-        assertTrue(sucesso);
-        verify(registroEntradaRepository, times(1)).delete(registroEntrada);
+            boolean sucesso = estacionamentoService.cancelarEntrada(PLACA_VEICULO);
+
+            assertTrue(sucesso);
+            verify(registroEntradaRepository, times(1)).delete(registroEntrada);
+        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve lançar IllegalArgumentException quando o veículo não estiver registrado ao cancelar entrada")
+        void cancelarEntrada_veiculoNaoRegistrado() {
+            when(veiculoService.buscarPorPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
+
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    estacionamentoService.cancelarEntrada(PLACA_VEICULO)
+            );
+
+            assertEquals("Veículo não registrado no estacionamento", exception.getMessage());
+        }
     }
 
+    @Nested
+    @DisplayName("Testes de Registro de Saída")
+    class TestesDeRegistroSaida {
 
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Deve lançar IllegalArgumentException quando o veículo não estiver registrado ao cancelar entrada")
-    public void cancelarEntrada_veiculoNaoRegistrado() {
-        String placa = PLACA_VEICULO;
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Registrar saída com sucesso: gera pagamento e remove entrada")
+        void registrarSaida_comSucesso_salvaPagamentoERemoveEntrada() {
+            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
+                    .thenReturn(Optional.of(veiculo));
 
-        when(veiculoService.buscarPorPlaca(placa)).thenReturn(Optional.of(veiculo));
+            when(registroEntradaRepository.findByVeiculo(veiculo))
+                    .thenReturn(Optional.of(registroEntrada));
 
-        when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
+            doNothing().when(pagamentoService).salvarPagamento(any(Pagamento.class));
 
-        when(estacionamentoRepository.findById(estacionamento.getId())).thenReturn(Optional.of(estacionamento));
+            boolean resultado = estacionamentoService.registrarSaida(PLACA_VEICULO);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            estacionamentoService.cancelarEntrada(placa);
-        });
+            assertTrue(resultado);
 
-        assertEquals("Veículo não registrado no estacionamento", exception.getMessage());
+            verify(registroEntradaRepository, times(1)).delete(registroEntrada);
+            verify(pagamentoService).salvarPagamento(argThat(p ->
+                    PLACA_VEICULO.equals(p.getPlaca()) &&
+                            p.getHoraEntrada().equals(registroEntrada.getHoraEntrada()) &&
+                            p.getHoraSaida() != null
+            ));
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Registrar saída retorna false quando não houver registro de entrada")
+        void registrarSaida_retornaFalse_quandoSemRegistroEntrada() {
+            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
+                    .thenReturn(Optional.of(veiculo));
+
+            when(registroEntradaRepository.findByVeiculo(veiculo))
+                    .thenReturn(Optional.empty());
+
+            boolean resultado = estacionamentoService.registrarSaida(PLACA_VEICULO);
+
+            assertFalse(resultado);
+            verify(registroEntradaRepository, never()).delete(any());
+            verify(pagamentoService, never()).salvarPagamento(any());
+        }
     }
-
-
-    @Test
-    @Tag("TDD")
-    @Tag("UnitTest")
-    @DisplayName("Registrar saída com sucesso: gera pagamento e remove entrada")
-    public void registrarSaida_comSucesso_salvaPagamentoERemoveEntrada() {
-        Veiculo veiculo = new Veiculo();
-        veiculo.setPlaca(PLACA_VEICULO);
-
-        when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
-                .thenReturn(Optional.of(veiculo));
-
-        RegistroEntrada registroEntrada = new RegistroEntrada(veiculo);
-        registroEntrada.setHoraEntrada(LocalDateTime.of(2025, 5, 4, 10, 0));
-        when(registroEntradaRepository.findByVeiculo(veiculo))
-                .thenReturn(Optional.of(registroEntrada));
-
-        doNothing().when(pagamentoService).salvarPagamento(any(Pagamento.class));
-
-        boolean resultado = estacionamentoService.registrarSaida(veiculo.getPlaca());
-
-        assertTrue(resultado);
-
-        verify(registroEntradaRepository, times(1))
-                .delete(registroEntrada);
-
-        verify(pagamentoService).salvarPagamento(argThat(p ->
-                PLACA_VEICULO.equals(p.getPlaca()) &&
-                        p.getHoraEntrada().equals(registroEntrada.getHoraEntrada()) &&
-                        p.getHoraSaida() != null
-        ));
-    }
-
-
-    @Test
-    @Tag("UnitTest")
-    @DisplayName("Registrar saída retorna false quando não houver registro de entrada")
-    public void registrarSaida_retornaFalse_quandoSemRegistroEntrada() {
-        when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
-                .thenReturn(Optional.of(veiculo));
-        when(registroEntradaRepository.findByVeiculo(veiculo))
-                .thenReturn(Optional.empty());
-
-        boolean resultado = estacionamentoService.registrarSaida(veiculo.getPlaca());
-
-        assertFalse(resultado);
-        verify(registroEntradaRepository, never()).delete(any());
-        verify(pagamentoService, never()).salvarPagamento(any());
-    }
-
-
 }
