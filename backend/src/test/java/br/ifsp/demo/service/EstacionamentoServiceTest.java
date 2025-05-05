@@ -249,5 +249,44 @@ public class EstacionamentoServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("Testes de Busca de Estacionamento")
+    class TestesDeBuscaEstacionamento {
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Buscar estacionamento com sucesso")
+        void buscarEstacionamento_comSucesso() {
+            UUID estacionamentoId = UUID.randomUUID();
+            Estacionamento estacionamento = new Estacionamento();
+            estacionamento.setNome("Estacionamento Central");
+            estacionamento.setEndereco("Rua X");
+
+            when(estacionamentoRepository.findById(estacionamentoId))
+                    .thenReturn(Optional.of(estacionamento));
+
+            Estacionamento resultado = estacionamentoService.buscarEstacionamento(estacionamentoId);
+
+            assertNotNull(resultado);
+            assertEquals(estacionamento.getNome(), resultado.getNome());
+            assertEquals(estacionamento.getEndereco(), resultado.getEndereco());
+        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve lançar IllegalArgumentException quando estacionamento não encontrado")
+        void buscarEstacionamento_naoEncontrado() {
+            UUID estacionamentoId = UUID.randomUUID();
+
+            when(estacionamentoRepository.findById(estacionamentoId))
+                    .thenReturn(Optional.empty());
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    estacionamentoService.buscarEstacionamento(estacionamentoId)
+            );
+            assertEquals("Estacionamento não encontrado", exception.getMessage());
+        }
+    }
 
 }
