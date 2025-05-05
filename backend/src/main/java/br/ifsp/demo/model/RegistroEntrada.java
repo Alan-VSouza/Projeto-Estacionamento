@@ -1,5 +1,6 @@
 package br.ifsp.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ public class RegistroEntrada {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonIgnore
     private UUID id;
 
     @ManyToOne
