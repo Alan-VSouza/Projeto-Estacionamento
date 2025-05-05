@@ -153,7 +153,7 @@ class RelatorioServiceTest {
         v1.setHoraEntrada(LocalDateTime.of(2025, 5, 3, 10, 0));
 
         Veiculo v2 = new Veiculo();
-        v2.setPlaca("XYZ5678");
+        v2.setPlaca("XYZ6969");
         v2.setTipoVeiculo("carro");
         v2.setModelo("gol");
         v2.setCor("vermelho");
@@ -166,5 +166,33 @@ class RelatorioServiceTest {
         int vagasDisponiveis = relatorioService.vagasDisponiveis();
 
         assertEquals(198, vagasDisponiveis);
+    }
+
+    @Test
+    @Tag("TDD")
+    @Tag("UnitTest")
+    @DisplayName("Deve retornar corretamente o número de vagas ocupadas")
+    void deveRetornarCorretamenteONumeroDeVagasOcupadas() {
+        Veiculo v1 = new Veiculo();
+        v1.setPlaca("ABC1234");
+        v1.setTipoVeiculo("carro");
+        v1.setModelo("Fusca");
+        v1.setCor("azul");
+        v1.setHoraEntrada(LocalDateTime.of(2025, 5, 3, 10, 0));
+
+        Veiculo v2 = new Veiculo();
+        v2.setPlaca("XYZ6969");
+        v2.setTipoVeiculo("carro");
+        v2.setModelo("gol");
+        v2.setCor("vermelho");
+        v2.setHoraEntrada(LocalDateTime.of(2025, 5, 3, 14, 0));
+
+        List<Veiculo> veiculosDeTeste = List.of(v1, v2);
+
+        when(veiculoRepository.findAll()).thenReturn(veiculosDeTeste);
+
+        int vagasOcupadas = relatorioService.vagasOcupadas();
+
+        assertEquals(2, vagasOcupadas);
     }
 }
