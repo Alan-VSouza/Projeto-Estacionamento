@@ -1,5 +1,6 @@
 package br.ifsp.demo.model;
 
+import br.ifsp.demo.components.TempoPermanencia;
 import br.ifsp.demo.components.ValorPermanencia;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
