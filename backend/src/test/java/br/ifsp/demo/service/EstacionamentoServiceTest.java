@@ -173,4 +173,22 @@ public class EstacionamentoServiceTest {
             verify(pagamentoService, never()).salvarPagamento(any());
         }
     }
+
+    @Nested
+    @DisplayName("Testes de Cadastro de Veículo")
+    class TestesDeCadastroVeiculo {
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @DisplayName("Deve retornar veículo cadastrado quando ele já existir no sistema")
+        void obterOuCadastrarVeiculo_deveRetornarVeiculoCadastrado() {
+            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
+                    .thenReturn(Optional.of(veiculo));
+
+            Veiculo resultado = estacionamentoService.obterOuCadastrarVeiculo(veiculo);
+
+            assertEquals(veiculo, resultado);
+        }
+    }
 }
