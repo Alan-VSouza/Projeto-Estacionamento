@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -229,4 +230,24 @@ public class EstacionamentoServiceTest {
             assertNull(resultado);
         }
     }
+
+    @Nested
+    @DisplayName("Testes de Busca de Estacionamento Atual")
+    class TestesDeBuscaEstacionamentoAtual {
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Buscar estacionamento atual retorna o estacionamento corretamente")
+        void buscarEstacionamentoAtual_comSucesso() {
+            when(estacionamentoRepository.findAll())
+                    .thenReturn(    List.of(estacionamento));
+
+            Estacionamento resultado = estacionamentoService.buscarEstacionamentoAtual();
+
+            assertNotNull(resultado);
+            assertEquals(estacionamento.getNome(), resultado.getNome());
+        }
+    }
+
+
 }
