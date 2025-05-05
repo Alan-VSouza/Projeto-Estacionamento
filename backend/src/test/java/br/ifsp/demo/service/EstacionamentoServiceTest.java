@@ -50,19 +50,32 @@ public class EstacionamentoServiceTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
 
-        veiculo = new Veiculo();
+        veiculo = createVeiculo();
+        estacionamento = createEstacionamento();
+        registroEntrada = createRegistroEntrada();
+    }
+
+    private Veiculo createVeiculo() {
+        Veiculo veiculo = new Veiculo();
         veiculo.setPlaca(PLACA_VEICULO);
         veiculo.setTipoVeiculo("Carro");
         veiculo.setModelo("Fusca");
         veiculo.setCor("Azul");
+        return veiculo;
+    }
 
-        estacionamento = new Estacionamento();
+    private Estacionamento createEstacionamento() {
+        Estacionamento estacionamento = new Estacionamento();
         estacionamento.setNome("Estacionamento Central");
         estacionamento.setEndereco("Rua X");
+        return estacionamento;
+    }
 
-        registroEntrada = new RegistroEntrada();
+    private RegistroEntrada createRegistroEntrada() {
+        RegistroEntrada registroEntrada = new RegistroEntrada();
         registroEntrada.setVeiculo(veiculo);
         registroEntrada.setHoraEntrada(LocalDateTime.now().minusHours(2));
+        return registroEntrada;
     }
 
     @Nested
@@ -70,7 +83,6 @@ public class EstacionamentoServiceTest {
     class TestesDeRegistroEntrada {
 
         @Test
-        @Tag("TDD")
         @Tag("UnitTest")
         @DisplayName("Registrar entrada com sucesso deve salvar registro no repositório")
         void registrarEntrada_comSucesso() {
@@ -95,7 +107,6 @@ public class EstacionamentoServiceTest {
     class TestesDeCancelamentoEntrada {
 
         @Test
-        @Tag("TDD")
         @Tag("UnitTest")
         @DisplayName("Cancelar entrada com sucesso deve deletar registro e retornar true")
         void cancelarEntrada_comSucesso() {
@@ -112,7 +123,6 @@ public class EstacionamentoServiceTest {
         }
 
         @Test
-        @Tag("TDD")
         @Tag("UnitTest")
         @DisplayName("Deve lançar IllegalArgumentException quando o veículo não estiver registrado ao cancelar entrada")
         void cancelarEntrada_veiculoNaoRegistrado() {
@@ -133,7 +143,6 @@ public class EstacionamentoServiceTest {
     class TestesDeRegistroSaida {
 
         @Test
-        @Tag("TDD")
         @Tag("UnitTest")
         @DisplayName("Registrar saída com sucesso: gera pagamento e remove entrada")
         void registrarSaida_comSucesso_salvaPagamentoERemoveEntrada() {
@@ -148,7 +157,6 @@ public class EstacionamentoServiceTest {
             boolean resultado = estacionamentoService.registrarSaida(PLACA_VEICULO);
 
             assertTrue(resultado);
-
             verify(registroEntradaRepository, times(1)).delete(registroEntrada);
             verify(pagamentoService).salvarPagamento(argThat(p ->
                     PLACA_VEICULO.equals(p.getPlaca()) &&
@@ -180,7 +188,6 @@ public class EstacionamentoServiceTest {
     class TestesDeCadastroVeiculo {
 
         @Test
-        @Tag("TDD")
         @Tag("UnitTest")
         @DisplayName("Deve retornar veículo cadastrado quando ele já existir no sistema")
         void obterOuCadastrarVeiculo_deveRetornarVeiculoCadastrado() {
@@ -240,7 +247,7 @@ public class EstacionamentoServiceTest {
         @DisplayName("Buscar estacionamento atual retorna o estacionamento corretamente")
         void buscarEstacionamentoAtual_comSucesso() {
             when(estacionamentoRepository.findAll())
-                    .thenReturn(    List.of(estacionamento));
+                    .thenReturn(List.of(estacionamento));
 
             Estacionamento resultado = estacionamentoService.buscarEstacionamentoAtual();
 
@@ -258,10 +265,6 @@ public class EstacionamentoServiceTest {
         @DisplayName("Buscar estacionamento com sucesso")
         void buscarEstacionamento_comSucesso() {
             UUID estacionamentoId = UUID.randomUUID();
-            Estacionamento estacionamento = new Estacionamento();
-            estacionamento.setNome("Estacionamento Central");
-            estacionamento.setEndereco("Rua X");
-
             when(estacionamentoRepository.findById(estacionamentoId))
                     .thenReturn(Optional.of(estacionamento));
 
@@ -273,7 +276,6 @@ public class EstacionamentoServiceTest {
         }
 
         @Test
-        @Tag("TDD")
         @Tag("UnitTest")
         @DisplayName("Deve lançar IllegalArgumentException quando estacionamento não encontrado")
         void buscarEstacionamento_naoEncontrado() {
