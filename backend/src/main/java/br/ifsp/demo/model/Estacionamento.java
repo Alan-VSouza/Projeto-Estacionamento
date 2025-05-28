@@ -16,6 +16,7 @@ public class Estacionamento {
     private UUID id;
     private String nome;
     private String endereco;
+    private int capacidade;
 
     public Estacionamento(String nome, String endereco) {
         setNome(nome);
@@ -50,5 +51,13 @@ public class Estacionamento {
             throw new IllegalArgumentException("Nome não pode ser nulo ou vazio");
         }
         this.nome = nome;
+    }
+
+    public int getCapacidade() {
+        return capacidade;
+    }
+
+    public void setCapacidade(int capacidade) {
+        this.capacidade = capacidade;
     }
 }
