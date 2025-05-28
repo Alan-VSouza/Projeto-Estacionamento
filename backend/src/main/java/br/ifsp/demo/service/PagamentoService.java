@@ -50,7 +50,6 @@ public class PagamentoService {
         double valorPermanencia = tempoPermanencia.calcularValorDaPermanencia(horasPermanencia);
 
         pagamento.setValor(valorPermanencia);
-        pagamento.setHoraEntrada(veiculo.get().getHoraEntrada());
         pagamentoRepository.save(pagamento);
 
         veiculoService.deletarVeiculo(veiculo.get().getId());
