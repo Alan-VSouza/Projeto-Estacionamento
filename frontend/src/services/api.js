@@ -1,0 +1,171 @@
+const API_BASE_URL = 'http://localhost:8080';
+
+export const loginUser = async (email, password) => { 
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/authenticate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: email, password: password }), 
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Email ou senha inválidos.');
+      }
+      const errorData = await response.json().catch(() => ({ message: 'Erro ao tentar fazer login.' }));
+      throw new Error(errorData.message || 'Erro ao tentar fazer login.');
+    }
+    const data = await response.json();
+    return data.token; 
+  } catch (error) {
+    console.error("Erro em loginUser:", error);
+    throw error;
+  }
+};
+
+const getToken = () => localStorage.getItem('jwtToken');
+
+export const fetchSpotsFromAPI = async () => {
+  const token = getToken();
+  try {
+    const responseEntradas = await fetch(`${API_BASE_URL}/estacionamento/entradas`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!responseEntradas.ok) {
+      if (responseEntradas.status === 401) throw new Error('Não autorizado. Faça login novamente.');
+      const errorData = await responseEntradas.json().catch(() => ({ message: 'Erro ao buscar vagas da API' }));
+      throw new Error(errorData.message || 'Erro ao buscar vagas da API');
+    }
+    const registrosEntrada = await responseEntradas.json();
+  
+  const NUMERO_TOTAL_VAGAS_DO_BACKEND = 200;
+  const allSpots = [];
+
+  for (let i = 0; i < NUMERO_TOTAL_VAGAS_DO_BACKEND; i++) {
+      const spotIdVisual = `Vaga ${String(i + 1).padStart(2, '0')}`; 
+      let spotData = { 
+        id: spotIdVisual, 
+        isOccupied: false, 
+        vehiclePlate: null, 
+        tipoVeiculo: null, 
+        entryTime: null,
+        backendPlateId: null 
+      };
+
+      if (i < registrosEntrada.length) {
+          const registro = registrosEntrada[i];
+          if (registro && registro.veiculo) { 
+              spotData = {
+                  ...spotData,
+                  isOccupied: true,
+                  vehiclePlate: registro.veiculo.placa,
+                  tipoVeiculo: registro.veiculo.tipoVeiculo,
+                  entryTime: registro.dataEntrada ? new Date(registro.dataEntrada) : null,
+                  backendPlateId: registro.veiculo.placa
+              };
+          }
+      }
+      allSpots.push(spotData);
+    }
+    return allSpots;
+
+  } catch (error) {
+    console.error("Erro em fetchSpotsFromAPI:", error);
+    throw error;
+  }
+};
+
+export const occupySpotInAPI = async (spotIdFrontend, vehicleData) => {
+  const token = getToken();
+  try {
+    const payload = {
+      placa: vehicleData.placa,
+      tipoVeiculo: vehicleData.tipoVeiculo, 
+      modelo: vehicleData.modelo,
+      cor: vehicleData.cor,
+  };
+
+    const response = await fetch(`${API_BASE_URL}/estacionamento/registar-entrada`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload), 
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Erro ao registrar entrada do veículo na API' }));
+      throw new Error(errorData.message || 'Erro ao registrar entrada do veículo na API');
+    }
+    const registroEntrada = await response.json(); 
+
+    return {
+      id: spotIdFrontend,
+      isOccupied: true,
+      vehiclePlate: registroEntrada.veiculo.placa,
+      tipoVeiculo: registroEntrada.veiculo.tipoVeiculo,
+      entryTime: new Date(registroEntrada.dataEntrada),
+      backendPlateId: registroEntrada.veiculo.placa
+    };
+  } catch (error) {
+    console.error("Erro em occupySpotInAPI:", error); 
+    throw error;
+  }
+};
+
+export const registerUser = async (userData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData), 
+    });
+
+    if (!response.ok) {
+
+      let errorMessage = 'Erro ao registrar usuário.';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || (typeof errorData === 'string' ? errorData : errorMessage);
+        if (response.status === 409) { 
+             errorMessage = errorData.message || "Este email já está registrado.";
+        }
+      } catch (e) {
+        errorMessage = response.statusText || errorMessage;
+      }
+      throw new Error(errorMessage);
+    }
+    return await response.json(); 
+  } catch (error) {
+    console.error("Erro em registerUser:", error);
+    throw error;
+  }
+};
+
+export const vacateSpotInAPI = async (vehiclePlate) => {
+  const token = getToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/estacionamento/registrar-saida?placa=${vehiclePlate}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Erro ao desocupar vaga na API' }));
+      throw new Error(errorData.message || 'Erro ao desocupar vaga na API');
+    }
+    const saidaData = await response.json();
+    return { isOccupied: false, vehiclePlate: null, entryTime: null, backendPlateId: null, ...saidaData };
+  } catch (error) {
+    console.error("Erro em vacateSpotInAPI:", error);
+    throw error;
+  }
+};
