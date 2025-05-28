@@ -5,16 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.UUID;
 
-@Getter
-@Setter
 @Entity
 public class Estacionamento {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonIgnore
@@ -23,11 +18,37 @@ public class Estacionamento {
     private String endereco;
 
     public Estacionamento(String nome, String endereco) {
-        this.nome = nome;
-        this.endereco = endereco;
+        setNome(nome);
+        setEndereco(endereco);
         this.id = UUID.randomUUID();
     }
 
     public Estacionamento() {
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(String endereco) {
+        if (endereco == null || endereco.trim().isEmpty()) {
+            throw new IllegalArgumentException("Endereço não pode ser nulo ou vazio");
+        }
+        this.endereco = endereco;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        if (nome == null || nome.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nome não pode ser nulo ou vazio");
+        }
+        this.nome = nome;
     }
 }
