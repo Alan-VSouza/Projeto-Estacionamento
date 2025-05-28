@@ -1,38 +1,242 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #e8edf0;
+  color: #333;
+}
+
 .App {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  background-color: #2c3e50;
+  padding: 20px;
+  color: white;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.App-header h1 {
+  margin: 0;
+  font-size: 1.8em;
+}
+
+.App-header nav {
+  margin-top: 10px;
+}
+.App-header nav a, .App-header nav button {
+  color: #bdc3c7;
+  text-decoration: none;
+  margin: 0 10px;
+  padding: 8px 10px;
+  border-radius: 3px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.App-header nav a:hover, .App-header nav button:hover {
+  background-color: #34495e; 
+  color: #fff;
+}
+.App-header nav button {
+  background: none;
+  border: 1px solid #bdc3c7;
+  cursor: pointer;
+}
+
+main {
+  padding: 20px;
+}
+
+footer {
+  background-color: #34495e;
+  color: #bdc3c7;
+  text-align: center;
+  padding: 15px 0;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  font-size: 0.9em;
+  border-top: 1px solid #2c3e50;
+}
+
+.parking-summary {
+  margin-bottom: 30px;
+  padding: 18px;
+  background-color: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: inline-block;
+  border: 1px solid #dde1e3;
+}
+
+.parking-summary p {
+  margin: 8px 0;
+  font-size: 1.1em;
+  color: #2c3e50;
+}
+
+.parking-lot-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+  padding-bottom: 80px; 
+  max-width: 1100px; 
+  margin: 0 auto;
+}
+
+.parking-spot {
+  width: 110px;  
+  height: 75px; 
+  border: 1px solid #b0bec5; 
+  border-radius: 4px; 
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  justify-content: space-between;
+  cursor: pointer;
+  font-weight: 500; 
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  font-size: 0.85em;
+  padding: 6px;
+  box-sizing: border-box;
+  background-color: #fcfdfd; 
+  position: relative;
 }
 
-.App-link {
-  color: #61dafb;
+.parking-spot::before {
+  content: '';
+  position: absolute;
+  bottom: 0; 
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%; 
+  height: 3px; 
+  background-color: #78909c; 
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
-@keyframes App-logo-spin {
+.parking-spot:hover::before {
+  opacity: 1; 
+}
+.parking-spot:hover {
+  box-shadow: 0 0 8px rgba(44, 62, 80, 0.2);
+  border-color: #546e7a;
+}
+
+.parking-spot.vacant {
+  background-color: #e9f5f7; 
+  color: #37474f;
+}
+.parking-spot.vacant:hover {
+  background-color: #d7eff2;
+}
+
+.parking-spot.occupied {
+  background-color: #eceff1;
+  color: #263238;
+  border-style: dashed; 
+  border-color: #90a4ae;
+}
+.parking-spot.occupied:hover {
+  background-color: #e0e5e8;
+}
+
+.spot-id {
+  font-size: 0.9em; 
+  color: #546e7a;
+  align-self: flex-start; 
+  padding: 2px 4px;
+  background-color: rgba(255,255,255,0.7);
+  border-radius: 2px;
+}
+
+.spot-car-icon {
+  font-size: 2.2em; 
+  line-height: 1;
+  margin-top: 4px;
+  animation: carAppear 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+  color: #455a64;
+}
+
+.spot-plate {
+  font-size: 0.7em;
+  font-family: 'Courier New', Courier, monospace;
+  color: #37474f;
+  background-color: #f5f5f5; 
+  padding: 1px 4px;
+  border-radius: 2px;
+  border: 1px solid #ccc;
+  margin-top: 2px;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes carAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.7);
+  }
+  70% {
+    transform: translateY(-3px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes carDisappear {
   from {
-    transform: rotate(0deg);
+    opacity: 1;
+    transform: scale(1);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 0;
+    transform: scale(0.7) translateY(10px);
+  }
+}
+
+@media (max-width: 768px) {
+  .parking-lot-container {
+    gap: 12px;
+  }
+  .parking-spot {
+    width: 90px;
+    height: 65px;
+  }
+  .spot-car-icon {
+    font-size: 1.8em;
+  }
+  .spot-plate {
+    font-size: 0.65em;
+  }
+  .spot-vehicle-icon { 
+    font-size: 30px; 
+    line-height: 1;
+    color: #455a64; 
+    animation: carAppear 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    margin-bottom: 3px; 
+  }
+}
+
+@media (max-width: 480px) {
+  .App-header nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .App-header nav a, .App-header nav button {
+    margin: 5px 0;
+    width: 80%;
+    text-align: center;
+  }
+  .parking-spot {
+    width: calc(50% - 10px);
   }
 }

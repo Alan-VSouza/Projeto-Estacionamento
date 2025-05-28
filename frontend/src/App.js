@@ -1,24 +1,86 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom'; 
 import './App.css';
+import ParkingLot from './components/ParkingLot';
+import Login from './pages/login';
+import RegisterAdminPage from './pages/RegisterAdminPage'; 
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); 
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwtToken');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+    setIsLoading(false);
+  }, []);
+
+  const handleLoginSuccess = () => { 
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('jwtToken');
+    setIsAuthenticated(false);
+  };
+
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          <h1>Gerenciador de Estacionamento</h1>
+          <nav>
+            {isAuthenticated && (
+              <>
+                <Link to="/" style={{ color: 'white', marginRight: '10px' }}>Estacionamento</Link>
+                <button onClick={handleLogout}>Sair</button>
+              </>
+            )}
+            {!isAuthenticated && (
+              <>
+                <Link to="/register-admin" style={{ color: 'white', marginRight: '10px' }}>Registrar Admin (Setup)</Link>
+                <Link to="/login" style={{ color: 'white' }}>Login</Link>
+              </>
+            )}
+          </nav>
+        </header>
+        <main>
+          <Routes>
+            <Route path="/register-admin" element={<RegisterAdminPage />} />
+            <Route 
+              path="/login" 
+              element={
+                !isAuthenticated ? (
+                  <Login onLoginSuccess={handleLoginSuccess} />
+                ) : (
+                  <Navigate to="/" replace /> 
+                )
+              } 
+            />
+            <Route 
+              path="/" 
+              element={
+                isAuthenticated ? (
+                  <ParkingLot initialTotalSpots={15} />
+                ) : (
+                  <Navigate to="/login" replace /> 
+                )
+              } 
+            />
+            <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} replace />} />
+          </Routes>
+        </main>
+        <footer>
+          <p>&copy; {new Date().getFullYear()} Meu Projeto de Estacionamento</p>
+        </footer>
+      </div>
+    </Router>
   );
 }
 
