@@ -1,15 +1,10 @@
 package br.ifsp.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.Setter;
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Getter
-@Setter
 @Entity
 public class RegistroEntrada {
 
@@ -28,7 +23,35 @@ public class RegistroEntrada {
     public RegistroEntrada() {}
 
     public RegistroEntrada(Veiculo veiculo) {
+        setVeiculo(veiculo);
+        setHoraEntrada(LocalDateTime.now());
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public Veiculo getVeiculo() {
+        return veiculo;
+    }
+
+    public void setVeiculo(Veiculo veiculo) {
+        if (veiculo == null) {
+            throw new IllegalArgumentException("Veículo não pode ser nulo");
+        }
         this.veiculo = veiculo;
-        this.horaEntrada = LocalDateTime.now();
+    }
+
+    public LocalDateTime getHoraEntrada() {
+        return horaEntrada;
+    }
+
+    public void setHoraEntrada(LocalDateTime horaEntrada) {
+        if (horaEntrada == null)
+            throw new IllegalArgumentException("Hora de entrada não pode ser nula");
+        if (horaEntrada.isAfter(LocalDateTime.now()))
+            throw new IllegalArgumentException("Hora de entrada não pode ser no futuro");
+
+        this.horaEntrada = horaEntrada;
     }
 }
