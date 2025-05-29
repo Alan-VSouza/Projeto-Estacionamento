@@ -49,20 +49,16 @@ class PagamentoServiceTest {
 
     @BeforeEach
     void setUp () {
-        veiculo = new Veiculo();
-        veiculo.setId(1L);
-        veiculo.setPlaca("BQF-2994");
-        veiculo.setTipoVeiculo("carro");
-        veiculo.setHoraEntrada(LocalDateTime.of(2025,4,30,10,0,0));
-        veiculo.setModelo("Escort");
-        veiculo.setCor("prata");
+        veiculo = new Veiculo("BQF-2994",
+                "carro",
+                "Escort",
+                "prata",
+                LocalDateTime.of(2025,4,30,10,0,0));
 
-        pagamento = new Pagamento();
-        pagamento.setUuid(UUID.randomUUID());
-        pagamento.setPlaca(veiculo.getPlaca());
-        pagamento.setHoraEntrada(veiculo.getHoraEntrada());
-        pagamento.setHoraSaida(LocalDateTime.now());
-        pagamento.setValor(43);
+        pagamento = new Pagamento(veiculo.getPlaca(),
+                veiculo.getHoraEntrada(),
+                LocalDateTime.now(),
+                43);
     }
 
 
