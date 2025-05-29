@@ -37,6 +37,7 @@ class RelatorioServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve calcular corretamente o relatório com base nos pagamentos da data")
         void deveCalcularCorretamenteORelatorioComBaseNosPagamentosDaData() {
             Pagamento p1 = new Pagamento();
@@ -71,6 +72,7 @@ class RelatorioServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve gerar recibo corretamente com base na placa")
         void deveGerarReciboCorretamenteComBaseNaPlaca() {
             String placa = "ABC1234";
@@ -96,6 +98,7 @@ class RelatorioServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve gerar histórico corretamente com base na placa")
         void deveGerarHistoricoCorretamenteComBaseNaPlaca() {
             String placa = "ABC1234";
@@ -141,6 +144,7 @@ class RelatorioServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve retornar corretamente o número de vagas disponíveis")
         void deveRetornarCorretamenteONumeroDeVagasDisponiveis() {
             Veiculo v1 = new Veiculo();
@@ -169,6 +173,7 @@ class RelatorioServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve retornar corretamente o número de vagas ocupadas")
         void deveRetornarCorretamenteONumeroDeVagasOcupadas() {
             Veiculo v1 = new Veiculo();
