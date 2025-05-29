@@ -14,10 +14,8 @@ class TempoPermanenciaTest {
 
     @BeforeEach
     void setUp() {
-
         ValorPermanencia valorPermanencia = new ValorPermanencia();
         tempoPermanencia = new TempoPermanencia(valorPermanencia);
-
     }
 
     @Nested
@@ -25,6 +23,7 @@ class TempoPermanenciaTest {
     class TDDTestes {
 
         @Test
+        @Tag("Functional")
         @Tag("UnitTest")
         @Tag("TDD")
         @DisplayName("Calcular o valor de uma hora de permanencia")
@@ -35,6 +34,7 @@ class TempoPermanenciaTest {
         }
 
         @Test
+        @Tag("Functional")
         @Tag("UnitTest")
         @Tag("TDD")
         @DisplayName("Calcular o valor por hora de permanencia em permanencia menor que seis horas")
@@ -45,6 +45,7 @@ class TempoPermanenciaTest {
         }
 
         @Test
+        @Tag("Functional")
         @Tag("UnitTest")
         @Tag("TDD")
         @DisplayName("Calcular o valor a partir de seis hora de permanencia")
@@ -55,6 +56,7 @@ class TempoPermanenciaTest {
         }
 
         @Test
+        @Tag("Functional")
         @Tag("UnitTest")
         @Tag("TDD")
         @DisplayName("Calcular o valor a partir de doze horas de permanencia")
@@ -65,6 +67,7 @@ class TempoPermanenciaTest {
         }
 
         @Test
+        @Tag("Functional")
         @Tag("UnitTest")
         @Tag("TDD")
         @DisplayName("Calcular o valor a partir de vinte e quatro horas de permanencia")
@@ -73,8 +76,6 @@ class TempoPermanenciaTest {
             assertEquals(160.0, tempoPermanencia.calcularValorDaPermanencia(29));
 
         }
-
-
     }
 
     @Nested
@@ -82,6 +83,7 @@ class TempoPermanenciaTest {
     class TestandoFuncionamentoDaClassCompleta {
 
         @ParameterizedTest
+        @Tag("Functional")
         @Tag("UnitTest")
         @CsvSource({
                 "1, 10.0",
@@ -102,6 +104,7 @@ class TempoPermanenciaTest {
         }
 
         @Test
+        @Tag("Functional")
         @Tag("UnitTest")
         @DisplayName("Testando valor de hora invalido")
         void testandoValorDeHoraInvalido() {
@@ -111,9 +114,6 @@ class TempoPermanenciaTest {
             });
 
             assertEquals("Horas deve ser maior que zero", ex.getMessage());
-
         }
-
     }
-
 }
