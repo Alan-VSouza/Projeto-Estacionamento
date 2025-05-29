@@ -64,6 +64,7 @@ public class RegistroEntradaServiceTest {
     class TestesDeRegistroEntrada {
 
         @Test
+        @Tag("Functional")
         @Tag("UnitTest")
         @Tag("TDD")
         @DisplayName("Deve registrar entrada com sucesso quando veículo não estiver registrado")
@@ -79,6 +80,7 @@ public class RegistroEntradaServiceTest {
         }
 
         @Test
+        @Tag("Functional")
         @Tag("UnitTest")
         @Tag("TDD")
         @DisplayName("Deve lançar IllegalArgumentException quando o veículo já estiver registrado")
@@ -93,6 +95,7 @@ public class RegistroEntradaServiceTest {
         }
 
         @Test
+        @Tag("Functional")
         @Tag("UnitTest")
         @DisplayName("Deve registrar corretamente o horário de entrada do veículo")
         void registrarEntrada_comHorarioCorreto() {
@@ -117,6 +120,7 @@ public class RegistroEntradaServiceTest {
     class TestesDeCancelamentoEntrada {
 
         @Test
+        @Tag("Functional")
         @Tag("UnitTest")
         @DisplayName("Deve cancelar check-in com sucesso")
         void cancelarCheckIn_comSucesso() {
