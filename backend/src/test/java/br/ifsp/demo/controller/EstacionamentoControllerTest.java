@@ -66,13 +66,11 @@ class EstacionamentoControllerTest {
         @Tag("UnitTest")
         @DisplayName("POST /estacionamento/registar-entrada -> 200 e retorna registro de entrada")
         void whenPostEntrada_thenReturnsRegistro() throws Exception {
-            UUID estacionamentoId = UUID.randomUUID();
-
             Veiculo veiculo = new Veiculo();
             veiculo.setPlaca(PLACA);
 
             Estacionamento estacionamento = new Estacionamento("Central", "Rua X");
-            estacionamento.setId(estacionamentoId);
+            UUID estacionamentoId = estacionamento.getId();
 
             RegistroEntrada registro = new RegistroEntrada(veiculo);
             registro.setHoraEntrada(LocalDateTime.of(2025, 5, 4, 10, 0));
