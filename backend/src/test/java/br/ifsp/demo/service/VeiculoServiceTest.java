@@ -51,6 +51,7 @@ class VeiculoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Salvar veículo com dados válidos deve ter sucesso")
         void salvarVeiculo_comDadosValidos_deveTerSucesso() {
             when(veiculoRepository.findByPlaca(veiculoValido.getPlaca()))
@@ -73,6 +74,7 @@ class VeiculoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Salvar veículo sem placa válida deve lançar exceção")
         void salvarVeiculo_quandoPlacaVazia_deveLancarIllegalArgumentException() {
             IllegalArgumentException ex = assertThrows(
@@ -87,6 +89,7 @@ class VeiculoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Salvar veículo com hora de entrada passada deve lançar exceção")
         void salvarVeiculo_quandoHoraEntradaPassada_deveLancarIllegalArgumentException() {
             IllegalArgumentException ex = assertThrows(
@@ -107,6 +110,7 @@ class VeiculoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Salvar veículo com placa duplicada deve lançar exceção")
         void salvarVeiculo_quandoPlacaDuplicada_deveLancarIllegalArgumentException() {
             when(veiculoRepository.findByPlaca(veiculoValido.getPlaca()))
@@ -135,6 +139,7 @@ class VeiculoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Atualizar veículo existente deve retornar veículo atualizado")
         void atualizarVeiculo_quandoExistente_deveRetornarVeiculoAtualizado() {
             when(veiculoRepository.findById(1L))
@@ -157,6 +162,7 @@ class VeiculoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Atualizar veículo inexistente deve lançar exceção")
         void atualizarVeiculo_quandoInexistente_deveLancarResponseStatusException() {
             when(veiculoRepository.findById(2L))
@@ -179,6 +185,7 @@ class VeiculoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Atualizar veículo com placa vazia deve lançar ResponseStatusException")
         void atualizarVeiculo_quandoPlacaVazia_deveLancarResponseStatusException() {
             ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
@@ -204,6 +211,7 @@ class VeiculoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deletar veículo existente deve remover veículo")
         void deletarVeiculo_quandoExistente_deveRemoverVeiculo() {
             when(veiculoRepository.findById(1L))
@@ -216,6 +224,7 @@ class VeiculoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deletar veículo inexistente deve lançar exceção")
         void deletarVeiculo_quandoInexistente_deveLancarIllegalArgumentException() {
             when(veiculoRepository.findById(3L))
