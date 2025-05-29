@@ -68,6 +68,7 @@ class PagamentoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve salvar o pagamento")
         void deveSalvarPagamento() {
 
@@ -84,6 +85,7 @@ class PagamentoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve deletar o pagamento")
         void deveDeletarPagamento() {
 
@@ -100,6 +102,7 @@ class PagamentoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve atualizar o pagamento")
         void deveAtualizarPagamento() {
 
@@ -124,6 +127,7 @@ class PagamentoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve encontrar o pagamento pelo UUID")
         void deveEncontrarPagamentoPeloUuid() {
             UUID uuid = pagamento.getUuid();
@@ -140,6 +144,7 @@ class PagamentoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Testa salvar pagamento calculando o valor de permanencia")
         void testaSalvarPagamentoCalculandoOValorDePermanencia() {
             pagamento.setHoraSaida(LocalDateTime.of(2025,4,30,13,1,0));
@@ -159,6 +164,7 @@ class PagamentoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve buscar pagamento por data")
         void deveBuscarPagamentoPorData() {
             LocalDate data = LocalDate.of(2025, 5, 2);
@@ -179,6 +185,7 @@ class PagamentoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve retornar o total arrecadado quando existem pagamentos")
         void deveRetornarTotalArrecadadoQuandoExistemPagamentos() {
             LocalDate data = LocalDate.of(2025, 5, 3);
@@ -195,6 +202,7 @@ class PagamentoServiceTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve retornar zero quando nao existirem pagamentos")
         void deveRetornarZeroQuandoNaoExistemPagamentos() {
             LocalDate data = LocalDate.of(2025, 5, 3);
@@ -216,6 +224,7 @@ class PagamentoServiceTest {
 
         @ParameterizedTest
         @Tag("UnitTest")
+        @Tag("Functional")
         @CsvSource(
                 value = {
                         "null, 2025-04-30T17:00:00, 20.0, Hora de entrada não pode ser nula",
@@ -239,6 +248,7 @@ class PagamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("mensagem de erro quando veiculo e nulo")
         void mensagemDeErroQuandoVeiculoNulo() {
 
@@ -250,6 +260,7 @@ class PagamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("mensgaem de erro ao tentar excluir pagamento nulo")
         void mensagemDeErroAoExcluirPagamentoNulo() {
 
@@ -260,6 +271,7 @@ class PagamentoServiceTest {
 
         @ParameterizedTest
         @Tag("UnitTest")
+        @Tag("Functional")
         @CsvSource(
                 value = {
                         "null, 2025-04-30T15:30:00, 2025-04-30T17:00:00, 15.0, Uuid não pode ser nulo",
@@ -282,6 +294,7 @@ class PagamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("mensagem de erro ao atualizar pagamento com veiculo nulo")
         void mensagemDeErroAoAtualizarPagamentoNulo() {
 
@@ -294,6 +307,7 @@ class PagamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("mensagem de erro ao atualizar pagamento com UUID inexistente")
         void mensagemDeErroAoAtualizarPagamentoInexistente() {
             UUID uuidInexistente = UUID.randomUUID();
@@ -317,6 +331,7 @@ class PagamentoServiceTest {
 
         @ParameterizedTest
         @Tag("UnitTest")
+        @Tag("Functional")
         @CsvSource(
                 value ={
                 "null, Uuid não pode ser nulo",
@@ -333,11 +348,5 @@ class PagamentoServiceTest {
             assertEquals(mensagem, exception.getMessage());
 
         }
-
-
-
     }
-
-
-
 }
