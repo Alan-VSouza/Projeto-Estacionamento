@@ -252,8 +252,6 @@ class EstacionamentoControllerTest {
         @Tag("UnitTest")
         @DisplayName("POST /estacionamento/registrar-saida -> 200 OK quando veículo não registrado e entrada é registrada com sucesso")
         void whenPostRegistrarEntrada_thenRegistersVehicleAndReturns200() throws Exception {
-            UUID estacionamentoId = UUID.randomUUID();
-
             Veiculo veiculo = new Veiculo();
             veiculo.setPlaca("FUSCA");
             veiculo.setTipoVeiculo("Carro");
@@ -261,7 +259,7 @@ class EstacionamentoControllerTest {
             veiculo.setCor("Azul");
 
             Estacionamento estacionamento = new Estacionamento("Central", "Rua X");
-            estacionamento.setId(estacionamentoId);
+            UUID estacionamentoId = estacionamento.getId();
 
             when(estacionamentoService.buscarEstacionamentoAtual()).thenReturn(estacionamento);
 
