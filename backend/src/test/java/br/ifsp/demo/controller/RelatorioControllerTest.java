@@ -52,6 +52,7 @@ class RelatorioControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve gerar o relatório de desempenho com sucesso")
         void deveGerarRelatorioDesempenhoComSucesso() throws Exception {
             LocalDate data = LocalDate.of(2025, 5, 3);
@@ -73,6 +74,7 @@ class RelatorioControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve retornar recibo com os detalhes da estadia e pagamento")
         void deveRetornarReciboComOsDetalhesDaEstadiaEPagamento() throws Exception {
             String placa = "ABC1234";
@@ -102,6 +104,7 @@ class RelatorioControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve retornar histórico com entrada e saída por placa")
         void deveRetornarHistoricoComEntradasESaidasPorPlaca() throws Exception {
             String placa = "ABC6969";
@@ -156,6 +159,7 @@ class RelatorioControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve relatar o numero de vagas disponíveis")
         void deveRelatarONumeroDeVagasDisponiveis() throws Exception {
             when(relatorioService.vagasDisponiveis()).thenReturn(69);
@@ -171,6 +175,7 @@ class RelatorioControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve relatar o numero de vagas ocupadas")
         void deveRelatarONumeroDeVagasOcupadas() throws Exception {
             when(relatorioService.vagasOcupadas()).thenReturn(69);
@@ -190,6 +195,7 @@ class RelatorioControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve retornar 404 quando recibo não for encontrado")
         void deveRetornar404QuandoReciboNaoForEncontrado() throws Exception {
             String placa = "XYZ9999";
