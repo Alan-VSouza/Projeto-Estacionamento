@@ -23,6 +23,7 @@ public class RegistroEntrada {
     public RegistroEntrada() {}
 
     public RegistroEntrada(Veiculo veiculo) {
+        this.id = UUID.randomUUID();
         setVeiculo(veiculo);
         setHoraEntrada(LocalDateTime.now());
     }
