@@ -64,6 +64,7 @@ class EstacionamentoControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("POST /estacionamento/registar-entrada -> 200 e retorna registro de entrada")
         void whenPostEntrada_thenReturnsRegistro() throws Exception {
             Veiculo veiculo = new Veiculo();
@@ -98,6 +99,7 @@ class EstacionamentoControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("DELETE /estacionamento/cancelar-entrada -> 200 OK quando sucesso")
         void whenDeleteEntrada_thenReturns200() throws Exception {
             String placa = PLACA;
@@ -114,6 +116,7 @@ class EstacionamentoControllerTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("DELETE /estacionamento/cancelar-entrada -> 404 Not Found quando falha")
         void whenDeleteEntradaFails_thenReturns404() throws Exception {
             String placa = PLACA;
@@ -136,6 +139,7 @@ class EstacionamentoControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("POST /estacionamento/saida -> 200 OK quando sucesso")
         void whenPostSaida_thenReturns200() throws Exception {
             Veiculo veiculo = new Veiculo();
@@ -153,6 +157,7 @@ class EstacionamentoControllerTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("POST /estacionamento/saida -> 404 Not Found quando falha")
         void whenPostSaidaFails_thenReturns404() throws Exception {
             Veiculo veiculo = new Veiculo();
@@ -177,6 +182,7 @@ class EstacionamentoControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("GET /buscar-entrada?placa= -> 200 OK e retorna registro de entrada")
         void whenGetEntrada_thenReturnsRegistro() throws Exception {
             Veiculo veiculo = new Veiculo();
@@ -204,6 +210,7 @@ class EstacionamentoControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("POST /estacionamento -> 201 Created e retorna estacionamento criado")
         void whenPostCriarEstacionamento_thenReturnsCreated() throws Exception {
             Estacionamento estacionamento = new Estacionamento("Central", "Rua X");
@@ -228,6 +235,7 @@ class EstacionamentoControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("GET /estacionamento -> 200 OK e retorna estacionamento existente")
         void whenGetEstacionamento_thenReturnsEstacionamento() throws Exception {
             UUID idEstacionamento = UUID.randomUUID();
@@ -250,6 +258,7 @@ class EstacionamentoControllerTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("POST /estacionamento/registrar-saida -> 200 OK quando veículo não registrado e entrada é registrada com sucesso")
         void whenPostRegistrarEntrada_thenRegistersVehicleAndReturns200() throws Exception {
             Veiculo veiculo = new Veiculo();
@@ -288,6 +297,7 @@ class EstacionamentoControllerTest {
         @Test
         @Tag("TDD")
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("GET /entradas -> retorna todas as entradas")
         void whenGetEntradas_thenReturnsAllEntries() throws Exception {
             Veiculo veiculo1 = new Veiculo();
