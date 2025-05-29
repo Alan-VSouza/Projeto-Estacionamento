@@ -3,6 +3,7 @@ package br.ifsp.demo.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 public class Veiculo {
@@ -28,6 +29,14 @@ public class Veiculo {
     private String cor;
 
     public Veiculo() {}
+
+    public Veiculo(String placa, String tipoVeiculo, String modelo, String cor, LocalDateTime horaEntrada) {
+        setPlaca(placa);
+        setTipoVeiculo(tipoVeiculo);
+        setModelo(modelo);
+        setCor(cor);
+        setHoraEntrada(horaEntrada);
+    }
 
     public Long getId() {
         return id;
