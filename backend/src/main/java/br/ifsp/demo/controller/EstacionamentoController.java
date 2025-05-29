@@ -27,11 +27,10 @@ public class EstacionamentoController {
         return ResponseEntity.ok(registro);
     }
 
-    @DeleteMapping("/cancelar-entrada")
-    public ResponseEntity<Void> cancelarEntrada(@RequestParam("placa") String placa) {
-        return estacionamentoService.cancelarEntrada(placa)
-                ? ResponseEntity.ok().build()
-                : ResponseEntity.notFound().build();
+    @PostMapping("/cancelar-entrada")
+    public ResponseEntity<Void> cancelarEntrada(@RequestParam String placa) {
+        estacionamentoService.cancelarEntrada(placa);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/registrar-saida")

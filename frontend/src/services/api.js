@@ -149,6 +149,36 @@ export const registerUser = async (userData) => {
   }
 };
 
+export const cancelEntryInAPI = async (vehiclePlate) => {
+  const token = localStorage.getItem('jwtToken');
+  try {
+    const response = await fetch(`${API_BASE_URL}/estacionamento/cancelar-entrada?placa=${vehiclePlate}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch {
+        errorData = { message: 'Erro ao cancelar entrada na API' };
+      }
+      throw new Error(errorData.message || 'Erro ao cancelar entrada na API');
+    }
+    let result = {};
+    const text = await response.text();
+    if (text) {
+      result = JSON.parse(text);
+    }
+    return result;
+  } catch (error) {
+    console.error("Erro em cancelEntryInAPI:", error);
+    throw error;
+  }
+};
+
 export const vacateSpotInAPI = async (vehiclePlate) => {
   const token = getToken();
   try {
@@ -159,10 +189,19 @@ export const vacateSpotInAPI = async (vehiclePlate) => {
       },
     });
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Erro ao desocupar vaga na API' }));
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch {
+        errorData = { message: 'Erro ao desocupar vaga na API' };
+      }
       throw new Error(errorData.message || 'Erro ao desocupar vaga na API');
     }
-    const saidaData = await response.json();
+    let saidaData = {};
+    const text = await response.text();
+    if (text) {
+      saidaData = JSON.parse(text);
+    }
     return { isOccupied: false, vehiclePlate: null, entryTime: null, backendPlateId: null, ...saidaData };
   } catch (error) {
     console.error("Erro em vacateSpotInAPI:", error);
