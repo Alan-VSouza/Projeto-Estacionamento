@@ -7,7 +7,7 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 
 @Suite
 @SelectPackages({"br.ifsp.demo.service","br.ifsp.demo.controller"})
-@SuiteDisplayName("All Service UnitTest Tests")
-@IncludeTags({"UnitTest"})
-public class UnitTest {
+@SuiteDisplayName("All Service Functional Tests")
+@IncludeTags({"Functional"})
+public class Functional {
 }
