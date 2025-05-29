@@ -84,6 +84,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Registrar entrada com sucesso deve salvar registro no repositório")
         void registrarEntrada_comSucesso() {
             UUID estacionamentoId = UUID.randomUUID();
@@ -108,6 +109,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Cancelar entrada com sucesso deve deletar registro e retornar true")
         void cancelarEntrada_comSucesso() {
             when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
@@ -124,6 +126,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve lançar IllegalArgumentException quando o veículo não estiver registrado ao cancelar entrada")
         void cancelarEntrada_veiculoNaoRegistrado() {
             when(veiculoService.buscarPorPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
@@ -144,6 +147,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Registrar saída com sucesso: gera pagamento e remove entrada")
         void registrarSaida_comSucesso_salvaPagamentoERemoveEntrada() {
             when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
@@ -167,6 +171,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Registrar saída retorna false quando não houver registro de entrada")
         void registrarSaida_retornaFalse_quandoSemRegistroEntrada() {
             when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
@@ -189,6 +194,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve retornar veículo cadastrado quando ele já existir no sistema")
         void obterOuCadastrarVeiculo_deveRetornarVeiculoCadastrado() {
             when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
@@ -201,6 +207,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve cadastrar e retornar um novo veículo quando ele não existir no sistema")
         void obterOuCadastrarVeiculo_deveCadastrarNovoVeiculo() {
             when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
@@ -224,6 +231,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Buscar entrada retorna null quando não houver entrada registrada")
         void buscarEntrada_retornaNull_quandoSemRegistroEntrada() {
             when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
@@ -244,6 +252,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Buscar estacionamento atual retorna o estacionamento corretamente")
         void buscarEstacionamentoAtual_comSucesso() {
             when(estacionamentoRepository.findAll())
@@ -262,6 +271,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Buscar estacionamento com sucesso")
         void buscarEstacionamento_comSucesso() {
             UUID estacionamentoId = UUID.randomUUID();
@@ -297,6 +307,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Criar estacionamento com sucesso")
         void criarEstacionamento_comSucesso() {
             Estacionamento estacionamento = new Estacionamento();
@@ -321,6 +332,7 @@ public class EstacionamentoServiceTest {
 
         @Test
         @Tag("UnitTest")
+        @Tag("Functional")
         @DisplayName("Deve retornar uma lista de entradas quando houver registros")
         void getAllEntradas_comRegistros() {
             RegistroEntrada registro1 = new RegistroEntrada();
@@ -341,7 +353,5 @@ public class EstacionamentoServiceTest {
             assertEquals(registro1, entradas.get(0));
             assertEquals(registro2, entradas.get(1));
         }
-
     }
-
 }
