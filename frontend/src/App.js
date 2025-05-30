@@ -4,6 +4,7 @@ import './App.css';
 import ParkingLot from './components/ParkingLot';
 import Login from './pages/login';
 import RegisterAdminPage from './pages/RegisterAdminPage'; 
+import ReportsPage from './pages/ReportsPage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,13 +40,14 @@ function App() {
             {isAuthenticated && (
               <>
                 <Link to="/" style={{ color: 'white', marginRight: '10px' }}>Estacionamento</Link>
+                <Link to="/reports" style={{ color: 'white', marginRight: '10px' }}>Relatórios</Link>
                 <button onClick={handleLogout}>Sair</button>
               </>
             )}
             {!isAuthenticated && (
               <>
-                <Link to="/register-admin" style={{ color: 'white', marginRight: '10px' }}>Registrar Admin (Setup)</Link>
-                <Link to="/login" style={{ color: 'white' }}>Login</Link>
+                <Link to="/register-admin" style={{ color: 'white', marginRight: '10px' }}>Registrar Funcionário</Link>
+                <Link to="/login" style={{ color: 'white' }}>Fazer Login</Link>
               </>
             )}
           </nav>
@@ -60,6 +62,16 @@ function App() {
                   <Login onLoginSuccess={handleLoginSuccess} />
                 ) : (
                   <Navigate to="/" replace /> 
+                )
+              } 
+            />
+            <Route 
+              path="/reports" 
+              element={
+                isAuthenticated ? (
+                  <ReportsPage />
+                ) : (
+                  <Navigate to="/login" replace />
                 )
               } 
             />
