@@ -14,7 +14,7 @@ public class RegistroEntrada {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "placa", referencedColumnName = "placa", nullable = false)
+    @JoinColumn(name = "veiculo_id")
     private Veiculo veiculo;
 
     @Column(nullable = false)
@@ -23,7 +23,6 @@ public class RegistroEntrada {
     public RegistroEntrada() {}
 
     public RegistroEntrada(Veiculo veiculo) {
-        this.id = UUID.randomUUID();
         setVeiculo(veiculo);
         setHoraEntrada(LocalDateTime.now());
     }

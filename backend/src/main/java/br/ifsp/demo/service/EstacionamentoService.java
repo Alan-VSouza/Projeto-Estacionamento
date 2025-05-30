@@ -6,6 +6,7 @@ import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.repository.EstacionamentoRepository;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus; // Importar para ResponseStatusException
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class EstacionamentoService {
 
     private final EstacionamentoRepository estacionamentoRepository;

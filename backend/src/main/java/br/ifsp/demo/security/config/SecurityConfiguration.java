@@ -26,7 +26,8 @@ public class SecurityConfiguration {
             "/api/v1/api-docs/**",
             "/api/v1/openapi/**",
             "/api/v1/swagger-ui/**",
-            "/api/estacionamento/entradas"
+            "/api/estacionamento/entradas",
+            "/estacionamento/registar-entrada"
     };
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authenticationProvider;

@@ -21,7 +21,7 @@ public class EstacionamentoController {
     private final EstacionamentoService estacionamentoService;
 
     @PostMapping("/registar-entrada")
-    public ResponseEntity<RegistroEntrada> registrarEntrada(@RequestBody Veiculo veiculo) {
+    public ResponseEntity<RegistroEntrada> registrarEntrada(@RequestBody Veiculo  veiculo) {
         Estacionamento estacionamento = estacionamentoService.buscarEstacionamentoAtual();
         RegistroEntrada registro = estacionamentoService.registrarEntrada(veiculo, estacionamento.getId());
         return ResponseEntity.ok(registro);
