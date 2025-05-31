@@ -1,5 +1,6 @@
 package br.ifsp.demo.service;
 
+import br.ifsp.demo.dto.CriarEstacionamentoDTO;
 import br.ifsp.demo.model.Estacionamento;
 import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
@@ -79,6 +80,30 @@ public class EstacionamentoService {
         return pagamento;
     }
 
+    @Transactional
+    public Estacionamento criarEstacionamento (CriarEstacionamentoDTO dto) {
+
+        if(dto == null)
+            throw new IllegalArgumentException("Dados de criação do estacionamento não podem ser nulos");
+
+        Estacionamento estacionamento = new Estacionamento(
+                dto.getNome(),
+                dto.getEndereco(),
+                dto.getCapacidade()
+        );
+
+        return estacionamentoRepository.save(estacionamento);
+    }
+
+    public Estacionamento buscarEstacionamento(UUID id) {
+        if (id == null) {
+            throw new IllegalArgumentException("O ID do estacionamento não pode ser nulo.");
+        }
+        return estacionamentoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estacionamento não encontrado com o ID: " + id));
+    }
+
+
     public Estacionamento buscarEstacionamentoAtual() {
         return estacionamentoRepository.findAll().stream().findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Nenhum estacionamento encontrado"));
@@ -93,6 +118,20 @@ public class EstacionamentoService {
 
         registroEntradaRepository.delete(entrada);
         return true;
+    }
+
+    public RegistroEntrada buscarEntrada (String placa) {
+        Veiculo veiculo = veiculoService.buscarPorPlaca(placa)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Esse veículo não está no estacionamento"));
+
+        return registroEntradaRepository.findByVeiculo(veiculo)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não existe nenhuma entrada registrada nesse veículo"));
+    }
+
+    public List<RegistroEntrada> getAllEntradas() {
+
+        return registroEntradaRepository.findAll();
+
     }
 
 }

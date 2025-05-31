@@ -1,9 +1,13 @@
 package br.ifsp.demo.controller;
 
+import br.ifsp.demo.dto.CriarEstacionamentoDTO;
+import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.model.Estacionamento;
+import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.model.RegistroEntrada;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.service.EstacionamentoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +27,7 @@ public class EstacionamentoController {
     @PostMapping("/registar-entrada")
     public ResponseEntity<RegistroEntrada> registrarEntrada(@RequestBody Veiculo  veiculo) {
         Estacionamento estacionamento = estacionamentoService.buscarEstacionamentoAtual();
-        RegistroEntrada registro = estacionamentoService.registrarEntrada(veiculo, estacionamento.getId());
+        RegistroEntrada registro = estacionamentoService.registrar(veiculo, estacionamento.getId());
         return ResponseEntity.ok(registro);
     }
 
@@ -34,10 +38,17 @@ public class EstacionamentoController {
     }
 
     @PostMapping("/registrar-saida")
-    public ResponseEntity<Void> registrarSaida(@RequestParam("placa") String placa) {
-        return estacionamentoService.registrarSaida(placa)
-                ? ResponseEntity.ok().build()
-                : ResponseEntity.notFound().build();
+    public ResponseEntity<ReciboDTO> registrarSaida(@RequestParam("placa") String placa) {
+        Pagamento pagamento = estacionamentoService.registrarSaida(placa);
+
+        ReciboDTO recibo = new ReciboDTO(
+                pagamento.getPlaca(),
+                pagamento.getHoraEntrada(),
+                pagamento.getHoraSaida(),
+                pagamento.getValor()
+        );
+
+        return ResponseEntity.ok(recibo);
     }
 
     @GetMapping("/buscar-entrada")
@@ -49,7 +60,7 @@ public class EstacionamentoController {
     }
 
     @PostMapping("/criar-estacionamento")
-    public ResponseEntity<Estacionamento> criar(@RequestBody Estacionamento estacionamento) {
+    public ResponseEntity<Estacionamento> criar(@Valid @RequestBody CriarEstacionamentoDTO estacionamento) {
         Estacionamento criado = estacionamentoService.criarEstacionamento(estacionamento);
         return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
