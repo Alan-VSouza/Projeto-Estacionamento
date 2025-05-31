@@ -1,77 +1,78 @@
 package br.ifsp.demo.controller;
 
-import br.ifsp.demo.dto.HistoricoDTO;
-import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.service.RelatorioService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.io.ByteArrayOutputStream;
 
 @RestController
 @RequestMapping("/api/relatorios")
-@RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class RelatorioController {
 
     private final RelatorioService relatorioService;
 
+    @Autowired
+    public RelatorioController(RelatorioService relatorioService) {
+        this.relatorioService = relatorioService;
+    }
+
     @GetMapping("/desempenho")
-    public ResponseEntity<RelatorioDTO> gerarRelatorioDesempenho(@RequestParam("data")
-                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
-        return ResponseEntity.ok(relatorioService.gerarRelatorioDesempenho(data));
-    }
-
-    @GetMapping("/recibo")
-    public ResponseEntity<ReciboDTO> gerarRecibo(@RequestParam("placa") String placa) {
-        ReciboDTO recibo = relatorioService.gerarRecibo(placa);
-        if (recibo != null) {
-            return ResponseEntity.ok(recibo);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @GetMapping("/historico/{placa}")
-    public ResponseEntity<List<HistoricoDTO>> gerarHistoricoPorPlaca(@PathVariable String placa) {
-        return ResponseEntity.ok(relatorioService.gerarHistorico(placa));
-    }
-
-    @GetMapping("/vagas-disponiveis")
-    public ResponseEntity<Map<String, Integer>> vagasDisponiveis() {
-        return ResponseEntity.ok(Map.of("vagasDisponiveis", relatorioService.vagasDisponiveis()));
-    }
-
-    @GetMapping("/vagas-ocupadas")
-    public ResponseEntity<Map<String, Integer>> vagasOcupadas() {
-        return ResponseEntity.ok(Map.of("vagasOcupadas", relatorioService.vagasOcupadas()));
+    public ResponseEntity<RelatorioDTO> gerarRelatorioDesempenho(
+            @RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+        RelatorioDTO relatorio = relatorioService.gerarRelatorioDesempenho(data);
+        return ResponseEntity.ok(relatorio);
     }
 
     @GetMapping("/desempenho/export/csv")
-    public ResponseEntity<byte[]> exportarRelatorioCSV(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
-        String csvContent = relatorioService.gerarRelatorioCSV(data);
+    public ResponseEntity<Resource> exportarRelatorioCSV(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+        try {
+            String csvContent = relatorioService.gerarRelatorioCSV(data);
 
-        byte[] bom = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
-        byte[] csvBytes = csvContent.getBytes(StandardCharsets.UTF_8);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            baos.write(0xEF);
+            baos.write(0xBB);
+            baos.write(0xBF);
+            baos.write(csvContent.getBytes(StandardCharsets.UTF_8));
 
-        byte[] result = new byte[bom.length + csvBytes.length];
-        System.arraycopy(bom, 0, result, 0, bom.length);
-        System.arraycopy(csvBytes, 0, result, bom.length, csvBytes.length);
+            ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("text/csv; charset=UTF-8"));
-        headers.setContentDispositionFormData("attachment", "relatorio-" + data + ".csv");
-        headers.setContentLength(result.length);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-" + data + ".csv")
+                    .header(HttpHeaders.CONTENT_TYPE, "text/csv; charset=UTF-8")
+                    .contentLength(resource.contentLength())
+                    .body(resource);
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(result);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar CSV", e);
+        }
+    }
+
+    @GetMapping("/desempenho/export/pdf")
+    public ResponseEntity<Resource> exportarRelatorioPDF(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+        try {
+            byte[] pdfContent = relatorioService.gerarRelatorioPDF(data);
+
+            ByteArrayResource resource = new ByteArrayResource(pdfContent);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-" + data + ".pdf")
+                    .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
+                    .contentLength(resource.contentLength())
+                    .body(resource);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar PDF", e);
+        }
     }
 }
