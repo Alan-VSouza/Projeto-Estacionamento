@@ -1,6 +1,6 @@
 package br.ifsp.demo.model;
 
-import br.ifsp.demo.components.TempoPermanencia;
+import br.ifsp.demo.components.CalculadoraTempoPermanencia;
 import br.ifsp.demo.components.ValorPermanencia;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,14 +8,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TempoPermanenciaTest {
+class CalculadoraTempoPermanenciaTest {
 
-    private TempoPermanencia tempoPermanencia;
+    private CalculadoraTempoPermanencia calculadoraTempoPermanencia;
 
     @BeforeEach
     void setUp() {
         ValorPermanencia valorPermanencia = new ValorPermanencia();
-        tempoPermanencia = new TempoPermanencia(valorPermanencia);
+        calculadoraTempoPermanencia = new CalculadoraTempoPermanencia(valorPermanencia);
     }
 
     @Nested
@@ -29,7 +29,7 @@ class TempoPermanenciaTest {
         @DisplayName("Calcular o valor de uma hora de permanencia")
         void calcularOValorDeUmaHoraDePermanencia() {
 
-            assertEquals(10.0, tempoPermanencia.calcularValorDaPermanencia(1));
+            assertEquals(10.0, calculadoraTempoPermanencia.calcularValorDaPermanencia(1));
 
         }
 
@@ -40,7 +40,7 @@ class TempoPermanenciaTest {
         @DisplayName("Calcular o valor por hora de permanencia em permanencia menor que seis horas")
         void calcularOValorPorHoraDePermanenciaEmPermanenciaMenorQueSeisHoras() {
 
-            assertEquals(35.0, tempoPermanencia.calcularValorDaPermanencia(5));
+            assertEquals(35.0, calculadoraTempoPermanencia.calcularValorDaPermanencia(5));
 
         }
 
@@ -51,7 +51,7 @@ class TempoPermanenciaTest {
         @DisplayName("Calcular o valor a partir de seis hora de permanencia")
         void calcularOValorAPartirDeSeisHoraDePermanencia() {
 
-            assertEquals(51.0, tempoPermanencia.calcularValorDaPermanencia(8));
+            assertEquals(51.0, calculadoraTempoPermanencia.calcularValorDaPermanencia(8));
 
         }
 
@@ -62,7 +62,7 @@ class TempoPermanenciaTest {
         @DisplayName("Calcular o valor a partir de doze horas de permanencia")
         void calcularOValorAPartirDeDozeHorasDePermanencia() {
 
-            assertEquals(111.0, tempoPermanencia.calcularValorDaPermanencia(19));
+            assertEquals(111.0, calculadoraTempoPermanencia.calcularValorDaPermanencia(19));
 
         }
 
@@ -73,7 +73,7 @@ class TempoPermanenciaTest {
         @DisplayName("Calcular o valor a partir de vinte e quatro horas de permanencia")
         void calcularOValorAPartirDeVinteQuatroHorasDePermanencia() {
 
-            assertEquals(160.0, tempoPermanencia.calcularValorDaPermanencia(29));
+            assertEquals(160.0, calculadoraTempoPermanencia.calcularValorDaPermanencia(29));
 
         }
     }
@@ -99,7 +99,7 @@ class TempoPermanenciaTest {
         @DisplayName("Testando valores limites")
         void testandoValoresLimites(int horas, double custo) {
 
-            assertEquals(custo, tempoPermanencia.calcularValorDaPermanencia(horas));
+            assertEquals(custo, calculadoraTempoPermanencia.calcularValorDaPermanencia(horas));
 
         }
 
@@ -110,7 +110,7 @@ class TempoPermanenciaTest {
         void testandoValorDeHoraInvalido() {
 
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-                tempoPermanencia.calcularValorDaPermanencia(-1);
+                calculadoraTempoPermanencia.calcularValorDaPermanencia(-1);
             });
 
             assertEquals("Horas deve ser maior que zero", ex.getMessage());

@@ -1,11 +1,14 @@
 package br.ifsp.demo.model;
 
+import br.ifsp.demo.exception.EstacionamentoLotadoException;
+import br.ifsp.demo.service.CalculadoraDeTarifa;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -18,13 +21,39 @@ public class Estacionamento {
     private String endereco;
     private int capacidade;
 
-    public Estacionamento(String nome, String endereco) {
+    protected Estacionamento() {}
+
+    public Estacionamento(String nome, String endereco, int capacidade) {
+
+        if(nome == null || nome.trim().isEmpty())
+            throw new IllegalArgumentException("Nome do estacionamento não pode ser nulo ou vazio");
+        if(endereco == null || endereco.trim().isEmpty())
+            throw new IllegalArgumentException("Endereço do estacionamento não pode ser nulo ou vazio");
+        if(capacidade <= 0)
+            throw new IllegalArgumentException("Capacidade do estacionamento precisa ser maior que zero");
+
         setNome(nome);
         setEndereco(endereco);
-        this.id = UUID.randomUUID();
+        setCapacidade(capacidade);
+
     }
 
-    public Estacionamento() {
+    public RegistroEntrada registrarEntrada(Veiculo veiculo, int ocupacao) {
+
+        if(ocupacao >= this.capacidade)
+            throw new EstacionamentoLotadoException("O estacionamento está lotado");
+
+        return new RegistroEntrada(veiculo);
+
+    }
+
+    public Pagamento registroSaida(RegistroEntrada registroEntrada, LocalDateTime horaSaida, CalculadoraDeTarifa tarifa) {
+
+        if(registroEntrada == null)
+            throw new IllegalArgumentException("Registro de entrada não pode ser nulo");
+
+        return registroEntrada.finalizarEstadia(horaSaida, tarifa);
+
     }
 
     public UUID getId() {
@@ -58,6 +87,11 @@ public class Estacionamento {
     }
 
     public void setCapacidade(int capacidade) {
+        if (capacidade <= 0) {
+            throw new IllegalArgumentException("Capacidade deve ser maior que zero.");
+        }
         this.capacidade = capacidade;
     }
+
+
 }

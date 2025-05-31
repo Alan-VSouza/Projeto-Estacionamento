@@ -1,7 +1,7 @@
 package br.ifsp.demo.service;
 
 import br.ifsp.demo.model.Pagamento;
-import br.ifsp.demo.components.TempoPermanencia;
+import br.ifsp.demo.components.CalculadoraTempoPermanencia;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.exception.PagamentoNaoEncontradoException;
 import br.ifsp.demo.exception.VeiculoNaoEncontradoException;
@@ -21,7 +21,7 @@ public class PagamentoService {
 
     private final PagamentoRepository pagamentoRepository;
     private final VeiculoService veiculoService;
-    private final TempoPermanencia tempoPermanencia;
+    private final CalculadoraTempoPermanencia calculadoraTempoPermanencia;
 
     public void salvarPagamento(Pagamento pagamento) {
 
@@ -47,19 +47,12 @@ public class PagamentoService {
         }
 
         int horasPermanencia = calcularHorasPermanencia(pagamento.getHoraEntrada(), pagamento.getHoraSaida());
-        double valorPermanencia = tempoPermanencia.calcularValorDaPermanencia(horasPermanencia);
+        double valorPermanencia = calculadoraTempoPermanencia.calcularValorDaPermanencia(horasPermanencia);
 
         pagamento.setValor(valorPermanencia);
         pagamentoRepository.save(pagamento);
 
         veiculoService.deletarVeiculo(veiculo.get().getId());
-    }
-
-
-    private int calcularHorasPermanencia(LocalDateTime horaEntrada, LocalDateTime horaSaida) {
-        double horas = java.time.Duration.between(horaEntrada, horaSaida).toMinutes() / 60.0;
-        System.out.println("Horas calculadas: " + horas);
-        return (int) Math.ceil(horas);
     }
 
 
