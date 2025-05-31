@@ -42,11 +42,18 @@ export const fetchSpotsFromAPI = async () => {
     }
     const registrosEntrada = await responseEntradas.json();
   
-  const NUMERO_TOTAL_VAGAS_DO_BACKEND = 200;
-  const allSpots = [];
+    const NUMERO_TOTAL_VAGAS_DO_BACKEND = 200;
+    const allSpots = [];
 
-  for (let i = 0; i < NUMERO_TOTAL_VAGAS_DO_BACKEND; i++) {
-      const spotIdVisual = `Vaga ${String(i + 1).padStart(2, '0')}`; 
+    const registrosPorPlaca = new Map();
+    registrosEntrada.forEach(registro => {
+      if (registro && registro.veiculo) {
+        registrosPorPlaca.set(registro.veiculo.placa, registro);
+      }
+    });
+
+    for (let i = 0; i < NUMERO_TOTAL_VAGAS_DO_BACKEND; i++) {
+      const spotIdVisual = `Vaga ${String(i + 1).padStart(2, '0')}`;
       let spotData = { 
         id: spotIdVisual, 
         isOccupied: false, 
@@ -56,21 +63,30 @@ export const fetchSpotsFromAPI = async () => {
         backendPlateId: null 
       };
 
-      if (i < registrosEntrada.length) {
-          const registro = registrosEntrada[i];
-          if (registro && registro.veiculo) { 
-              spotData = {
-                  ...spotData,
-                  isOccupied: true,
-                  vehiclePlate: registro.veiculo.placa,
-                  tipoVeiculo: registro.veiculo.tipoVeiculo,
-                  entryTime: registro.dataEntrada ? new Date(registro.dataEntrada) : null,
-                  backendPlateId: registro.veiculo.placa
-              };
-          }
-      }
       allSpots.push(spotData);
     }
+
+    let vagaIndex = 0;
+    registrosEntrada.forEach(registro => {
+      if (registro && registro.veiculo) {
+        while (vagaIndex < allSpots.length && allSpots[vagaIndex].isOccupied) {
+          vagaIndex++;
+        }
+        
+        if (vagaIndex < allSpots.length) {
+          allSpots[vagaIndex] = {
+            ...allSpots[vagaIndex],
+            isOccupied: true,
+            vehiclePlate: registro.veiculo.placa,
+            tipoVeiculo: registro.veiculo.tipoVeiculo,
+            entryTime: registro.dataEntrada ? new Date(registro.dataEntrada) : null,
+            backendPlateId: registro.veiculo.placa
+          };
+          vagaIndex++;
+        }
+      }
+    });
+
     return allSpots;
 
   } catch (error) {

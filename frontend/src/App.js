@@ -8,7 +8,8 @@ import ReportsPage from './pages/ReportsPage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
+  const [mobileMenuActive, setMobileMenuActive] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
@@ -25,6 +26,11 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('jwtToken');
     setIsAuthenticated(false);
+    setMobileMenuActive(false);
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuActive(!mobileMenuActive);
   };
 
   if (isLoading) {
@@ -35,21 +41,81 @@ function App() {
     <Router>
       <div className="App">
         <header className="App-header">
-          <h1>Gerenciador de Estacionamento</h1>
+          <h1>🚗 Smart Parking</h1>
           <nav>
-            {isAuthenticated && (
-              <>
-                <Link to="/" style={{ color: 'white', marginRight: '10px' }}>Estacionamento</Link>
-                <Link to="/reports" style={{ color: 'white', marginRight: '10px' }}>Relatórios</Link>
-                <button onClick={handleLogout}>Sair</button>
-              </>
-            )}
-            {!isAuthenticated && (
-              <>
-                <Link to="/register-admin" style={{ color: 'white', marginRight: '10px' }}>Registrar Funcionário</Link>
-                <Link to="/login" style={{ color: 'white' }}>Fazer Login</Link>
-              </>
-            )}
+            <ul className={`nav-list ${mobileMenuActive ? 'active' : ''}`}>
+              {isAuthenticated && (
+                <>
+                  <li>
+                    <Link to="/" onClick={() => setMobileMenuActive(false)}>
+                      🏠 Dashboard
+                    </Link>
+                  </li>
+                  <li className="dropdown">
+                    <span>📊 Relatórios ▼</span>
+                    <ul className="dropdown-menu">
+                      <li>
+                        <Link to="/reports" onClick={() => setMobileMenuActive(false)}>
+                          📈 Receita Diária
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/reports" onClick={() => setMobileMenuActive(false)}>
+                          📋 Histórico
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/reports" onClick={() => setMobileMenuActive(false)}>
+                          📊 Estatísticas
+                        </Link>
+                      </li>
+                    </ul>
+                  </li>
+                  <li className="dropdown">
+                    <span>⚙️ Sistema ▼</span>
+                    <ul className="dropdown-menu">
+                      <li>
+                        <Link to="/settings" onClick={() => setMobileMenuActive(false)}>
+                          🔧 Configurações
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/users" onClick={() => setMobileMenuActive(false)}>
+                          👥 Usuários
+                        </Link>
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <button onClick={handleLogout}>
+                      🚪 Sair
+                    </button>
+                  </li>
+                </>
+              )}
+              {!isAuthenticated && (
+                <>
+                  <li>
+                    <Link to="/register-admin" onClick={() => setMobileMenuActive(false)}>
+                      👤 Registrar Funcionário
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/login" onClick={() => setMobileMenuActive(false)}>
+                      🔑 Fazer Login
+                    </Link>
+                  </li>
+                </>
+              )}
+            </ul>
+            <div 
+              className={`mobile-menu ${mobileMenuActive ? 'active' : ''}`}
+              onClick={toggleMobileMenu}
+            >
+              <div className="line1"></div>
+              <div className="line2"></div>
+              <div className="line3"></div>
+            </div>
           </nav>
         </header>
         <main>
@@ -89,7 +155,7 @@ function App() {
           </Routes>
         </main>
         <footer>
-          <p>&copy; {new Date().getFullYear()} Meu Projeto de Estacionamento</p>
+          <p>&copy; {new Date().getFullYear()} Smart Parking System - Desenvolvido por Alan, Ana e Fabiano</p>
         </footer>
       </div>
     </Router>
