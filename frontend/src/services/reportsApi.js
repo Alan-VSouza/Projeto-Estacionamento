@@ -41,6 +41,28 @@ export const getAvailableSpots = async () => {
   }
 };
 
+export const getVehicleHistory = async (placa) => {
+  const token = getToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/relatorios/historico/${placa}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Nenhum histórico encontrado para esta placa');
+      }
+      const errorData = await response.json().catch(() => ({ message: 'Erro ao buscar histórico do veículo' }));
+      throw new Error(errorData.message || 'Erro ao buscar histórico do veículo');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Erro em getVehicleHistory:", error);
+    throw error;
+  }
+};
+
 export const getOccupiedSpots = async () => {
   const token = getToken();
   try {
