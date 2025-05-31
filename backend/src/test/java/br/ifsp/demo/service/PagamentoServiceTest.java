@@ -3,7 +3,7 @@ package br.ifsp.demo.service;
 import br.ifsp.demo.exception.PagamentoNaoEncontradoException;
 import br.ifsp.demo.exception.VeiculoNaoEncontradoException;
 import br.ifsp.demo.model.Pagamento;
-import br.ifsp.demo.components.TempoPermanencia;
+import br.ifsp.demo.components.CalculadoraTempoPermanencia;
 import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.PagamentoRepository;
 import org.junit.jupiter.api.*;
@@ -39,7 +39,7 @@ class PagamentoServiceTest {
     private VeiculoService veiculoService;
 
     @Mock
-    TempoPermanencia tempoPermanencia;
+    CalculadoraTempoPermanencia calculadoraTempoPermanencia;
 
     @InjectMocks
     private PagamentoService service;
@@ -78,7 +78,7 @@ class PagamentoServiceTest {
 
             verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
             verify(veiculoService).deletarVeiculo(veiculo.getId());
-            verify(tempoPermanencia, times(1)).calcularValorDaPermanencia(anyInt());
+            verify(calculadoraTempoPermanencia, times(1)).calcularValorDaPermanencia(anyInt());
 
         }
 
@@ -150,7 +150,7 @@ class PagamentoServiceTest {
             pagamento.setHoraSaida(LocalDateTime.of(2025,4,30,13,1,0));
 
             when(veiculoService.buscarPorPlaca(pagamento.getPlaca())).thenReturn(Optional.ofNullable(veiculo));
-            when(tempoPermanencia.calcularValorDaPermanencia(anyInt())).thenReturn(26.0);
+            when(calculadoraTempoPermanencia.calcularValorDaPermanencia(anyInt())).thenReturn(26.0);
 
             service.salvarPagamento(pagamento);
 
