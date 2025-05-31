@@ -2,6 +2,7 @@ package br.ifsp.demo.controller;
 
 import br.ifsp.demo.dto.CriarEstacionamentoDTO;
 import br.ifsp.demo.dto.ReciboDTO;
+import br.ifsp.demo.dto.VeiculoComVagaDTO;
 import br.ifsp.demo.model.Estacionamento;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.model.RegistroEntrada;
@@ -25,9 +26,22 @@ public class EstacionamentoController {
     private final EstacionamentoService estacionamentoService;
 
     @PostMapping("/registar-entrada")
-    public ResponseEntity<RegistroEntrada> registrarEntrada(@RequestBody Veiculo  veiculo) {
+    public ResponseEntity<RegistroEntrada> registrarEntrada(@Valid @RequestBody VeiculoComVagaDTO request) {
         Estacionamento estacionamento = estacionamentoService.buscarEstacionamentoAtual();
-        RegistroEntrada registro = estacionamentoService.registrar(veiculo, estacionamento.getId());
+
+        Integer vagaId = request.vagaId();
+        if (vagaId == null) {
+            vagaId = estacionamentoService.findNextAvailableSpot();
+        }
+
+        Veiculo veiculo = new Veiculo(
+                request.placa(),
+                request.tipoVeiculo(),
+                request.modelo(),
+                request.cor()
+        );
+
+        RegistroEntrada registro = estacionamentoService.registrarEntrada(veiculo, estacionamento.getId(), vagaId);
         return ResponseEntity.ok(registro);
     }
 

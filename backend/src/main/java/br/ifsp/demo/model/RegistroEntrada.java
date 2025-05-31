@@ -21,21 +21,35 @@ public class RegistroEntrada {
     @Column(nullable = false)
     private LocalDateTime horaEntrada;
 
+    @Column(nullable = false)
+    private Integer vagaId;
+
     protected RegistroEntrada() {}
 
-    public RegistroEntrada(Veiculo veiculo) {
-
-        if(veiculo == null)
+    public RegistroEntrada(Veiculo veiculo, Integer vagaId) {
+        if(veiculo == null) {
             throw new IllegalArgumentException("Veículo não pode ser nulo");
+        }
+        if(vagaId == null || vagaId < 1 || vagaId > 200) {
+            throw new IllegalArgumentException("ID da vaga deve estar entre 1 e 200");
+        }
 
         this.veiculo = veiculo;
         this.horaEntrada = LocalDateTime.now();
+        this.vagaId = vagaId;
+    }
+
+    public RegistroEntrada(Veiculo veiculo) {
+        if(veiculo == null) {
+            throw new IllegalArgumentException("Veículo não pode ser nulo");
+        }
+        this.veiculo = veiculo;
+        this.horaEntrada = LocalDateTime.now();
+        this.vagaId = 1;
     }
 
     public Pagamento finalizarEstadia(LocalDateTime horaSaida, CalculadoraDeTarifa calculadora) {
-
         return new Pagamento(this, horaSaida, calculadora);
-
     }
 
     public UUID getId() {
@@ -48,4 +62,13 @@ public class RegistroEntrada {
         return horaEntrada;
     }
 
+    public Integer getVagaId() {
+        return vagaId;
+    }
+    public void setVagaId(Integer vagaId) {
+        if(vagaId == null || vagaId < 1 || vagaId > 200) {
+            throw new IllegalArgumentException("ID da vaga deve estar entre 1 e 200");
+        }
+        this.vagaId = vagaId;
+    }
 }

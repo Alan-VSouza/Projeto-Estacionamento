@@ -126,10 +126,10 @@ public class RelatorioService {
                     .withHeader("Métrica", "Valor"));
 
             csvPrinter.printRecord("Data", data.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            csvPrinter.printRecord("Receita Total", "R$ " + String.format("%.2f", relatorio.getReceitaTotal()));
-            csvPrinter.printRecord("Quantidade de Veículos", relatorio.getQuantidade());
-            csvPrinter.printRecord("Tempo Médio (horas)", String.format("%.2f", relatorio.getTempoMedioHoras()));
-            csvPrinter.printRecord("Ocupação Média", String.format("%.2f%%", relatorio.getOcupacaoMedia() * 100));
+            csvPrinter.printRecord("Receita Total", "R$ " + String.format("%.2f", relatorio.receitaTotal()));
+            csvPrinter.printRecord("Quantidade de Veículos", relatorio.quantidade());
+            csvPrinter.printRecord("Tempo Médio (horas)", String.format("%.2f", relatorio.tempoMedioHoras()));
+            csvPrinter.printRecord("Ocupação Média", String.format("%.2f%%", relatorio.ocupacaoMedia() * 100));
 
             csvPrinter.flush();
             return sw.toString();

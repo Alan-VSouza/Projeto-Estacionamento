@@ -11,14 +11,15 @@ import br.ifsp.demo.repository.RegistroEntradaRepository;
 import br.ifsp.demo.repository.VeiculoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus; // Importar para ResponseStatusException
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException; // Importar ResponseStatusException
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -43,29 +44,53 @@ public class EstacionamentoService {
     }
 
     @Transactional
-    public RegistroEntrada registrar(Veiculo veiculoDados, UUID idEstacionamento) {
-
+    public RegistroEntrada registrarEntrada(Veiculo veiculo, UUID idEstacionamento, Integer vagaId) {
         Estacionamento estacionamento = estacionamentoRepository.findById(idEstacionamento)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estacionamento não encontrado"));
-
-        veiculoService.buscarPorPlaca(veiculoDados.getPlaca())
-                .ifPresent(veiculo -> {
-                    if (registroEntradaRepository.findByVeiculo(veiculo).isPresent()) {
-                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Veículo já possui uma entrada registrada.");
-                    }
-                });
-
-        Veiculo veiculoRegistrar = veiculoService.obterOuCadastrarVeiculo(veiculoDados);
+        Optional<RegistroEntrada> vagaOcupada = registroEntradaRepository.findByVagaId(vagaId);
+        if (vagaOcupada.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Vaga " + vagaId + " já está ocupada");
+        }
         long veiculosEstacionados = registroEntradaRepository.count();
+        if (veiculosEstacionados >= estacionamento.getCapacidade()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Estacionamento lotado. Capacidade máxima atingida.");
+        }
 
-        RegistroEntrada novoRegistro = estacionamento.registrarEntrada(veiculoRegistrar, (int) veiculosEstacionados);
+        Optional<Veiculo> veiculoExistenteOpt = veiculoService.buscarPorPlaca(veiculo.getPlaca());
+        if (veiculoExistenteOpt.isPresent()) {
+            Optional<RegistroEntrada> entradaExistenteOpt = registroEntradaRepository.findByVeiculo(veiculoExistenteOpt.get());
+            if (entradaExistenteOpt.isPresent()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Veículo já possui uma entrada registrada na vaga " + entradaExistenteOpt.get().getVagaId());
+            }
+        }
 
-        return registroEntradaRepository.save(novoRegistro);
+        Veiculo veiculoCadastrado = veiculoService.obterOuCadastrarVeiculo(veiculo);
+        RegistroEntrada registroEntrada = new RegistroEntrada(veiculoCadastrado, vagaId);
+        return registroEntradaRepository.save(registroEntrada);
+    }
+
+    public Integer findNextAvailableSpot() {
+        List<Integer> vagasOcupadas = registroEntradaRepository.findAllOccupiedSpotIds();
+
+        for (int i = 1; i <= 200; i++) {
+            if (!vagasOcupadas.contains(i)) {
+                return i;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.CONFLICT, "Todas as vagas estão ocupadas");
+    }
+
+    @Transactional
+    public RegistroEntrada registrar(Veiculo veiculoDados, UUID idEstacionamento) {
+        Integer vagaId = findNextAvailableSpot();
+        return registrarEntrada(veiculoDados, idEstacionamento, vagaId);
     }
 
     @Transactional
     public Pagamento registrarSaida(String placa) {
-
         Estacionamento estacionamento = buscarEstacionamentoAtual();
         Veiculo veiculo = veiculoService.buscarPorPlaca(placa)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veículo não está registrado"));
@@ -81,15 +106,14 @@ public class EstacionamentoService {
     }
 
     @Transactional
-    public Estacionamento criarEstacionamento (CriarEstacionamentoDTO dto) {
-
+    public Estacionamento criarEstacionamento(CriarEstacionamentoDTO dto) {
         if(dto == null)
             throw new IllegalArgumentException("Dados de criação do estacionamento não podem ser nulos");
 
         Estacionamento estacionamento = new Estacionamento(
-                dto.getNome(),
-                dto.getEndereco(),
-                dto.getCapacidade()
+                dto.nome(),
+                dto.endereco(),
+                dto.capacidade()
         );
 
         return estacionamentoRepository.save(estacionamento);
@@ -103,14 +127,12 @@ public class EstacionamentoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estacionamento não encontrado com o ID: " + id));
     }
 
-
     public Estacionamento buscarEstacionamentoAtual() {
         return estacionamentoRepository.findAll().stream().findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Nenhum estacionamento encontrado"));
     }
 
     public boolean cancelarEntrada(String placa) {
-
         Veiculo veiculo = veiculoService.buscarPorPlaca(placa)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veiculo não encontrado"));
         RegistroEntrada entrada = registroEntradaRepository.findByVeiculo(veiculo)
@@ -120,7 +142,7 @@ public class EstacionamentoService {
         return true;
     }
 
-    public RegistroEntrada buscarEntrada (String placa) {
+    public RegistroEntrada buscarEntrada(String placa) {
         Veiculo veiculo = veiculoService.buscarPorPlaca(placa)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Esse veículo não está no estacionamento"));
 
@@ -129,9 +151,6 @@ public class EstacionamentoService {
     }
 
     public List<RegistroEntrada> getAllEntradas() {
-
         return registroEntradaRepository.findAll();
-
     }
-
 }
