@@ -8,6 +8,7 @@ import Login from './pages/login';
 import RegisterAdminPage from './pages/RegisterAdminPage'; 
 import ReportsPage from './pages/ReportsPage';
 import { validateToken } from './services/api';
+import logo from './images/logo.png';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -51,7 +52,7 @@ function App() {
       <div className="loading-screen">
         <div className="loading-container">
           <div className="loading-logo">
-            <div className="car-icon">🚗</div>
+            <img src={logo} alt="Smart Parking Logo" className="logo-icon" />
             <h1 className="loading-title">Smart Parking</h1>
           </div>
           
@@ -85,54 +86,57 @@ function App() {
     <Router>
       <div className="App">
         <header className="App-header">
-          <h1>🚗 Smart Parking</h1>
+          <h1>
+            <img src={logo} alt="Smart Parking Logo" className="header-logo" />
+            Smart Parking
+          </h1>
           <nav>
             <ul className={`nav-list ${mobileMenuActive ? 'active' : ''}`}>
               {isAuthenticated && (
                 <>
                   <li>
                     <Link to="/" onClick={() => setMobileMenuActive(false)}>
-                      🏠 Dashboard
+                      Dashboard
                     </Link>
                   </li>
                   <li className="dropdown">
-                    <span>📊 Relatórios ▼</span>
+                    <span>Relatórios ▼</span>
                     <ul className="dropdown-menu">
                       <li>
                         <Link to="/reports" onClick={() => setMobileMenuActive(false)}>
-                          📈 Receita Diária
+                          Receita Diária
                         </Link>
                       </li>
                       <li>
                         <Link to="/reports" onClick={() => setMobileMenuActive(false)}>
-                          📋 Histórico
+                          Histórico
                         </Link>
                       </li>
                       <li>
                         <Link to="/reports" onClick={() => setMobileMenuActive(false)}>
-                          📊 Estatísticas
+                          Estatísticas
                         </Link>
                       </li>
                     </ul>
                   </li>
                   <li className="dropdown">
-                    <span>⚙️ Sistema ▼</span>
+                    <span>Sistema ▼</span>
                     <ul className="dropdown-menu">
                       <li>
                         <Link to="/settings" onClick={() => setMobileMenuActive(false)}>
-                          🔧 Configurações
+                          Configurações
                         </Link>
                       </li>
                       <li>
                         <Link to="/users" onClick={() => setMobileMenuActive(false)}>
-                          👥 Usuários
+                          Usuários
                         </Link>
                       </li>
                     </ul>
                   </li>
                   <li>
                     <button onClick={handleLogout}>
-                      🚪 Sair
+                      Sair
                     </button>
                   </li>
                 </>
@@ -141,12 +145,12 @@ function App() {
                 <>
                   <li>
                     <Link to="/register-admin" onClick={() => setMobileMenuActive(false)}>
-                      👤 Registrar Funcionário
+                      Registrar Funcionário
                     </Link>
                   </li>
                   <li>
                     <Link to="/login" onClick={() => setMobileMenuActive(false)}>
-                      🔑 Fazer Login
+                      Fazer Login
                     </Link>
                   </li>
                 </>
