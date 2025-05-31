@@ -1,4 +1,3 @@
-// src/components/parking/ParkingSummary.js
 import React from 'react';
 
 function ParkingSummary({ totalSpots, occupiedSpots }) {

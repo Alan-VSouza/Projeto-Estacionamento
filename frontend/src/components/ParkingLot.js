@@ -3,6 +3,7 @@ import ParkingSpot from './ParkingSpot';
 import ParkingSummary from './ParkingSummary';
 import { fetchSpotsFromAPI, occupySpotInAPI, vacateSpotInAPI, cancelEntryInAPI } from '../services/api';
 import VehicleEntryForm from './VehicleEntryForm';
+import ActionModal from './ActionModal';
 
 function ParkingLot({ }) {
   const [spots, setSpots] = useState([]);
@@ -12,72 +13,91 @@ function ParkingLot({ }) {
   const [showVehicleForm, setShowVehicleForm] = useState(false);
   const [selectedSpotId, setSelectedSpotId] = useState(null);
 
-    useEffect(() => {
+  const [showActionModal, setShowActionModal] = useState(false);
+  const [selectedSpotData, setSelectedSpotData] = useState(null);
+
+  useEffect(() => {
     const loadSpots = async () => {
-        try {
+      try {
         setLoading(true);
         setError(null);
         const apiSpots = await fetchSpotsFromAPI(); 
         setSpots(apiSpots); 
-        } catch (err) {
-        } finally {
+      } catch (err) {
+        setError(err.message);
+      } finally {
         setLoading(false);
-        }
+      }
     };
     loadSpots();
-    }, []);
+  }, []);
 
   const handleSpotClick = async (spotId) => {
-  const spotToUpdate = spots.find(spot => spot.id === spotId);
-  if (!spotToUpdate) return;
+    const spotToUpdate = spots.find(spot => spot.id === spotId);
+    if (!spotToUpdate) return;
 
-  if (spotToUpdate.isOccupied) {
-    const action = window.prompt(
-      `O que deseja fazer com ${spotToUpdate.id} (Placa: ${spotToUpdate.vehiclePlate})?\n` +
-      "Digite:\n" +
-      "1 para Desocupar (registrar saída)\n" +
-      "2 para Cancelar entrada"
-    );
-    if (action === "1") {
-      try {
-        const plateToVacate = spotToUpdate.backendPlateId || spotToUpdate.vehiclePlate;
-        const apiResponse = await vacateSpotInAPI(plateToVacate);
-        setSpots(currentSpots =>
-          currentSpots.map(s => (s.id === spotId ? { ...s, isOccupied: false, vehiclePlate: null, entryTime: null, backendPlateId: null } : s))
-        );
-        console.log(`Vaga ${spotId} desocupada. Detalhes:`, apiResponse);
-      } catch (err) {
-        console.error("Erro ao desocupar vaga:", err);
-        alert(`Erro: ${err.message || "Não foi possível desocupar a vaga."}`);
-      }
-    } else if (action === "2") {
-      try {
-        const plateToCancel = spotToUpdate.backendPlateId || spotToUpdate.vehiclePlate;
-        await cancelEntryInAPI(plateToCancel);
-        setSpots(currentSpots =>
-          currentSpots.map(s => (s.id === spotId ? { ...s, isOccupied: false, vehiclePlate: null, entryTime: null, backendPlateId: null } : s))
-        );
-        alert("Entrada cancelada com sucesso.");
-      } catch (err) {
-        console.error("Erro ao cancelar entrada:", err);
-        alert(`Erro: ${err.message || "Não foi possível cancelar a entrada."}`);
-      }
-    }
+    if (spotToUpdate.isOccupied) {
+      setSelectedSpotData(spotToUpdate);
+      setShowActionModal(true);
     } else {
       setSelectedSpotId(spotId);
       setShowVehicleForm(true);
     }
   };
 
+  const handleVacateSpot = async () => {
+    if (!selectedSpotData) return;
+    
+    try {
+      const plateToVacate = selectedSpotData.backendPlateId || selectedSpotData.vehiclePlate;
+      const apiResponse = await vacateSpotInAPI(plateToVacate);
+      
+      setSpots(currentSpots =>
+        currentSpots.map(s => 
+          s.id === selectedSpotData.id 
+            ? { ...s, isOccupied: false, vehiclePlate: null, entryTime: null, backendPlateId: null } 
+            : s
+        )
+      );
+      
+      console.log(`Vaga ${selectedSpotData.id} desocupada. Detalhes:`, apiResponse);
+      alert(`✅ Vaga ${selectedSpotData.id} desocupada com sucesso!`);
+    } catch (err) {
+      console.error("Erro ao desocupar vaga:", err);
+      alert(`❌ Erro: ${err.message || "Não foi possível desocupar a vaga."}`);
+    }
+  };
+
+  const handleCancelEntry = async () => {
+    if (!selectedSpotData) return;
+    
+    try {
+      const plateToCancel = selectedSpotData.backendPlateId || selectedSpotData.vehiclePlate;
+      await cancelEntryInAPI(plateToCancel);
+      
+      setSpots(currentSpots =>
+        currentSpots.map(s => 
+          s.id === selectedSpotData.id 
+            ? { ...s, isOccupied: false, vehiclePlate: null, entryTime: null, backendPlateId: null } 
+            : s
+        )
+      );
+      
+      alert(`✅ Entrada da vaga ${selectedSpotData.id} cancelada com sucesso!`);
+    } catch (err) {
+      console.error("Erro ao cancelar entrada:", err);
+      alert(`❌ Erro: ${err.message || "Não foi possível cancelar a entrada."}`);
+    }
+  };
 
   const handleVehicleEntrySubmit = async (vehicleData) => {
     if (!selectedSpotId) return;
     try {
-       const updatedSpotDataFromAPI = await occupySpotInAPI(selectedSpotId, vehicleData);
+      const updatedSpotDataFromAPI = await occupySpotInAPI(selectedSpotId, vehicleData);
       
       setSpots(currentSpots =>
         currentSpots.map(s => (s.id === selectedSpotId ? { ...s, ...updatedSpotDataFromAPI } : s))
-    );
+      );
       setShowVehicleForm(false);
       setSelectedSpotId(null);
     } catch (err) {
@@ -89,6 +109,11 @@ function ParkingLot({ }) {
   const handleCloseVehicleForm = () => {
     setShowVehicleForm(false);
     setSelectedSpotId(null);
+  };
+
+  const handleCloseActionModal = () => {
+    setShowActionModal(false);
+    setSelectedSpotData(null);
   };
 
   const occupiedSpotsCount = spots.filter(spot => spot.isOccupied).length;
@@ -109,6 +134,7 @@ function ParkingLot({ }) {
           />
         ))}
       </div>
+
       {showVehicleForm && selectedSpotId && (
         <VehicleEntryForm
           spotId={selectedSpotId}
@@ -116,6 +142,14 @@ function ParkingLot({ }) {
           onCancel={handleCloseVehicleForm}
         />
       )}
+
+      <ActionModal
+        isOpen={showActionModal}
+        onClose={handleCloseActionModal}
+        spotData={selectedSpotData}
+        onVacate={handleVacateSpot}
+        onCancel={handleCancelEntry}
+      />
     </div>
   );
 }
