@@ -1,20 +1,15 @@
 package br.ifsp.demo.dto;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.Min;
 
-@Getter
-@Setter
-public class CriarEstacionamentoDTO {
+public record CriarEstacionamentoDTO(
+        @NotBlank(message = "Nome não pode ser vazio")
+        String nome,
 
-    @NotBlank(message = "O nome não pode ser vazio ou nulo.")
-    private String nome;
+        @NotBlank(message = "Endereço não pode ser vazio")
+        String endereco,
 
-    @NotBlank(message = "O endereço não pode ser vazio ou nulo.")
-    private String endereco;
-
-    @Min(value = 1, message = "A capacidade deve ser de no mínimo 1.")
-    private int capacidade;
-}
+        @Min(value = 1, message = "Capacidade deve ser maior que 0")
+        int capacidade
+) {}
