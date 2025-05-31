@@ -22,6 +22,63 @@ export const getDailyRevenueReport = async (date) => {
   }
 };
 
+export const exportReportPDF = async (date) => {
+  const token = getToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/relatorios/desempenho/export/pdf?data=${date}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Erro ao exportar relatório em PDF');
+    }
+    
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `relatorio-${date}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Erro em exportReportPDF:", error);
+    throw error;
+  }
+};
+
+export const exportReportCSV = async (date) => {
+  const token = getToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/relatorios/desempenho/export/csv?data=${date}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Erro ao exportar relatório em CSV');
+    }
+    
+    const csvContent = await response.text();
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `relatorio-${date}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Erro em exportReportCSV:", error);
+    throw error;
+  }
+};
+
 export const getAvailableSpots = async () => {
   const token = getToken();
   try {

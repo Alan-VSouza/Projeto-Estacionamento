@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import { loginUser } from '../services/api';
 
 function Login({ onLoginSuccess }) {
@@ -17,9 +18,16 @@ function Login({ onLoginSuccess }) {
       if (onLoginSuccess) {
         onLoginSuccess(token);
       }
-      alert('Login bem-sucedido!');
+      toast.success('🎉 Login realizado com sucesso!', {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } catch (err) {
       setError(err.message);
+      toast.error(`❌ ${err.message}`, {
+        position: "top-right",
+        autoClose: 4000,
+      });
     } finally {
       setLoading(false);
     }

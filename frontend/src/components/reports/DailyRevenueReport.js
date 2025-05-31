@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { getDailyRevenueReport } from '../../services/reportsApi';
+import { toast } from 'react-toastify';
+import { getDailyRevenueReport, exportReportPDF, exportReportCSV } from '../../services/reportsApi';
 
 function DailyRevenueReport() {
   const [reportData, setReportData] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [exporting, setExporting] = useState(false);
 
   const loadReport = async (date) => {
     setLoading(true);
@@ -27,6 +29,42 @@ function DailyRevenueReport() {
 
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
+  };
+
+  const handleExportPDF = async () => {
+    setExporting(true);
+    try {
+      await exportReportPDF(selectedDate);
+      toast.success('📄 PDF exportado com sucesso!', {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } catch (error) {
+      toast.error(`❌ Erro ao exportar PDF: ${error.message}`, {
+        position: "top-right",
+        autoClose: 4000,
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportCSV = async () => {
+    setExporting(true);
+    try {
+      await exportReportCSV(selectedDate);
+      toast.success('📊 CSV exportado com sucesso!', {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } catch (error) {
+      toast.error(`❌ Erro ao exportar CSV: ${error.message}`, {
+        position: "top-right",
+        autoClose: 4000,
+      });
+    } finally {
+      setExporting(false);
+    }
   };
 
   const formatCurrency = (value) => {
@@ -83,6 +121,26 @@ function DailyRevenueReport() {
             <div className="report-card occupancy">
               <h3>Taxa de Ocupação</h3>
               <div className="value">{((reportData.ocupacaoMedia || 0) * 100).toFixed(1)}%</div>
+            </div>
+          </div>
+
+          <div className="export-section">
+            <h3>📥 Exportar Relatório</h3>
+            <div className="export-buttons">
+              <button 
+                onClick={handleExportPDF} 
+                disabled={exporting}
+                className="export-btn pdf-btn"
+              >
+                {exporting ? '⏳ Exportando...' : '📄 Exportar PDF'}
+              </button>
+              <button 
+                onClick={handleExportCSV} 
+                disabled={exporting}
+                className="export-btn csv-btn"
+              >
+                {exporting ? '⏳ Exportando...' : '📊 Exportar CSV'}
+              </button>
             </div>
           </div>
 
