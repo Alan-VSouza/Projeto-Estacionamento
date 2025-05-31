@@ -1,5 +1,6 @@
 package br.ifsp.demo.model;
 
+import br.ifsp.demo.service.CalculadoraDeTarifa;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -20,38 +21,31 @@ public class RegistroEntrada {
     @Column(nullable = false)
     private LocalDateTime horaEntrada;
 
-    public RegistroEntrada() {}
+    protected RegistroEntrada() {}
 
     public RegistroEntrada(Veiculo veiculo) {
-        setVeiculo(veiculo);
-        setHoraEntrada(LocalDateTime.now());
+
+        if(veiculo == null)
+            throw new IllegalArgumentException("Veículo não pode ser nulo");
+
+        this.veiculo = veiculo;
+        this.horaEntrada = LocalDateTime.now();
+    }
+
+    public Pagamento finalizarEstadia(LocalDateTime horaSaida, CalculadoraDeTarifa calculadora) {
+
+        return new Pagamento(this, horaSaida, calculadora);
+
     }
 
     public UUID getId() {
         return id;
     }
-
     public Veiculo getVeiculo() {
         return veiculo;
     }
-
-    public void setVeiculo(Veiculo veiculo) {
-        if (veiculo == null) {
-            throw new IllegalArgumentException("Veículo não pode ser nulo");
-        }
-        this.veiculo = veiculo;
-    }
-
     public LocalDateTime getHoraEntrada() {
         return horaEntrada;
     }
 
-    public void setHoraEntrada(LocalDateTime horaEntrada) {
-        if (horaEntrada == null)
-            throw new IllegalArgumentException("Hora de entrada não pode ser nula");
-        if (horaEntrada.isAfter(LocalDateTime.now()))
-            throw new IllegalArgumentException("Hora de entrada não pode ser no futuro");
-
-        this.horaEntrada = horaEntrada;
-    }
 }
