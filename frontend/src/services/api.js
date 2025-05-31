@@ -46,26 +46,24 @@ export const fetchSpotsFromAPI = async () => {
     const allSpots = [];
 
     for (let i = 0; i < NUMERO_TOTAL_VAGAS_DO_BACKEND; i++) {
-      const spotIdVisual = `Vaga ${String(i + 1).padStart(2, '0')}`;
-      let spotData = { 
-        id: spotIdVisual, 
+      const vagaNumero = i + 1; 
+      const spotIdVisual = `Vaga ${String(vagaNumero).padStart(2, '0')}`;
+      allSpots.push({ 
+        id: spotIdVisual,
+        vagaId: vagaNumero, 
         isOccupied: false, 
         vehiclePlate: null, 
         tipoVeiculo: null, 
         entryTime: null,
         backendPlateId: null 
-      };
-      allSpots.push(spotData);
+      });
     }
 
-    let vagaIndex = 0;
     registrosEntrada.forEach(registro => {
-      if (registro && registro.veiculo) {
-        while (vagaIndex < allSpots.length && allSpots[vagaIndex].isOccupied) {
-          vagaIndex++;
-        }
+      if (registro && registro.veiculo && registro.vagaId) {
+        const vagaIndex = registro.vagaId - 1; 
         
-        if (vagaIndex < allSpots.length) {
+        if (vagaIndex >= 0 && vagaIndex < allSpots.length) {
           allSpots[vagaIndex] = {
             ...allSpots[vagaIndex],
             isOccupied: true,
@@ -74,7 +72,6 @@ export const fetchSpotsFromAPI = async () => {
             entryTime: registro.horaEntrada ? new Date(registro.horaEntrada) : null,
             backendPlateId: registro.veiculo.placa
           };
-          vagaIndex++;
         }
       }
     });
@@ -90,12 +87,14 @@ export const fetchSpotsFromAPI = async () => {
 export const occupySpotInAPI = async (spotIdFrontend, vehicleData) => {
   const token = getToken();
   try {
+    const vagaNumero = parseInt(spotIdFrontend.replace('Vaga ', ''));
     const payload = {
       placa: vehicleData.placa,
       tipoVeiculo: vehicleData.tipoVeiculo, 
       modelo: vehicleData.modelo,
       cor: vehicleData.cor,
-  };
+      vagaId: vagaNumero 
+    };
 
     const response = await fetch(`${API_BASE_URL}/estacionamento/registar-entrada`, {
       method: 'POST',
@@ -114,10 +113,11 @@ export const occupySpotInAPI = async (spotIdFrontend, vehicleData) => {
 
     return {
       id: spotIdFrontend,
+      vagaId: vagaNumero,
       isOccupied: true,
       vehiclePlate: registroEntrada.veiculo.placa,
       tipoVeiculo: registroEntrada.veiculo.tipoVeiculo,
-      entryTime: new Date(registroEntrada.dataEntrada),
+      entryTime: new Date(registroEntrada.horaEntrada),
       backendPlateId: registroEntrada.veiculo.placa
     };
   } catch (error) {

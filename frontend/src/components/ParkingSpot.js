@@ -1,7 +1,7 @@
 import React from 'react';
 
 function ParkingSpot({ spotData, onSpotClick }) {
-  const { id, isOccupied, vehiclePlate, tipoVeiculo } = spotData; 
+  const { id, vagaId, isOccupied, vehiclePlate, tipoVeiculo } = spotData;
 
   const renderVehicleIcon = () => {
     if (!isOccupied) return null;
@@ -16,7 +16,7 @@ function ParkingSpot({ spotData, onSpotClick }) {
     <div
       className={`parking-spot ${isOccupied ? 'occupied' : 'vacant'}`}
       onClick={() => onSpotClick(id)}
-      title={isOccupied ? `Tipo: ${tipoVeiculo || 'N/D'}, Placa: ${vehiclePlate || 'Ocupado'}` : 'Vaga Livre'}
+      title={isOccupied ? `Vaga ${vagaId} - Tipo: ${tipoVeiculo || 'N/D'}, Placa: ${vehiclePlate || 'Ocupado'}` : `Vaga ${vagaId} - Livre`}
     >
       <div className="spot-id">{id}</div>
       {isOccupied && (
