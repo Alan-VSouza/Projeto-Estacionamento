@@ -15,10 +15,7 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (estacionamentoRepository.count() == 0) {
-            Estacionamento novoEstacionamento = new Estacionamento();
-
-            novoEstacionamento.setNome("Estacionamento Principal Central");
-            novoEstacionamento.setCapacidade(200);
+            Estacionamento novoEstacionamento = new Estacionamento("Estacionamento Principal Centrar", "Rua Sei Lá", 200);
 
             estacionamentoRepository.save(novoEstacionamento);
             System.out.println(">>>> DataLoader: Estacionamento padrão 'Estacionamento Principal Central' foi criado!");
