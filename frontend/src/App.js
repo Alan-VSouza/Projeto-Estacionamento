@@ -9,6 +9,7 @@ import RegisterAdminPage from './pages/RegisterAdminPage';
 import ReportsPage from './pages/ReportsPage';
 import { validateToken } from './services/api';
 import logo from './images/logo.png';
+import VehicleHistoryPage from './pages/VehicleHistoryPage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -108,8 +109,8 @@ function App() {
                         </Link>
                       </li>
                       <li>
-                        <Link to="/reports" onClick={() => setMobileMenuActive(false)}>
-                          Histórico
+                        <Link to="/vehicle-history" onClick={() => setMobileMenuActive(false)}>
+                          Histórico de Veículos
                         </Link>
                       </li>
                       <li>
@@ -184,6 +185,16 @@ function App() {
               element={
                 isAuthenticated ? (
                   <ReportsPage />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } 
+            />
+            <Route 
+              path="/vehicle-history" 
+              element={
+                isAuthenticated ? (
+                  <VehicleHistoryPage />
                 ) : (
                   <Navigate to="/login" replace />
                 )

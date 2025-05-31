@@ -1,5 +1,6 @@
 package br.ifsp.demo.controller;
 
+import br.ifsp.demo.dto.HistoricoDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.service.RelatorioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.core.io.Resource;
 import java.time.LocalDate;
 import java.nio.charset.StandardCharsets;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/relatorios")
@@ -56,6 +58,29 @@ public class RelatorioController {
         } catch (Exception e) {
             throw new RuntimeException("Erro ao gerar CSV", e);
         }
+    }
+
+    @GetMapping("/historico/{placa}")
+    public ResponseEntity<List<HistoricoDTO>> getVehicleHistory(@PathVariable String placa) {
+        List<HistoricoDTO> historico = relatorioService.gerarHistorico(placa);
+
+        if (historico.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(historico);
+    }
+
+    @GetMapping("/vagas-disponiveis")
+    public ResponseEntity<Integer> getAvailableSpots() {
+        int vagasDisponiveis = relatorioService.vagasDisponiveis();
+        return ResponseEntity.ok(vagasDisponiveis);
+    }
+
+    @GetMapping("/vagas-ocupadas")
+    public ResponseEntity<Integer> getOccupiedSpots() {
+        int vagasOcupadas = relatorioService.vagasOcupadas();
+        return ResponseEntity.ok(vagasOcupadas);
     }
 
     @GetMapping("/desempenho/export/pdf")

@@ -1,5 +1,7 @@
 package br.ifsp.demo.service;
 
+import br.ifsp.demo.dto.HistoricoDTO;
+import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.repository.PagamentoRepository;
@@ -28,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -35,14 +38,84 @@ public class RelatorioService {
 
     private final PagamentoRepository pagamentoRepository;
     private final VeiculoRepository veiculoRepository;
-    private final RegistroEntradaRepository relatorioRepository;
+    private final RegistroEntradaRepository registroEntradaRepository;
     private static final int NUMERO_VAGAS = 200;
 
     @Autowired
-    public RelatorioService(PagamentoRepository pagamentoRepository, VeiculoRepository veiculoRepository, RegistroEntradaRepository relatorioRepository) {
+    public RelatorioService(PagamentoRepository pagamentoRepository,
+                            VeiculoRepository veiculoRepository,
+                            RegistroEntradaRepository registroEntradaRepository) {
         this.pagamentoRepository = pagamentoRepository;
         this.veiculoRepository = veiculoRepository;
-        this.relatorioRepository = relatorioRepository;
+        this.registroEntradaRepository = registroEntradaRepository;
+    }
+
+    public RelatorioDTO gerarRelatorioDesempenho(LocalDate dataReferencia) {
+        LocalDateTime inicioDoDia = dataReferencia.atStartOfDay();
+        LocalDateTime fimDoDia = dataReferencia.atTime(LocalTime.MAX);
+
+        List<Pagamento> pagamentosDoDia = getPagamentosDoDia(inicioDoDia, fimDoDia);
+
+        int quantidade = pagamentosDoDia.size();
+        double tempoTotalMinutos = calcularTempoTotal(pagamentosDoDia);
+        double tempoMedioHoras = calcularTempoMedioHoras(quantidade, tempoTotalMinutos);
+        double receitaTotal = calcularReceitaTotal(pagamentosDoDia);
+        double minutosOcupadosTotal = calcularMinutosOcupados(pagamentosDoDia, inicioDoDia, fimDoDia);
+
+        double ocupacaoMedia = calcularOcupacaoMedia(minutosOcupadosTotal);
+
+        return new RelatorioDTO(quantidade, tempoMedioHoras, receitaTotal, ocupacaoMedia);
+    }
+
+    public ReciboDTO gerarRecibo(String placa) {
+        return pagamentoRepository.findAll().stream()
+                .filter(p -> placa.equals(p.getPlaca()))
+                .max(Comparator.comparing(Pagamento::getHoraSaida))
+                .map(p -> new ReciboDTO(p.getPlaca(), p.getHoraEntrada(), p.getHoraSaida(), p.getValor()))
+                .orElse(null);
+    }
+
+    public List<HistoricoDTO> gerarHistorico(String placa) {
+        return pagamentoRepository.findAll().stream()
+                .filter(p -> placa.equals(p.getPlaca()))
+                .sorted(Comparator.comparing(Pagamento::getHoraEntrada).reversed())
+                .map(p -> new HistoricoDTO(p.getPlaca(), p.getHoraEntrada(), p.getHoraSaida(), p.getValor()))
+                .toList();
+    }
+
+    public int vagasDisponiveis() {
+        long vagasOcupadas = registroEntradaRepository.count();
+        return NUMERO_VAGAS - (int) vagasOcupadas;
+    }
+
+    public int vagasOcupadas() {
+        return (int) registroEntradaRepository.count();
+    }
+
+    public String gerarRelatorioCSV(LocalDate data) {
+        try {
+            RelatorioDTO relatorio = gerarRelatorioDesempenho(data);
+
+            StringWriter sw = new StringWriter();
+            CSVFormat format = CSVFormat.DEFAULT
+                    .withHeader("Métrica", "Valor")
+                    .withRecordSeparator("\n");
+
+            CSVPrinter csvPrinter = new CSVPrinter(sw, format);
+
+            csvPrinter.printRecord("Data", data.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            csvPrinter.printRecord("Receita Total", "R$ " + String.format("%.2f", relatorio.receitaTotal()));
+            csvPrinter.printRecord("Quantidade de Veículos", relatorio.quantidade());
+            csvPrinter.printRecord("Tempo Médio (horas)", String.format("%.2f", relatorio.tempoMedioHoras()));
+            csvPrinter.printRecord("Ocupação Média", String.format("%.2f%%", relatorio.ocupacaoMedia() * 100));
+
+            csvPrinter.flush();
+            csvPrinter.close();
+
+            return sw.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar CSV", e);
+        }
     }
 
     public byte[] gerarRelatorioPDF(LocalDate data) {
@@ -53,7 +126,6 @@ public class RelatorioService {
             PdfWriter writer = new PdfWriter(baos);
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
-
             PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
             PdfFont boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
 
@@ -103,49 +175,6 @@ public class RelatorioService {
 
         } catch (Exception e) {
             throw new RuntimeException("Erro ao gerar PDF", e);
-        }
-    }
-
-    public RelatorioDTO gerarRelatorioDesempenho(LocalDate dataReferencia) {
-        LocalDateTime inicioDoDia = dataReferencia.atStartOfDay();
-        LocalDateTime fimDoDia = dataReferencia.atTime(LocalTime.MAX);
-
-        List<Pagamento> pagamentosDoDia = getPagamentosDoDia(inicioDoDia, fimDoDia);
-
-        int quantidade = pagamentosDoDia.size();
-        double tempoTotalMinutos = calcularTempoTotal(pagamentosDoDia);
-        double tempoMedioHoras = calcularTempoMedioHoras(quantidade, tempoTotalMinutos);
-        double receitaTotal = calcularReceitaTotal(pagamentosDoDia);
-        double minutosOcupadosTotal = calcularMinutosOcupados(pagamentosDoDia, inicioDoDia, fimDoDia);
-
-        double ocupacaoMedia = calcularOcupacaoMedia(minutosOcupadosTotal);
-
-        return new RelatorioDTO(quantidade, tempoMedioHoras, receitaTotal, ocupacaoMedia);
-    }
-
-    public String gerarRelatorioCSV(LocalDate data) {
-        try {
-            RelatorioDTO relatorio = gerarRelatorioDesempenho(data);
-
-            StringWriter sw = new StringWriter();
-            CSVFormat format = CSVFormat.DEFAULT
-                    .withHeader("Métrica", "Valor")
-                    .withRecordSeparator("\n");
-
-            CSVPrinter csvPrinter = new CSVPrinter(sw, format);
-
-            csvPrinter.printRecord("Data", data.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            csvPrinter.printRecord("Receita Total", "R$ " + String.format("%.2f", relatorio.receitaTotal()));
-            csvPrinter.printRecord("Quantidade de Veículos", relatorio.quantidade());
-            csvPrinter.printRecord("Tempo Médio (horas)", String.format("%.2f", relatorio.tempoMedioHoras()));
-            csvPrinter.printRecord("Ocupação Média", String.format("%.2f%%", relatorio.ocupacaoMedia() * 100));
-
-            csvPrinter.flush();
-            csvPrinter.close();
-
-            return sw.toString();
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao gerar CSV", e);
         }
     }
 

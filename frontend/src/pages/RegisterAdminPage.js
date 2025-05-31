@@ -24,7 +24,7 @@ function RegisterAdminPage() {
     try {
       const userData = { name, lastname, email, password };
       await registerUser(userData);
-      setSuccessMessage('Administrador registrado com sucesso! Você pode precisar reiniciar o servidor para que as permissões de registro de admin sejam revogadas, ou fazer login.');
+      setSuccessMessage('Administrador registrado com sucesso!');
       setName('');
       setLastname('');
       setEmail('');

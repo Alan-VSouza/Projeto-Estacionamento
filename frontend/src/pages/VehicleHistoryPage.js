@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import { getVehicleHistory } from '../services/reportsApi';
 
 function VehicleHistoryPage() {
@@ -11,7 +12,7 @@ function VehicleHistoryPage() {
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!placa.trim()) {
-      setError('Por favor, digite uma placa válida');
+      toast.error('Por favor, digite uma placa válida');
       return;
     }
     
@@ -22,9 +23,11 @@ function VehicleHistoryPage() {
     try {
       const data = await getVehicleHistory(placa.trim().toUpperCase());
       setHistorico(data);
+      toast.success(`Histórico encontrado para ${placa.toUpperCase()}`);
     } catch (err) {
       setError(err.message);
       setHistorico([]);
+      toast.error(`Erro ao buscar histórico: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -54,7 +57,7 @@ function VehicleHistoryPage() {
   return (
     <div className="vehicle-history-page">
       <div className="page-header">
-        <h1>🔍 Histórico de Veículos</h1>
+        <h1>Histórico de Veículos</h1>
         <p>Consulte o histórico completo de entradas e saídas por placa</p>
       </div>
 
@@ -70,7 +73,7 @@ function VehicleHistoryPage() {
               maxLength="8"
             />
             <button type="submit" disabled={loading} className="search-button">
-              {loading ? '🔄 Buscando...' : '🔍 Buscar'}
+              {loading ? 'Buscando...' : 'Buscar'}
             </button>
           </div>
         </form>
@@ -78,20 +81,20 @@ function VehicleHistoryPage() {
 
       {error && (
         <div className="error-message">
-          ⚠️ {error}
+          {error}
         </div>
       )}
 
       {searched && !loading && !error && historico.length === 0 && (
         <div className="no-results">
-          📭 Nenhum histórico encontrado para a placa <strong>{placa}</strong>
+          Nenhum histórico encontrado para a placa <strong>{placa}</strong>
         </div>
       )}
 
       {historico.length > 0 && (
         <div className="history-results">
           <div className="results-header">
-            <h2>📋 Histórico da Placa: <span className="plate-highlight">{placa}</span></h2>
+            <h2>Histórico da Placa: <span className="plate-highlight">{placa}</span></h2>
             <p className="results-count">{historico.length} registro(s) encontrado(s)</p>
           </div>
           
@@ -101,33 +104,33 @@ function VehicleHistoryPage() {
                 <div className="card-header">
                   <span className="entry-number">#{historico.length - index}</span>
                   <span className={`status-badge ${registro.horaSaida ? 'completed' : 'active'}`}>
-                    {registro.horaSaida ? '✅ Finalizado' : '🔄 Em andamento'}
+                    {registro.horaSaida ? 'Finalizado' : 'Em andamento'}
                   </span>
                 </div>
                 
                 <div className="card-content">
                   <div className="time-info">
                     <div className="time-entry">
-                      <span className="time-label">🚗 Entrada:</span>
+                      <span className="time-label">Entrada:</span>
                       <span className="time-value">{formatDateTime(registro.horaEntrada)}</span>
                     </div>
                     
                     <div className="time-entry">
-                      <span className="time-label">🚪 Saída:</span>
+                      <span className="time-label">Saída:</span>
                       <span className="time-value">
                         {registro.horaSaida ? formatDateTime(registro.horaSaida) : 'Em andamento'}
                       </span>
                     </div>
                     
                     <div className="time-entry">
-                      <span className="time-label">⏱️ Duração:</span>
+                      <span className="time-label">Duração:</span>
                       <span className="time-value">{calculateDuration(registro.horaEntrada, registro.horaSaida)}</span>
                     </div>
                   </div>
                   
                   <div className="payment-info">
                     <div className="payment-amount">
-                      <span className="payment-label">💰 Valor:</span>
+                      <span className="payment-label">Valor:</span>
                       <span className="payment-value">{formatCurrency(registro.valor)}</span>
                     </div>
                   </div>
