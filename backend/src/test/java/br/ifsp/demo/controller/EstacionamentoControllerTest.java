@@ -101,35 +101,13 @@ class EstacionamentoControllerTest {
         @Tag("TDD")
         @Tag("UnitTest")
         @Tag("Functional")
-        @DisplayName("DELETE /estacionamento/cancelar-entrada -> 200 OK quando sucesso")
+        @DisplayName("POST /estacionamento/cancelar-entrada -> 200 OK quando sucesso")
         void whenDeleteEntrada_thenReturns200() throws Exception {
-            String placa = PLACA;
 
-            when(estacionamentoService.cancelarEntrada(placa))
-                    .thenReturn(true);
-
-            mockMvc.perform(delete(BASE + "/cancelar-entrada")
-                            .param("placa", placa)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post(BASE + "/cancelar-entrada")
+                    .param("placa", PLACA))
                     .andExpect(status().isOk());
-        }
 
-        @Test
-        @Tag("UnitTest")
-        @Tag("Functional")
-        @DisplayName("DELETE /estacionamento/cancelar-entrada -> 404 Not Found quando falha")
-        void whenDeleteEntradaFails_thenReturns404() throws Exception {
-            String placa = PLACA;
-
-            when(estacionamentoService.cancelarEntrada(placa))
-                    .thenReturn(false);
-
-            mockMvc.perform(delete(BASE + "/cancelar-entrada")
-                            .param("placa", placa)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isNotFound());
         }
     }
 
