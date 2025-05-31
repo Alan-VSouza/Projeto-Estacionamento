@@ -45,13 +45,6 @@ export const fetchSpotsFromAPI = async () => {
     const NUMERO_TOTAL_VAGAS_DO_BACKEND = 200;
     const allSpots = [];
 
-    const registrosPorPlaca = new Map();
-    registrosEntrada.forEach(registro => {
-      if (registro && registro.veiculo) {
-        registrosPorPlaca.set(registro.veiculo.placa, registro);
-      }
-    });
-
     for (let i = 0; i < NUMERO_TOTAL_VAGAS_DO_BACKEND; i++) {
       const spotIdVisual = `Vaga ${String(i + 1).padStart(2, '0')}`;
       let spotData = { 
@@ -62,7 +55,6 @@ export const fetchSpotsFromAPI = async () => {
         entryTime: null,
         backendPlateId: null 
       };
-
       allSpots.push(spotData);
     }
 
@@ -79,7 +71,7 @@ export const fetchSpotsFromAPI = async () => {
             isOccupied: true,
             vehiclePlate: registro.veiculo.placa,
             tipoVeiculo: registro.veiculo.tipoVeiculo,
-            entryTime: registro.dataEntrada ? new Date(registro.dataEntrada) : null,
+            entryTime: registro.horaEntrada ? new Date(registro.horaEntrada) : null,
             backendPlateId: registro.veiculo.placa
           };
           vagaIndex++;

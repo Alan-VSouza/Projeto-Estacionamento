@@ -1,5 +1,5 @@
 function ActionModal({ isOpen, onClose, spotData, onVacate, onCancel }) {
-  if (!isOpen) return null;
+  if (!isOpen || !spotData) return null;
 
   const handleVacate = () => {
     onVacate();
@@ -9,6 +9,38 @@ function ActionModal({ isOpen, onClose, spotData, onVacate, onCancel }) {
   const handleCancel = () => {
     onCancel();
     onClose();
+  };
+
+  const formatEntryTime = (entryTime) => {
+    if (!entryTime) {
+      return 'Data não disponível';
+    }
+    
+    try {
+      let date;
+      if (entryTime instanceof Date) {
+        date = entryTime;
+      } else {
+        date = new Date(entryTime);
+      }
+      
+      if (isNaN(date.getTime())) {
+        return 'Data não disponível';
+      }
+
+      return date.toLocaleString('pt-BR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      
+    } catch (error) {
+      console.error('Erro ao formatar data:', error);
+      return 'Data não disponível';
+    }
   };
 
   return (
@@ -28,9 +60,7 @@ function ActionModal({ isOpen, onClose, spotData, onVacate, onCancel }) {
             <div className="vehicle-details">
               <p><strong>Placa:</strong> {spotData.vehiclePlate}</p>
               <p><strong>Tipo:</strong> {spotData.tipoVeiculo}</p>
-              {spotData.entryTime && (
-                <p><strong>Entrada:</strong> {spotData.entryTime.toLocaleString('pt-BR')}</p>
-              )}
+              <p><strong>Entrada:</strong> {formatEntryTime(spotData.entryTime)}</p>
             </div>
           </div>
           
