@@ -6,6 +6,8 @@ import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.service.RelatorioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,5 +51,18 @@ public class RelatorioController {
     @GetMapping("/vagas-ocupadas")
     public ResponseEntity<Map<String, Integer>> vagasOcupadas() {
         return ResponseEntity.ok(Map.of("vagasOcupadas", relatorioService.vagasOcupadas()));
+    }
+
+    @GetMapping("/desempenho/export/csv")
+    public ResponseEntity<String> exportarRelatorioCSV(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+        String csvContent = relatorioService.gerarRelatorioCSV(data); // Chama o método do RelatorioService
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/csv; charset=UTF-8"));
+        headers.setContentDispositionFormData("attachment", "relatorio-" + data + ".csv");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(csvContent);
     }
 }

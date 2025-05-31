@@ -7,13 +7,17 @@ import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.repository.PagamentoRepository;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
 import br.ifsp.demo.repository.VeiculoRepository;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.StringWriter;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 
@@ -111,5 +115,26 @@ public class RelatorioService {
     private double calcularOcupacaoMedia(double minutosOcupadosTotal) {
         long minutosNoDia = Duration.between(LocalDateTime.now().toLocalDate().atStartOfDay(), LocalDateTime.now()).toMinutes();
         return (double) Math.round(minutosOcupadosTotal / (minutosNoDia * NUMERO_VAGAS) * 100) / 100;
+    }
+
+    public String gerarRelatorioCSV(LocalDate data) {
+        try {
+            RelatorioDTO relatorio = gerarRelatorioDesempenho(data);
+
+            StringWriter sw = new StringWriter();
+            CSVPrinter csvPrinter = new CSVPrinter(sw, CSVFormat.DEFAULT
+                    .withHeader("Métrica", "Valor"));
+
+            csvPrinter.printRecord("Data", data.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            csvPrinter.printRecord("Receita Total", "R$ " + String.format("%.2f", relatorio.getReceitaTotal()));
+            csvPrinter.printRecord("Quantidade de Veículos", relatorio.getQuantidade());
+            csvPrinter.printRecord("Tempo Médio (horas)", String.format("%.2f", relatorio.getTempoMedioHoras()));
+            csvPrinter.printRecord("Ocupação Média", String.format("%.2f%%", relatorio.getOcupacaoMedia() * 100));
+
+            csvPrinter.flush();
+            return sw.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar CSV", e);
+        }
     }
 }
