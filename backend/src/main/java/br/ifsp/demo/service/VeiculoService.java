@@ -20,49 +20,33 @@ public class VeiculoService {
         this.veiculoRepository = veiculoRepository;
     }
 
-    public Veiculo cadastrarVeiculo(String placa, LocalDateTime horaEntrada,
-                                    String tipoVeiculo, String modelo, String cor) {
+    public Veiculo cadastrarVeiculo(String placa, String tipoVeiculo, String modelo, String cor) {
+
         if (placa == null || placa.trim().isEmpty()) {
             throw new IllegalArgumentException("Placa não pode ser vazia");
-        }
-        if (horaEntrada == null || horaEntrada.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Hora de entrada não pode ser nula");
         }
         if (veiculoRepository.findByPlaca(placa).isPresent()) {
             throw new IllegalArgumentException("Placa já cadastrada");
         }
 
-        Veiculo novoVeiculo = new Veiculo();
-        novoVeiculo.setPlaca(placa);
-        novoVeiculo.setTipoVeiculo(tipoVeiculo);
-        novoVeiculo.setModelo(modelo);
-        novoVeiculo.setCor(cor);
-        novoVeiculo.setHoraEntrada(horaEntrada);
-
+        Veiculo novoVeiculo = new Veiculo(placa, tipoVeiculo, modelo, cor);
         return veiculoRepository.save(novoVeiculo);
-    }
-
-    public Veiculo atualizarVeiculo(Long id, String placa,
-                                    String tipoVeiculo, String modelo, String cor) {
-        if (placa == null || placa.trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Placa não pode ser vazia");
-        }
-
-        Veiculo veiculoExistente = veiculoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veículo não encontrado"));
-
-        veiculoExistente.setPlaca(placa);
-        veiculoExistente.setTipoVeiculo(tipoVeiculo);
-        veiculoExistente.setModelo(modelo);
-        veiculoExistente.setCor(cor);
-
-        return veiculoRepository.save(veiculoExistente);
     }
 
     public void deletarVeiculo(Long id) {
         Veiculo veiculoParaDeletar = veiculoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
         veiculoRepository.delete(veiculoParaDeletar);
+    }
+
+    public Veiculo obterOuCadastrarVeiculo(Veiculo veiculoDados) {
+        return buscarPorPlaca(veiculoDados.getPlaca())
+                .orElseGet(() -> cadastrarVeiculo(
+                        veiculoDados.getPlaca(),
+                        veiculoDados.getTipoVeiculo(),
+                        veiculoDados.getModelo(),
+                        veiculoDados.getCor()
+                ));
     }
 
     public Optional<Veiculo> buscarPorPlaca(String placa) {
