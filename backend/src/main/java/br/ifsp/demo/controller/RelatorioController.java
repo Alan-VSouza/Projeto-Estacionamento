@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -54,15 +55,23 @@ public class RelatorioController {
     }
 
     @GetMapping("/desempenho/export/csv")
-    public ResponseEntity<String> exportarRelatorioCSV(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
-        String csvContent = relatorioService.gerarRelatorioCSV(data); // Chama o método do RelatorioService
+    public ResponseEntity<byte[]> exportarRelatorioCSV(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+        String csvContent = relatorioService.gerarRelatorioCSV(data);
+
+        byte[] bom = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
+        byte[] csvBytes = csvContent.getBytes(StandardCharsets.UTF_8);
+
+        byte[] result = new byte[bom.length + csvBytes.length];
+        System.arraycopy(bom, 0, result, 0, bom.length);
+        System.arraycopy(csvBytes, 0, result, bom.length, csvBytes.length);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("text/csv; charset=UTF-8"));
         headers.setContentDispositionFormData("attachment", "relatorio-" + data + ".csv");
+        headers.setContentLength(result.length);
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(csvContent);
+                .body(result);
     }
 }

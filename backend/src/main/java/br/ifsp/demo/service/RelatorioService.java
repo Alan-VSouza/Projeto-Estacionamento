@@ -122,8 +122,11 @@ public class RelatorioService {
             RelatorioDTO relatorio = gerarRelatorioDesempenho(data);
 
             StringWriter sw = new StringWriter();
-            CSVPrinter csvPrinter = new CSVPrinter(sw, CSVFormat.DEFAULT
-                    .withHeader("Métrica", "Valor"));
+            CSVFormat format = CSVFormat.DEFAULT
+                    .withHeader("Métrica", "Valor")
+                    .withRecordSeparator("\n");
+
+            CSVPrinter csvPrinter = new CSVPrinter(sw, format);
 
             csvPrinter.printRecord("Data", data.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             csvPrinter.printRecord("Receita Total", "R$ " + String.format("%.2f", relatorio.receitaTotal()));
@@ -132,6 +135,7 @@ public class RelatorioService {
             csvPrinter.printRecord("Ocupação Média", String.format("%.2f%%", relatorio.ocupacaoMedia() * 100));
 
             csvPrinter.flush();
+            csvPrinter.close();
             return sw.toString();
         } catch (Exception e) {
             throw new RuntimeException("Erro ao gerar CSV", e);

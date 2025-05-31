@@ -62,9 +62,11 @@ export const exportReportCSV = async (date) => {
     if (!response.ok) {
       throw new Error('Erro ao exportar relatório em CSV');
     }
-    
-    const csvContent = await response.text();
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+    const arrayBuffer = await response.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { 
+      type: 'text/csv;charset=utf-8;' 
+    });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
