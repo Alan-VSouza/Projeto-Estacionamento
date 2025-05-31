@@ -165,6 +165,32 @@ export const registerUser = async (userData) => {
   }
 };
 
+export const validateToken = async () => {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/estacionamento/entradas`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    if (response.ok) {
+      return true; 
+    } else {
+      localStorage.removeItem('jwtToken');
+      return false;
+    }
+  } catch (error) {
+    console.error('Erro ao validar token:', error);
+    localStorage.removeItem('jwtToken');
+    return false;
+  }
+};
+
 export const cancelEntryInAPI = async (vehiclePlate) => {
   const token = localStorage.getItem('jwtToken');
   try {

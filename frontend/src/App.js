@@ -5,6 +5,7 @@ import ParkingLot from './components/ParkingLot';
 import Login from './pages/login';
 import RegisterAdminPage from './pages/RegisterAdminPage'; 
 import ReportsPage from './pages/ReportsPage';
+import { validateToken } from './services/api';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -12,11 +13,21 @@ function App() {
   const [mobileMenuActive, setMobileMenuActive] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('jwtToken');
-    if (token) {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
+    const checkAuthentication = async () => {
+      setIsLoading(true);
+      try {
+        const isValid = await validateToken(); 
+        setIsAuthenticated(isValid);
+      } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
+        setIsAuthenticated(false);
+        localStorage.removeItem('jwtToken'); 
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthentication();
   }, []);
 
   const handleLoginSuccess = () => { 
@@ -32,10 +43,6 @@ function App() {
   const toggleMobileMenu = () => {
     setMobileMenuActive(!mobileMenuActive);
   };
-
-  if (isLoading) {
-    return <div>Carregando...</div>;
-  }
 
   return (
     <Router>
