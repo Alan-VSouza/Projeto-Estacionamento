@@ -44,6 +44,41 @@ function App() {
     setMobileMenuActive(!mobileMenuActive);
   };
 
+  if (isLoading) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-container">
+          <div className="loading-logo">
+            <div className="car-icon">🚗</div>
+            <h1 className="loading-title">Smart Parking</h1>
+          </div>
+          
+          <div className="loading-spinner">
+            <div className="spinner-ring"></div>
+            <div className="spinner-ring"></div>
+            <div className="spinner-ring"></div>
+          </div>
+          
+          <div className="loading-text">
+            <p className="loading-message">Verificando autenticação...</p>
+            <div className="loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="loading-background">
+          <div className="floating-shape shape-1"></div>
+          <div className="floating-shape shape-2"></div>
+          <div className="floating-shape shape-3"></div>
+          <div className="floating-shape shape-4"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Router>
       <div className="App">
