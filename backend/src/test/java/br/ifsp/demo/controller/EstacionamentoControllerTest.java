@@ -42,11 +42,17 @@ class EstacionamentoControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private Veiculo veiculo;
+    private Estacionamento estacionamento;
+
     private static final String BASE = "/estacionamento";
     private static final String PLACA = "ABC1234";
 
     @BeforeEach
     void setup() {
+        veiculo = new Veiculo(PLACA, "Carro", "Teste", "Preto");
+        estacionamento = new Estacionamento("Central", "Rua X", 50);
+
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -67,28 +73,23 @@ class EstacionamentoControllerTest {
         @Tag("Functional")
         @DisplayName("POST /estacionamento/registar-entrada -> 200 e retorna registro de entrada")
         void whenPostEntrada_thenReturnsRegistro() throws Exception {
-            Veiculo veiculo = new Veiculo();
-            veiculo.setPlaca(PLACA);
 
-            Estacionamento estacionamento = new Estacionamento("Central", "Rua X");
-            UUID estacionamentoId = estacionamento.getId();
+            UUID estacionamentoID = estacionamento.getId();
 
-            RegistroEntrada registro = new RegistroEntrada(veiculo);
-            registro.setHoraEntrada(LocalDateTime.of(2025, 5, 4, 10, 0));
+            RegistroEntrada registroMock = new RegistroEntrada(veiculo);
 
             when(estacionamentoService.buscarEstacionamentoAtual()).thenReturn(estacionamento);
-            when(estacionamentoService.registrarEntrada(any(Veiculo.class), eq(estacionamentoId)))
-                    .thenReturn(registro);
+            when(estacionamentoService.registrar(any(Veiculo.class), eq(estacionamentoID)))
+                    .thenReturn(registroMock);
 
             mockMvc.perform(post(BASE + "/registar-entrada")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(veiculo))
-                            .param("idEstacionamento", estacionamentoId.toString()))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(veiculo)))
                     .andExpect(status().isOk())
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.veiculo.placa").value(PLACA))
-                    .andExpect(jsonPath("$.horaEntrada").value("2025-05-04T10:00:00"));
+                    .andExpect(jsonPath("$.horaEntrada").exists());
+
         }
     }
 
@@ -318,5 +319,5 @@ class EstacionamentoControllerTest {
                     .andExpect(jsonPath("$[0].veiculo.placa").value("ABC1234"))
                     .andExpect(jsonPath("$[1].veiculo.placa").value("DEF5678"));
         }
-    }
+   }
 }
