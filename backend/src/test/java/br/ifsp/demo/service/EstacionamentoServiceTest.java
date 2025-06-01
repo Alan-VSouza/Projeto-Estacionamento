@@ -250,28 +250,25 @@ public class EstacionamentoServiceTest {
             assertEquals("Esse veículo não está no estacionamento", exception.getReason());
             verify(registroEntradaRepository, never()).findByVeiculo(any(Veiculo.class));
         }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Buscar entrada retorna null quando não houver entrada registrada")
+        void buscarEntrada_retornaNull_quandoSemRegistroEntrada() {
+            when(veiculoService.buscarPorPlaca(PLACA)).thenReturn(Optional.of(veiculo));
+
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
+
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                    estacionamentoService.buscarEntrada(PLACA)
+            );
+
+            assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+            assertEquals("Não existe nenhuma entrada registrada nesse veículo", exception.getReason());
     }
-//
-//    @Nested
-//    @DisplayName("Testes de Busca de Entrada")
-//    class TestesDeBuscaEntrada {
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Buscar entrada retorna null quando não houver entrada registrada")
-//        void buscarEntrada_retornaNull_quandoSemRegistroEntrada() {
-//            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
-//                    .thenReturn(Optional.of(veiculo));
-//
-//            when(registroEntradaRepository.findByVeiculo(veiculo))
-//                    .thenReturn(Optional.empty());
-//
-//            RegistroEntrada resultado = estacionamentoService.buscarEntrada(PLACA_VEICULO);
-//
-//            assertNull(resultado);
-//        }
-//    }
+
+
 //
 //    @Nested
 //    @DisplayName("Testes de Busca de Estacionamento Atual")
@@ -381,4 +378,4 @@ public class EstacionamentoServiceTest {
 //            assertEquals(registro2, entradas.get(1));
 //        }
 //    }
-}
+}}
