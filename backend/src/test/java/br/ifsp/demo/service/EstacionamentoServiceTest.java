@@ -410,4 +410,26 @@ public class EstacionamentoServiceTest {
             }
         }
     }
+    @Nested
+    @DisplayName("Structural Tests")
+    class StructuralTests {
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Deve lançar exceção ao tentar registrar entrada em vaga já ocupada")
+        void registrarEntrada_vagaOcupada_lancaExcecao() {
+            UUID estacionamentoId = UUID.randomUUID();
+            Integer vagaId = 5;
+
+            when(estacionamentoRepository.findById(estacionamentoId)).thenReturn(Optional.of(estacionamento));
+            when(registroEntradaRepository.findByVagaId(vagaId)).thenReturn(Optional.of(new RegistroEntrada(veiculo, vagaId)));
+
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                    estacionamentoService.registrarEntrada(veiculo, estacionamentoId, vagaId)
+            );
+
+            assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+            assertTrue(Objects.requireNonNull(exception.getReason()).contains("Vaga " + vagaId + " já está ocupada"));
+        }
+    }
 }
