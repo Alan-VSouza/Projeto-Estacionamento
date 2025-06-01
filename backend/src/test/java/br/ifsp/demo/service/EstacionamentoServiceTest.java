@@ -301,42 +301,47 @@ public class EstacionamentoServiceTest {
             assertEquals("Nenhum estacionamento encontrado", exception.getMessage());
         }
     }
-//
-//    @Nested
-//    @DisplayName("Testes de Busca de Estacionamento")
-//    class TestesDeBuscaEstacionamento {
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Buscar estacionamento com sucesso")
-//        void buscarEstacionamento_comSucesso() {
-//            UUID estacionamentoId = UUID.randomUUID();
-//            when(estacionamentoRepository.findById(estacionamentoId))
-//                    .thenReturn(Optional.of(estacionamento));
-//
-//            Estacionamento resultado = estacionamentoService.buscarEstacionamento(estacionamentoId);
-//
-//            assertNotNull(resultado);
-//            assertEquals(estacionamento.getNome(), resultado.getNome());
-//            assertEquals(estacionamento.getEndereco(), resultado.getEndereco());
-//        }
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @DisplayName("Deve lançar IllegalArgumentException quando estacionamento não encontrado")
-//        void buscarEstacionamento_naoEncontrado() {
-//            UUID estacionamentoId = UUID.randomUUID();
-//
-//            when(estacionamentoRepository.findById(estacionamentoId))
-//                    .thenReturn(Optional.empty());
-//
-//            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-//                    estacionamentoService.buscarEstacionamento(estacionamentoId)
-//            );
-//            assertEquals("Estacionamento não encontrado", exception.getMessage());
-//        }
-//    }
+
+    @Nested
+    @DisplayName("Testes de Busca de Estacionamento")
+    class TestesDeBuscaEstacionamento {
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Buscar estacionamento com sucesso")
+        void buscarEstacionamento_comSucesso() {
+            UUID estacionamentoIdParaTeste = UUID.randomUUID();
+
+            when(estacionamentoRepository.findById(estacionamentoIdParaTeste))
+                    .thenReturn(Optional.of(estacionamento));
+
+            Estacionamento resultado = estacionamentoService.buscarEstacionamento(estacionamentoIdParaTeste);
+
+            assertNotNull(resultado);
+            assertEquals(estacionamento.getNome(), resultado.getNome());
+            assertEquals(estacionamento.getEndereco(), resultado.getEndereco());
+            assertEquals(estacionamento.getCapacidade(), resultado.getCapacidade());
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @DisplayName("Deve lançar IllegalArgumentException quando estacionamento não encontrado")
+        void buscarEstacionamento_naoEncontrado() {
+            UUID idNaoExistente = UUID.randomUUID();
+
+            when(estacionamentoRepository.findById(idNaoExistente))
+                    .thenReturn(Optional.empty());
+
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                    estacionamentoService.buscarEstacionamento(idNaoExistente)
+            );
+
+            assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+            assertTrue(exception.getReason().contains("Estacionamento não encontrado com o ID: " + idNaoExistente));
+
+        }
+    }
 //
 //    @Nested
 //    @DisplayName("Testes de Criação de Estacionamento")
