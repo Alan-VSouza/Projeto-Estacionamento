@@ -195,42 +195,62 @@ public class EstacionamentoServiceTest {
         }
     }
 
-//    @Nested
-//    @DisplayName("Testes de Cadastro de Veículo")
-//    class TestesDeCadastroVeiculo {
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Deve retornar veículo cadastrado quando ele já existir no sistema")
-//        void obterOuCadastrarVeiculo_deveRetornarVeiculoCadastrado() {
-//            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
-//                    .thenReturn(Optional.of(veiculo));
-//
-//            Veiculo resultado = estacionamentoService.obterOuCadastrarVeiculo(veiculo);
-//
-//            assertEquals(veiculo, resultado);
-//        }
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Deve cadastrar e retornar um novo veículo quando ele não existir no sistema")
-//        void obterOuCadastrarVeiculo_deveCadastrarNovoVeiculo() {
-//            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
-//                    .thenReturn(Optional.empty());
-//
-//            Veiculo novoVeiculo = new Veiculo();
-//            novoVeiculo.setPlaca(PLACA_VEICULO);
-//            when(veiculoService.cadastrarVeiculo(anyString(), any(), anyString(), anyString(), anyString()))
-//                    .thenReturn(novoVeiculo);
-//
-//            Veiculo resultado = estacionamentoService.obterOuCadastrarVeiculo(veiculo);
-//
-//            assertNotNull(resultado);
-//            assertEquals(PLACA_VEICULO, resultado.getPlaca());
-//        }
-//    }
+    @Nested
+    @DisplayName("Testes de Busca de Entrada")
+    class TestesDeBuscaEntrada {
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve retornar RegistroEntrada quando encontrado")
+        void buscarEntrada_encontrado_retornaRegistro() {
+            when(veiculoService.buscarPorPlaca(PLACA))
+                    .thenReturn(Optional.of(veiculo));
+            when(registroEntradaRepository.findByVeiculo(veiculo))
+                    .thenReturn(Optional.of(registroEntrada));
+
+            RegistroEntrada resultado = estacionamentoService.buscarEntrada(PLACA);
+
+            assertNotNull(resultado);
+            assertEquals(registroEntrada, resultado);
+            assertEquals(PLACA, resultado.getVeiculo().getPlaca());
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve lançar ResponseStatusException NOT_FOUND quando registro de entrada não encontrado para veículo existente")
+        void buscarEntrada_registroNaoEncontrado_lancaExcecao() {
+            when(veiculoService.buscarPorPlaca(PLACA))
+                    .thenReturn(Optional.of(veiculo));
+            when(registroEntradaRepository.findByVeiculo(veiculo))
+                    .thenReturn(Optional.empty());
+
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                    estacionamentoService.buscarEntrada(PLACA)
+            );
+
+            assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+            assertEquals("Não existe nenhuma entrada registrada nesse veículo", exception.getReason());
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve lançar ResponseStatusException NOT_FOUND quando veículo não encontrado")
+        void buscarEntrada_veiculoNaoEncontrado_lancaExcecao() {
+            when(veiculoService.buscarPorPlaca(PLACA))
+                    .thenReturn(Optional.empty());
+
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                    estacionamentoService.buscarEntrada(PLACA)
+            );
+
+            assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+            assertEquals("Esse veículo não está no estacionamento", exception.getReason());
+            verify(registroEntradaRepository, never()).findByVeiculo(any(Veiculo.class));
+        }
+    }
 //
 //    @Nested
 //    @DisplayName("Testes de Busca de Entrada")
