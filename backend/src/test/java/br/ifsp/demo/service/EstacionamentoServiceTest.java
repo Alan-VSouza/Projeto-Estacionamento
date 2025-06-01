@@ -431,5 +431,25 @@ public class EstacionamentoServiceTest {
             assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
             assertTrue(Objects.requireNonNull(exception.getReason()).contains("Vaga " + vagaId + " já está ocupada"));
         }
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Deve lançar exceção quando estacionamento estiver lotado")
+        void registrarEntrada_estacionamentoLotado_lancaExcecao() {
+            UUID estacionamentoId = UUID.randomUUID();
+
+            estacionamento = new Estacionamento("Teste", "Endereco", 2); // capacidade 2
+            when(estacionamentoRepository.findById(estacionamentoId)).thenReturn(Optional.of(estacionamento));
+            when(registroEntradaRepository.findByVagaId(anyInt())).thenReturn(Optional.empty());
+            when(registroEntradaRepository.count()).thenReturn(2L); // capacidade atingida
+
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                    estacionamentoService.registrarEntrada(veiculo, estacionamentoId, 1)
+            );
+
+            assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+            assertEquals("Estacionamento lotado. Capacidade máxima atingida.", exception.getReason());
+        }
     }
 }
