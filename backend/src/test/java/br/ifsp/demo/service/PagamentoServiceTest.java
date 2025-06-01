@@ -256,17 +256,7 @@ class PagamentoServiceTest {
             verify(pagamentoRepository, never()).save(any(Pagamento.class));
         }
 
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("mensagem de erro quando veiculo e nulo")
-//        void mensagemDeErroQuandoVeiculoNulo() {
-//
-//            pagamento.setPlaca(null);
-//
-//            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.salvarPagamento(pagamento));
-//            assertEquals("Placa não pode ser nula ou vazia", exception.getMessage());
-//        }
+
 //
 //        @Test
 //        @Tag("UnitTest")
