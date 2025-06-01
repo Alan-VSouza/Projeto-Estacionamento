@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ParkingSpot from './ParkingSpot';
 import ParkingSummary from './ParkingSummary';
-import { fetchSpotsFromAPI, occupySpotInAPI, vacateSpotInAPI, cancelEntryInAPI } from '../services/api';
-import VehicleEntryForm from './VehicleEntryForm';
-import ActionModal from './ActionModal';
+import { fetchSpotsFromAPI, occupySpotInAPI, vacateSpotInAPI, cancelEntryInAPI } from '../../services/api/Api';
+import VehicleEntryForm from '../forms/VehicleEntryForm';
+import ActionModal from '../ActionModal';
 
 function ParkingLot({ }) {
   const [spots, setSpots] = useState([]);

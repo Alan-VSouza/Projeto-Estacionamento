@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { getDailyRevenueReport, exportReportPDF, exportReportCSV } from '../../services/reportsApi';
+import { getDailyRevenueReport, exportReportPDF, exportReportCSV } from '../../services/api/reportsApi';
 
 function DailyRevenueReport() {
   const [reportData, setReportData] = useState(null);

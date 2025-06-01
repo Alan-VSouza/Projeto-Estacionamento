@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { getVehicleHistory } from '../services/reportsApi';
+import { getVehicleHistory } from '../../services/api/reportsApi';
 
 function VehicleHistoryPage() {
   const [placa, setPlaca] = useState('');

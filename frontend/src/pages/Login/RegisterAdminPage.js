@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { registerUser } from '../services/api';
+import { registerUser } from '../../services/api/Api';
 
 function RegisterAdminPage() {
   const [name, setName] = useState('');

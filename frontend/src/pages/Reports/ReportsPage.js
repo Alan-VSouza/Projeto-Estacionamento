@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import DailyRevenueReport from '../components/reports/DailyRevenueReport';
+import { useState } from 'react';
+import DailyRevenueReport from '../../components/reports/DailyRevenueReport';
 
 function ReportsPage() {
   const [activeTab, setActiveTab] = useState('daily-revenue');

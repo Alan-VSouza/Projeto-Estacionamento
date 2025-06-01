@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { loginUser } from '../services/api';
+import { loginUser } from '../../services/api/Api';
 
-function Login({ onLoginSuccess }) {
+function LoginWebsite({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -66,4 +66,4 @@ function Login({ onLoginSuccess }) {
   );
 }
 
-export default Login;
+export default LoginWebsite;

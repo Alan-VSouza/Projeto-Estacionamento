@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom'; 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './App.css';
-import ParkingLot from './components/ParkingLot';
-import Login from './pages/login';
-import RegisterAdminPage from './pages/RegisterAdminPage'; 
-import ReportsPage from './pages/ReportsPage';
-import { validateToken } from './services/api';
-import logo from './images/logo.png';
-import VehicleHistoryPage from './pages/VehicleHistoryPage';
+import './styles/App.css';
+import ParkingLot from './components/parking/ParkingLot';
+import LoginWebsite from './pages/Login/Login';
+import RegisterAdminPage from './pages/Login/RegisterAdminPage'; 
+import ReportsPage from './pages/Reports/ReportsPage';
+import VehicleHistoryPage from './pages/VehicleHistory/VehicleHistoryPage';
+import { validateToken } from './services/api/Api';
+import logo from './assets/images/logo.png';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -174,7 +174,7 @@ function App() {
               path="/login" 
               element={
                 !isAuthenticated ? (
-                  <Login onLoginSuccess={handleLoginSuccess} />
+                  <LoginWebsite onLoginSuccess={handleLoginSuccess} />
                 ) : (
                   <Navigate to="/" replace /> 
                 )
