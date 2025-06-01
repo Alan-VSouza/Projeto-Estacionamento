@@ -121,21 +121,6 @@ function App() {
                       </li>
                     </ul>
                   </li>
-                  <li className="dropdown">
-                    <span>Sistema ▼</span>
-                    <ul className="dropdown-menu">
-                      <li>
-                        <Link to="/settings" onClick={() => setMobileMenuActive(false)}>
-                          Configurações
-                        </Link>
-                      </li>
-                      <li>
-                        <Link to="/users" onClick={() => setMobileMenuActive(false)}>
-                          Usuários
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
                   <li>
                     <button onClick={handleLogout}>
                       Sair

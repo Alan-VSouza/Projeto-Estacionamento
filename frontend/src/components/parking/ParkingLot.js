@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify'; 
 import ParkingSpot from './ParkingSpot';
 import ParkingSummary from './ParkingSummary';
