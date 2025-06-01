@@ -8,23 +8,15 @@ import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.EstacionamentoRepository;
 import br.ifsp.demo.repository.PagamentoRepository;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
-import org.apache.coyote.Response;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -53,16 +45,16 @@ public class EstacionamentoServiceTest {
     private Veiculo veiculo;
     private Estacionamento estacionamento;
     private RegistroEntrada registroEntrada;
-    private Integer vagaIdValida = 1;
+    private final Integer vagaIdValida = 1;
 
     private final String PLACA = "BQF-1993";
-    private final String NOME_ESTACIONAMENTO = "Estacionamento Carros Velozes";
-    private final String ENDERECO_ESTACIONAMENTO = "Rua Muito Longe";
     private final static int CAPACIDADE = 50;
 
     @BeforeEach
     void setup() {
         veiculo = new Veiculo(PLACA, "Carro", "Escort", "Prata");
+        String NOME_ESTACIONAMENTO = "Estacionamento Carros Velozes";
+        String ENDERECO_ESTACIONAMENTO = "Rua Muito Longe";
         estacionamento = new Estacionamento(NOME_ESTACIONAMENTO, ENDERECO_ESTACIONAMENTO, CAPACIDADE);
         registroEntrada = new RegistroEntrada(veiculo, vagaIdValida);
     }
@@ -337,7 +329,7 @@ public class EstacionamentoServiceTest {
                 );
 
                 assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-                assertTrue(exception.getReason().contains("Estacionamento não encontrado com o ID: " + idNaoExistente));
+                assertTrue(Objects.requireNonNull(exception.getReason()).contains("Estacionamento não encontrado com o ID: " + idNaoExistente));
 
             }
         }
