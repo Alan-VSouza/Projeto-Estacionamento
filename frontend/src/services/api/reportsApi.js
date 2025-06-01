@@ -5,7 +5,7 @@ const getToken = () => localStorage.getItem('jwtToken');
 export const getDailyRevenueReport = async (date) => {
   const token = getToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/relatorios/desempenho?data=${date}`, {
+    const response = await fetch(`${API_BASE_URL}/estacionamento/relatorios/desempenho?data=${date}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -25,7 +25,7 @@ export const getDailyRevenueReport = async (date) => {
 export const exportReportPDF = async (date) => {
   const token = getToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/relatorios/desempenho/export/pdf?data=${date}`, {
+    const response = await fetch(`${API_BASE_URL}/estacionamento/relatorios/desempenho/export/pdf?data=${date}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -53,7 +53,7 @@ export const exportReportPDF = async (date) => {
 export const exportReportCSV = async (date) => {
   const token = getToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/relatorios/desempenho/export/csv?data=${date}`, {
+    const response = await fetch(`${API_BASE_URL}/estacionamento/relatorios/desempenho/export/csv?data=${date}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -84,7 +84,7 @@ export const exportReportCSV = async (date) => {
 export const getAvailableSpots = async () => {
   const token = getToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/relatorios/vagas-disponiveis`, {
+    const response = await fetch(`${API_BASE_URL}/estacionamento/vagas-disponiveis`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -103,7 +103,7 @@ export const getAvailableSpots = async () => {
 export const getVehicleHistory = async (placa) => {
   const token = getToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/relatorios/historico/${placa}`, {
+    const response = await fetch(`${API_BASE_URL}/estacionamento/relatorios/historico/${placa}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -125,7 +125,7 @@ export const getVehicleHistory = async (placa) => {
 export const getOccupiedSpots = async () => {
   const token = getToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/relatorios/vagas-ocupadas`, {
+    const response = await fetch(`${API_BASE_URL}/estacionamento/vagas-ocupadas`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -144,7 +144,7 @@ export const getOccupiedSpots = async () => {
 export const getEstatisticasTempoReal = async () => {
   const token = getToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/relatorios/estatisticas`, {
+    const response = await fetch(`${API_BASE_URL}/estacionamento/relatorios/estatisticas`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Erro ao buscar estatísticas em tempo real');
@@ -158,7 +158,7 @@ export const getEstatisticasTempoReal = async () => {
 export const getEstatisticasSemanais = async () => {
   const token = getToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/relatorios/estatisticas/semanal`, {
+    const response = await fetch(`${API_BASE_URL}/estacionamento/relatorios/estatisticas/semanal`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Erro ao buscar estatísticas semanais');
