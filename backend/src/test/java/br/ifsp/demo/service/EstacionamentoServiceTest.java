@@ -1,5 +1,6 @@
 package br.ifsp.demo.service;
 
+import br.ifsp.demo.dto.CriarEstacionamentoDTO;
 import br.ifsp.demo.model.Estacionamento;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.model.RegistroEntrada;
@@ -342,31 +343,38 @@ public class EstacionamentoServiceTest {
 
         }
     }
-//
-//    @Nested
-//    @DisplayName("Testes de Criação de Estacionamento")
-//    class TestesDeCriacaoEstacionamento {
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Criar estacionamento com sucesso")
-//        void criarEstacionamento_comSucesso() {
-//            Estacionamento estacionamento = new Estacionamento();
-//            estacionamento.setNome("Estacionamento Central");
-//            estacionamento.setEndereco("Rua X");
-//
-//            when(estacionamentoRepository.save(any(Estacionamento.class)))
-//                    .thenReturn(estacionamento);
-//
-//            Estacionamento resultado = estacionamentoService.criarEstacionamento(estacionamento);
-//
-//            assertNotNull(resultado);
-//            assertEquals(estacionamento.getNome(), resultado.getNome());
-//            assertEquals(estacionamento.getEndereco(), resultado.getEndereco());
-//            verify(estacionamentoRepository, times(1)).save(any(Estacionamento.class));
-//        }
-//    }
+
+    @Nested
+    @DisplayName("Testes de Criação de Estacionamento")
+    class TestesDeCriacaoEstacionamento {
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Criar estacionamento com sucesso")
+        void criarEstacionamento_comSucesso() {
+            CriarEstacionamentoDTO dto = new CriarEstacionamentoDTO(
+                    "Estacionamento Beira Mar",
+                    "Avenida Litoranea, 777",
+                    120
+            );
+
+            when(estacionamentoRepository.save(any(Estacionamento.class)))
+                    .thenAnswer(invocation -> {
+                        estacionamento = invocation.getArgument(0);
+                        return estacionamento;
+                    });
+
+            Estacionamento resultado = estacionamentoService.criarEstacionamento(dto);
+
+            assertNotNull(resultado);
+            assertEquals(dto.nome(), resultado.getNome());
+            assertEquals(dto.endereco(), resultado.getEndereco());
+            assertEquals(dto.capacidade(), resultado.getCapacidade());
+
+            verify(estacionamentoRepository, times(1)).save(any(Estacionamento.class));
+        }
+    }
 //
 //    @Nested
 //    @DisplayName("Testes de Obtenção de Entradas")
