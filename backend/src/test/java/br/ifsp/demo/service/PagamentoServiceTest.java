@@ -25,8 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 
@@ -123,69 +122,26 @@ class PagamentoServiceTest {
             verify(pagamentoRepository, times(1)).existsById(uuidInexistente);
             verify(pagamentoRepository, never()).deleteById(any(UUID.class));
         }
-//
-//        @Test
-//        @Tag("TDD")
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Deve atualizar o pagamento")
-//        void deveAtualizarPagamento() {
-//
-//            when(veiculoService.buscarPorPlaca(pagamento.getPlaca())).thenReturn(Optional.ofNullable(veiculo));
-//            when(pagamentoRepository.findById(pagamento.getUuid())).thenReturn(Optional.of(pagamento));
-//
-//            LocalDateTime novaEntrada = LocalDateTime.now().minusHours(3);
-//            LocalDateTime novaSaida = LocalDateTime.now().minusHours(1);
-//            double novoValor = 44;
-//
-//            Pagamento pagamentoAtualizado = service.atualizarPagamento(pagamento.getUuid(), novaEntrada, novaSaida, veiculo.getPlaca(), novoValor);
-//
-//            assertThat(pagamentoAtualizado.getHoraEntrada()).isEqualTo(novaEntrada);
-//            assertThat(pagamentoAtualizado.getHoraSaida()).isEqualTo(novaSaida);
-//            assertThat(pagamentoAtualizado.getPlaca()).isEqualTo(veiculo.getPlaca());
-//            assertThat(pagamentoAtualizado.getValor()).isEqualTo(44);
-//
-//            verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
-//
-//        }
-//
-//        @Test
-//        @Tag("TDD")
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Deve encontrar o pagamento pelo UUID")
-//        void deveEncontrarPagamentoPeloUuid() {
-//            UUID uuid = pagamento.getUuid();
-//
-//            when(pagamentoRepository.findById(uuid)).thenReturn(Optional.of(pagamento));
-//
-//            Pagamento result = service.buscarPorId(uuid);
-//
-//            assertThat(result).isNotNull();
-//            assertThat(result.getUuid()).isEqualTo(uuid);
-//            verify(pagamentoRepository, times(1)).findById(uuid);
-//        }
-//
-//        @Test
-//        @Tag("TDD")
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Testa salvar pagamento calculando o valor de permanencia")
-//        void testaSalvarPagamentoCalculandoOValorDePermanencia() {
-//            pagamento.setHoraSaida(LocalDateTime.of(2025,4,30,13,1,0));
-//
-//            when(veiculoService.buscarPorPlaca(pagamento.getPlaca())).thenReturn(Optional.ofNullable(veiculo));
-//            when(calculadoraTempoPermanencia.calcularValorDaPermanencia(anyInt())).thenReturn(26.0);
-//
-//            service.salvarPagamento(pagamento);
-//
-//            assertEquals(26.0, pagamento.getValor());
-//
-//            verify(pagamentoRepository, times(1)).save(pagamento);
-//            verify(veiculoService, times(1)).deletarVeiculo(veiculo.getId());
-//
-//        }
-//
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve encontrar o pagamento pelo UUID")
+        void deveEncontrarPagamentoPeloUuid() {
+            UUID uuidParaTeste = UUID.randomUUID();
+
+            when(pagamentoRepository.findById(uuidParaTeste)).thenReturn(Optional.of(pagamento));
+
+            Pagamento resultado = pagamentoService.buscarPorId(uuidParaTeste);
+
+            assertNotNull(resultado);
+            assertEquals(pagamento, resultado);
+            assertEquals(pagamento.getPlaca(), resultado.getPlaca());
+
+            verify(pagamentoRepository, times(1)).findById(uuidParaTeste);
+        }
+
 //        @Test
 //        @Tag("TDD")
 //        @Tag("UnitTest")
