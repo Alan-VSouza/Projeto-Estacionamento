@@ -269,25 +269,38 @@ public class EstacionamentoServiceTest {
     }
 
 
-//
-//    @Nested
-//    @DisplayName("Testes de Busca de Estacionamento Atual")
-//    class TestesDeBuscaEstacionamentoAtual {
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Buscar estacionamento atual retorna o estacionamento corretamente")
-//        void buscarEstacionamentoAtual_comSucesso() {
-//            when(estacionamentoRepository.findAll())
-//                    .thenReturn(List.of(estacionamento));
-//
-//            Estacionamento resultado = estacionamentoService.buscarEstacionamentoAtual();
-//
-//            assertNotNull(resultado);
-//            assertEquals(estacionamento.getNome(), resultado.getNome());
-//        }
-//    }
+
+    @Nested
+    @DisplayName("Testes de Busca de Estacionamento Atual")
+    class TestesDeBuscaEstacionamentoAtual {
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Buscar estacionamento atual retorna o estacionamento corretamente")
+        void buscarEstacionamentoAtual_comSucesso() {
+            when(estacionamentoRepository.findAll()).thenReturn(List.of(estacionamento));
+
+            Estacionamento resultado = estacionamentoService.buscarEstacionamentoAtual();
+
+            assertNotNull(resultado);
+            assertEquals(estacionamento.getNome(), resultado.getNome());
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve lançar IllegalArgumentException quando nenhum estacionamento atual é encontrado")
+        void buscarEstacionamentoAtual_nenhumEncontrado_lancaExcecao() {
+            when(estacionamentoRepository.findAll()).thenReturn(Collections.emptyList());
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    estacionamentoService.buscarEstacionamentoAtual()
+            );
+
+            assertEquals("Nenhum estacionamento encontrado", exception.getMessage());
+        }
+    }
 //
 //    @Nested
 //    @DisplayName("Testes de Busca de Estacionamento")
@@ -378,4 +391,5 @@ public class EstacionamentoServiceTest {
 //            assertEquals(registro2, entradas.get(1));
 //        }
 //    }
-}}
+}
+}
