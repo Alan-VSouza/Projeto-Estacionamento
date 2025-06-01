@@ -146,26 +146,6 @@ class PagamentoServiceTest {
 //        @Tag("TDD")
 //        @Tag("UnitTest")
 //        @Tag("Functional")
-//        @DisplayName("Testa salvar pagamento calculando o valor de permanencia")
-//        void testaSalvarPagamentoCalculandoOValorDePermanencia() {
-//            pagamento.setHoraSaida(LocalDateTime.of(2025,4,30,13,1,0));
-//
-//            when(veiculoService.buscarPorPlaca(pagamento.getPlaca())).thenReturn(Optional.ofNullable(veiculo));
-//            when(calculadoraTempoPermanencia.calcularValorDaPermanencia(anyInt())).thenReturn(26.0);
-//
-//            service.salvarPagamento(pagamento);
-//
-//            assertEquals(26.0, pagamento.getValor());
-//
-//            verify(pagamentoRepository, times(1)).save(pagamento);
-//            verify(veiculoService, times(1)).deletarVeiculo(veiculo.getId());
-//
-//        }
-//
-//        @Test
-//        @Tag("TDD")
-//        @Tag("UnitTest")
-//        @Tag("Functional")
 //        @DisplayName("Deve buscar pagamento por data")
 //        void deveBuscarPagamentoPorData() {
 //            LocalDate data = LocalDate.of(2025, 5, 2);
