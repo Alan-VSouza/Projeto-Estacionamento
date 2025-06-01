@@ -475,5 +475,25 @@ public class EstacionamentoServiceTest {
             assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
             assertTrue(Objects.requireNonNull(exception.getReason()).contains("Veículo já possui uma entrada registrada na vaga " + vagaId));
         }
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Deve lançar exceção quando todas as vagas estiverem ocupadas")
+        void findNextAvailableSpot_todasVagasOcupadas_lancaExcecao() {
+            List<Integer> todasVagas = new java.util.ArrayList<>();
+            for (int i = 1; i <= 200; i++) {
+                todasVagas.add(i);
+            }
+
+            when(registroEntradaRepository.findAllOccupiedSpotIds()).thenReturn(todasVagas);
+
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                    estacionamentoService.findNextAvailableSpot()
+            );
+
+            assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+            assertEquals("Todas as vagas estão ocupadas", exception.getReason());
+        }
     }
 }
