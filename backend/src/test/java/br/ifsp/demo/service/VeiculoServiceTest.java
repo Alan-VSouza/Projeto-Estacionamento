@@ -144,5 +144,19 @@ class VeiculoServiceTest {
             assertEquals("Placa não pode ser vazia", ex.getMessage());
             verify(veiculoRepository, never()).save(any());
         }
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("ObterOuCadastrar deve retornar veículo existente se já cadastrado")
+        void obterOuCadastrarVeiculo_quandoJaExiste_deveRetornarExistente() {
+            when(veiculoRepository.findByPlaca(veiculoValido.getPlaca()))
+                    .thenReturn(Optional.of(veiculoValido));
+
+            Veiculo resultado = veiculoService.obterOuCadastrarVeiculo(veiculoValido);
+
+            assertSame(veiculoValido, resultado);
+            verify(veiculoRepository, never()).save(any());
+        }
     }
 }
