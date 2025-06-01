@@ -1,0 +1,129 @@
+.parking-summary {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: inline-block;
+  text-align: left;
+}
+
+.parking-summary h2 {
+  margin: 0 0 20px 0;
+  color: #2d3748;
+  font-weight: 600;
+  font-size: 1.5em;
+}
+
+.parking-summary p {
+  margin: 12px 0;
+  font-size: 1.1em;
+  color: #4a5568;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.parking-summary .summary-value {
+  font-weight: 600;
+  color: #4063ff; 
+  font-size: 1.2em;
+}
+
+.parking-lot-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 20px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-medium);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.parking-spot {
+  width: 140px;
+  height: 100px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 7px 10px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+}
+
+.parking-spot::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  z-index: -1;
+  transition: all 0.3s ease;
+}
+
+.parking-spot:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-medium);
+}
+
+.parking-spot.vacant {
+  background: linear-gradient(135deg, #e9e9e9 10%, #d8d8d8 90%);
+  color: rgb(0, 0, 0);
+  box-shadow: 0 10px 30px rgba(175, 175, 175, 0.3);
+}
+
+.parking-spot.vacant:hover {
+  box-shadow: 0 20px 40px rgba(203, 203, 203, 0.3);
+}
+
+.parking-spot.occupied {
+  background: #00ae00;
+  border: white 0.15px solid;
+  color: white;
+  box-shadow: 0 20px 40px #b1ffb143;
+}
+
+.parking-spot.occupied:hover {
+  box-shadow: 0 20px 40px #00ff0043;
+}
+
+.spot-id {
+  font-size: 0.9em;
+  font-weight: 600;
+  opacity: 0.9;
+  margin-bottom: 1px;
+}
+
+.spot-vehicle-icon {
+  font-size: 2.2em;
+  line-height: 1;
+  animation: vehicleEnter 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.spot-plate {
+  font-size: 0.75em;
+  font-weight: 1000;
+  background: rgba(255, 255, 255, 0.826);
+  color: #1b212c;
+  padding: 4px 8px;
+  border-radius: 8px;
+  margin-top: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}

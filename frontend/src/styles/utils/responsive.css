@@ -1,0 +1,309 @@
+@media (max-width: 999px) {
+  .nav-list {
+    position: fixed;
+    top: 80px;
+    right: 0;
+    width: 60vw;
+    height: calc(100vh - 80px);
+    background: rgba(35, 35, 46, 0.98);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 50px 0 0 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease-in-out;
+    opacity: 0;
+    pointer-events: none;
+    z-index: var(--z-header);
+  }
+
+  .nav-list.active {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-list li {
+    margin: 15px 0;
+    width: 80%;
+    height: auto;
+    justify-content: center;
+    opacity: 0;
+  }
+
+  .nav-list.active li {
+    opacity: 1;
+    animation: navLinkFade 0.5s forwards;
+  }
+
+  .nav-list .dropdown .dropdown-menu {
+    position: static;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: none;
+    border: none;
+    border-radius: 10px;
+    margin-top: 10px;
+    transform: none;
+  }
+
+  .nav-list .dropdown:hover .dropdown-menu {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-menu {
+    display: flex;
+  }
+
+  .App-header h1 {
+    font-size: 1.4em;
+    padding-left: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .App-header {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .parking-lot-container {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    padding: 20px;
+  }
+  
+  .parking-spot {
+    width: 120px;
+    height: 85px;
+  }
+  
+  .spot-vehicle-icon {
+    font-size: 2em;
+  }
+
+  .report-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .report-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .reports-tabs {
+    flex-direction: column;
+  }
+
+  .login-container,
+  .register-admin-container {
+    margin: 20px;
+    padding: 30px 25px;
+    max-width: none;
+  }
+  
+  .login-container h2,
+  .register-admin-container h2 {
+    font-size: 1.8em;
+  }
+  
+  .login-container input,
+  .register-admin-container input {
+    padding: 14px 16px;
+  }
+  
+  .login-container button,
+  .register-admin-container button {
+    padding: 14px 20px;
+    font-size: 1em;
+  }
+
+  .search-input-group {
+    flex-direction: column;
+  }
+  
+  .search-input,
+  .search-button {
+    width: 100%;
+  }
+  
+  .card-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .time-entry {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .time-label {
+    min-width: auto;
+  }
+
+  .loading-title {
+    font-size: 2em;
+  }
+  
+  .car-icon {
+    font-size: 3em;
+  }
+  
+  .loading-spinner {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .loading-message {
+    font-size: 1.1em;
+  }
+  
+  .floating-shape {
+    opacity: 0.5;
+  }
+
+  .export-buttons {
+    flex-direction: column;
+  }
+  
+  .export-btn {
+    width: 100%;
+  }
+
+  .Toastify__toast-container {
+    width: 100vw;
+    padding: 0;
+    left: 0;
+    margin: 0;
+  }
+  
+  .Toastify__toast {
+    margin-bottom: 0;
+    border-radius: 0;
+  }
+
+  .action-modal {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .action-modal-header {
+    padding: 15px 20px;
+  }
+  
+  .action-modal-content {
+    padding: 20px;
+  }
+  
+  .vehicle-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .action-modal-buttons {
+    padding: 0 20px 20px 20px;
+  }
+  
+  .action-btn {
+    padding: 18px 15px;
+  }
+
+  .search-input-group {
+    flex-direction: column;
+  }
+  
+  .history-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .parking-lot-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .vehicle-entry-modal {
+    padding: 30px 20px;
+    width: 95%;
+  }
+
+  .App-header h1 {
+    font-size: 1.2em;
+    padding-left: 15px;
+  }
+
+  main {
+    padding: 100px 15px 40px 15px;
+  }
+
+  .login-container,
+  .register-admin-container {
+    margin: 15px;
+    padding: 25px 20px;
+  }
+  
+  .login-container h2,
+  .register-admin-container h2 {
+    font-size: 1.6em;
+  }
+  
+  .register-admin-container p {
+    font-size: 0.9em;
+    padding: 12px;
+  }
+
+  .loading-title {
+    font-size: 1.8em;
+    letter-spacing: 1px;
+  }
+  
+  .car-icon {
+    font-size: 2.5em;
+  }
+  
+  .loading-spinner {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .loading-message {
+    font-size: 1em;
+  }
+  
+  .loading-dots span {
+    width: 10px;
+    height: 10px;
+  }
+
+  .vehicle-icon {
+    font-size: 2.5em;
+  }
+  
+  .action-modal-header h3 {
+    font-size: 1.2em;
+  }
+  
+  .action-question p {
+    font-size: 1em;
+  }
+
+  .Toastify__toast-container {
+    width: 320px;
+  }
+
+  .header-logo {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+  }
+
+  .logo-icon {
+    width: 60px;
+    height: 60px;
+  }
+}
