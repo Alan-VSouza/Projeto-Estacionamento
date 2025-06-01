@@ -167,19 +167,28 @@ public class EstacionamentoController {
         LocalDate hoje = LocalDate.now();
         double receitaSemanal = 0;
         int veiculosSemanal = 0;
-        double tempoMedioSemanal = 0;
+        double tempoTotalSemanal = 0;
+        int diasComDados = 0;
 
         for (int i = 0; i < 7; i++) {
             LocalDate data = hoje.minusDays(i);
             RelatorioDTO relatorio = relatorioService.gerarRelatorioDesempenho(data);
+
             receitaSemanal += relatorio.receitaTotal();
             veiculosSemanal += relatorio.quantidade();
-            tempoMedioSemanal += relatorio.tempoMedioHoras();
+
+            if (relatorio.quantidade() > 0) {
+                tempoTotalSemanal += (relatorio.tempoMedioHoras() * relatorio.quantidade());
+                diasComDados++;
+            }
         }
 
         estatisticas.put("receitaSemanal", receitaSemanal);
         estatisticas.put("veiculosSemanal", veiculosSemanal);
-        estatisticas.put("tempoMedioSemanal", tempoMedioSemanal / 7);
+
+        double tempoMedioSemanal = veiculosSemanal > 0 ? tempoTotalSemanal / veiculosSemanal : 0;
+        estatisticas.put("tempoMedioSemanal", tempoMedioSemanal);
+
         estatisticas.put("mediaDiariaReceita", receitaSemanal / 7);
         estatisticas.put("mediaDiariaVeiculos", veiculosSemanal / 7.0);
 
