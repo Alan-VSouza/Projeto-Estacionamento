@@ -507,5 +507,17 @@ public class EstacionamentoServiceTest {
 
             assertEquals("Dados de criação do estacionamento não podem ser nulos", exception.getMessage());
         }
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Deve lançar exceção quando ID do estacionamento for nulo")
+        void buscarEstacionamento_idNulo_lancaExcecao() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    estacionamentoService.buscarEstacionamento(null)
+            );
+
+            assertEquals("O ID do estacionamento não pode ser nulo.", exception.getMessage());
+        }
     }
 }
