@@ -148,4 +148,18 @@ class CalculadoraTempoPermanenciaTest {
             assertEquals(10.0, resultado);
         }
     }
+
+    @Test
+    @Tag("Structural")
+    @Tag("UnitTest")
+    @DisplayName("Deve lançar exceção quando entrada for nula")
+    void deveLancarExcecaoQuandoEntradaForNula() {
+        LocalDateTime saida = LocalDateTime.now().plusHours(1);
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+            calculadoraTempoPermanencia.calcularValor(null, saida);
+        });
+
+        assertEquals("horas não podem ser nulas", ex.getMessage());
+    }
 }
