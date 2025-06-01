@@ -7,15 +7,18 @@ import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.EstacionamentoRepository;
 import br.ifsp.demo.repository.PagamentoRepository;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
+import org.apache.coyote.Response;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -136,53 +139,62 @@ public class EstacionamentoServiceTest {
         }
     }
 
-//    @Nested
-//    @DisplayName("Testes de Registro de Saída")
-//    class TestesDeRegistroSaida {
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Registrar saída com sucesso: gera pagamento e remove entrada")
-//        void registrarSaida_comSucesso_salvaPagamentoERemoveEntrada() {
-//            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
-//                    .thenReturn(Optional.of(veiculo));
-//
-//            when(registroEntradaRepository.findByVeiculo(veiculo))
-//                    .thenReturn(Optional.of(registroEntrada));
-//
-//            doNothing().when(pagamentoService).salvarPagamento(any(Pagamento.class));
-//
-//            boolean resultado = estacionamentoService.registrarSaida(PLACA_VEICULO);
-//
-//            assertTrue(resultado);
-//            verify(registroEntradaRepository, times(1)).delete(registroEntrada);
-//            verify(pagamentoService).salvarPagamento(argThat(p ->
-//                    PLACA_VEICULO.equals(p.getPlaca()) &&
-//                            p.getHoraEntrada().equals(registroEntrada.getHoraEntrada()) &&
-//                            p.getHoraSaida() != null
-//            ));
-//        }
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Registrar saída retorna false quando não houver registro de entrada")
-//        void registrarSaida_retornaFalse_quandoSemRegistroEntrada() {
-//            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
-//                    .thenReturn(Optional.of(veiculo));
-//
-//            when(registroEntradaRepository.findByVeiculo(veiculo))
-//                    .thenReturn(Optional.empty());
-//
-//            boolean resultado = estacionamentoService.registrarSaida(PLACA_VEICULO);
-//
-//            assertFalse(resultado);
-//            verify(registroEntradaRepository, never()).delete(any());
-//            verify(pagamentoService, never()).salvarPagamento(any());
-//        }
-//    }
-//
+    @Nested
+    @DisplayName("Testes de Registro de Saída")
+    class TestesDeRegistroSaida {
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Registrar saída com sucesso: gera pagamento e remove entrada")
+        void registrarSaida_comSucesso_salvaPagamentoERemoveEntrada() {
+
+            LocalDateTime horaEntrada = registroEntrada.getHoraEntrada();
+            double valorCalculadoEsperado = 20.0;
+
+            when(calculadoraDeTarifa.calcularValor(eq(horaEntrada), any(LocalDateTime.class))).thenReturn(valorCalculadoEsperado);
+            when(estacionamentoRepository.findAll()).thenReturn(List.of(estacionamento));
+
+            when(pagamentoRepository.save(any(Pagamento.class))).thenAnswer(invocation -> invocation.getArgument(0));
+            when(veiculoService.buscarPorPlaca(PLACA)).thenReturn(Optional.of(veiculo));
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
+
+            Pagamento pagamentoResultado = estacionamentoService.registrarSaida(PLACA);
+
+            assertNotNull(pagamentoResultado);
+            assertEquals(PLACA, pagamentoResultado.getPlaca());
+            assertEquals(horaEntrada, pagamentoResultado.getHoraEntrada());
+            assertNotNull(pagamentoResultado.getHoraSaida());
+            assertEquals(valorCalculadoEsperado, pagamentoResultado.getValor());
+
+            verify(registroEntradaRepository, times(1)).delete(registroEntrada);
+            verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
+
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve lançar ResponseStatusException NOT_FOUND quando não houver registro de entrada ao registrar saída")
+        void registrarSaida_lancaExcecao_quandoSemRegistroEntrada() {
+            when(estacionamentoRepository.findAll()).thenReturn(List.of(estacionamento));
+
+            when(veiculoService.buscarPorPlaca(PLACA)).thenReturn(Optional.of(veiculo));
+
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
+
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                    estacionamentoService.registrarSaida(PLACA)
+            );
+
+            assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+            assertEquals("Nenhum registro de entrada ativo para esse veículo", exception.getReason());
+
+            verify(registroEntradaRepository, never()).delete(any());
+            verify(pagamentoRepository, never()).save(any());
+        }
+    }
+
 //    @Nested
 //    @DisplayName("Testes de Cadastro de Veículo")
 //    class TestesDeCadastroVeiculo {
