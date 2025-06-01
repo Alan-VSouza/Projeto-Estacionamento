@@ -6,14 +6,20 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class CalculadoraTempoPermanenciaTest {
 
     private CalculadoraTempoPermanencia calculadoraTempoPermanencia;
+    private LocalDateTime entrada;
+    private LocalDateTime saida;
 
     @BeforeEach
     void setUp() {
+        entrada = LocalDateTime.now();
+
         ValorPermanencia valorPermanencia = new ValorPermanencia();
         calculadoraTempoPermanencia = new CalculadoraTempoPermanencia(valorPermanencia);
     }
@@ -28,8 +34,9 @@ class CalculadoraTempoPermanenciaTest {
         @Tag("TDD")
         @DisplayName("Calcular o valor de uma hora de permanencia")
         void calcularOValorDeUmaHoraDePermanencia() {
+            LocalDateTime saida = entrada.plusMinutes(50);
 
-            assertEquals(10.0, calculadoraTempoPermanencia.calcularValorDaPermanencia(1));
+            assertEquals(10.0, calculadoraTempoPermanencia.calcularValor(entrada, saida));
 
         }
 
@@ -40,7 +47,9 @@ class CalculadoraTempoPermanenciaTest {
         @DisplayName("Calcular o valor por hora de permanencia em permanencia menor que seis horas")
         void calcularOValorPorHoraDePermanenciaEmPermanenciaMenorQueSeisHoras() {
 
-            assertEquals(35.0, calculadoraTempoPermanencia.calcularValorDaPermanencia(5));
+            saida = entrada.plusHours(5);
+
+            assertEquals(35.0, calculadoraTempoPermanencia.calcularValor(entrada, saida));
 
         }
 
@@ -51,7 +60,9 @@ class CalculadoraTempoPermanenciaTest {
         @DisplayName("Calcular o valor a partir de seis hora de permanencia")
         void calcularOValorAPartirDeSeisHoraDePermanencia() {
 
-            assertEquals(51.0, calculadoraTempoPermanencia.calcularValorDaPermanencia(8));
+            saida = entrada.plusHours(8);
+
+            assertEquals(51.0, calculadoraTempoPermanencia.calcularValor(entrada, saida));
 
         }
 
@@ -62,7 +73,9 @@ class CalculadoraTempoPermanenciaTest {
         @DisplayName("Calcular o valor a partir de doze horas de permanencia")
         void calcularOValorAPartirDeDozeHorasDePermanencia() {
 
-            assertEquals(111.0, calculadoraTempoPermanencia.calcularValorDaPermanencia(19));
+            saida = entrada.plusHours(19);
+
+            assertEquals(111.0, calculadoraTempoPermanencia.calcularValor(entrada, saida));
 
         }
 
@@ -73,7 +86,9 @@ class CalculadoraTempoPermanenciaTest {
         @DisplayName("Calcular o valor a partir de vinte e quatro horas de permanencia")
         void calcularOValorAPartirDeVinteQuatroHorasDePermanencia() {
 
-            assertEquals(160.0, calculadoraTempoPermanencia.calcularValorDaPermanencia(29));
+            saida = entrada.plusHours(29);
+
+            assertEquals(160.0, calculadoraTempoPermanencia.calcularValor(entrada, saida));
 
         }
     }
@@ -99,7 +114,9 @@ class CalculadoraTempoPermanenciaTest {
         @DisplayName("Testando valores limites")
         void testandoValoresLimites(int horas, double custo) {
 
-            assertEquals(custo, calculadoraTempoPermanencia.calcularValorDaPermanencia(horas));
+            saida = entrada.plusHours(horas);
+
+            assertEquals(custo, calculadoraTempoPermanencia.calcularValor(entrada, saida));
 
         }
 
@@ -109,11 +126,13 @@ class CalculadoraTempoPermanenciaTest {
         @DisplayName("Testando valor de hora invalido")
         void testandoValorDeHoraInvalido() {
 
+            saida = entrada.minusHours(1);
+
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-                calculadoraTempoPermanencia.calcularValorDaPermanencia(-1);
+                calculadoraTempoPermanencia.calcularValor(entrada, saida);
             });
 
-            assertEquals("Horas deve ser maior que zero", ex.getMessage());
+            assertEquals("Horário de saída não pode ser antes do horário de entrada", ex.getMessage());
         }
     }
 }
