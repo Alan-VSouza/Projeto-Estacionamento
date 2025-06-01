@@ -267,142 +267,155 @@ public class EstacionamentoServiceTest {
 
             assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
             assertEquals("Não existe nenhuma entrada registrada nesse veículo", exception.getReason());
+        }
+
+        @Nested
+        @DisplayName("Testes de Busca de Estacionamento Atual")
+        class TestesDeBuscaEstacionamentoAtual {
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Functional")
+            @DisplayName("Buscar estacionamento atual retorna o estacionamento corretamente")
+            void buscarEstacionamentoAtual_comSucesso() {
+                when(estacionamentoRepository.findAll()).thenReturn(List.of(estacionamento));
+
+                Estacionamento resultado = estacionamentoService.buscarEstacionamentoAtual();
+
+                assertNotNull(resultado);
+                assertEquals(estacionamento.getNome(), resultado.getNome());
+            }
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Functional")
+            @DisplayName("Deve lançar IllegalArgumentException quando nenhum estacionamento atual é encontrado")
+            void buscarEstacionamentoAtual_nenhumEncontrado_lancaExcecao() {
+                when(estacionamentoRepository.findAll()).thenReturn(Collections.emptyList());
+
+                IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                        estacionamentoService.buscarEstacionamentoAtual()
+                );
+
+                assertEquals("Nenhum estacionamento encontrado", exception.getMessage());
+            }
+        }
+
+        @Nested
+        @DisplayName("Testes de Busca de Estacionamento")
+        class TestesDeBuscaEstacionamento {
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Functional")
+            @DisplayName("Buscar estacionamento com sucesso")
+            void buscarEstacionamento_comSucesso() {
+                UUID estacionamentoIdParaTeste = UUID.randomUUID();
+
+                when(estacionamentoRepository.findById(estacionamentoIdParaTeste))
+                        .thenReturn(Optional.of(estacionamento));
+
+                Estacionamento resultado = estacionamentoService.buscarEstacionamento(estacionamentoIdParaTeste);
+
+                assertNotNull(resultado);
+                assertEquals(estacionamento.getNome(), resultado.getNome());
+                assertEquals(estacionamento.getEndereco(), resultado.getEndereco());
+                assertEquals(estacionamento.getCapacidade(), resultado.getCapacidade());
+            }
+
+            @Test
+            @Tag("UnitTest")
+            @DisplayName("Deve lançar IllegalArgumentException quando estacionamento não encontrado")
+            void buscarEstacionamento_naoEncontrado() {
+                UUID idNaoExistente = UUID.randomUUID();
+
+                when(estacionamentoRepository.findById(idNaoExistente))
+                        .thenReturn(Optional.empty());
+
+                ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+                        estacionamentoService.buscarEstacionamento(idNaoExistente)
+                );
+
+                assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+                assertTrue(exception.getReason().contains("Estacionamento não encontrado com o ID: " + idNaoExistente));
+
+            }
+        }
+
+        @Nested
+        @DisplayName("Testes de Criação de Estacionamento")
+        class TestesDeCriacaoEstacionamento {
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Functional")
+            @DisplayName("Criar estacionamento com sucesso")
+            void criarEstacionamento_comSucesso() {
+                CriarEstacionamentoDTO dto = new CriarEstacionamentoDTO(
+                        "Estacionamento Beira Mar",
+                        "Avenida Litoranea, 777",
+                        120
+                );
+
+                when(estacionamentoRepository.save(any(Estacionamento.class)))
+                        .thenAnswer(invocation -> {
+                            estacionamento = invocation.getArgument(0);
+                            return estacionamento;
+                        });
+
+                Estacionamento resultado = estacionamentoService.criarEstacionamento(dto);
+
+                assertNotNull(resultado);
+                assertEquals(dto.nome(), resultado.getNome());
+                assertEquals(dto.endereco(), resultado.getEndereco());
+                assertEquals(dto.capacidade(), resultado.getCapacidade());
+
+                verify(estacionamentoRepository, times(1)).save(any(Estacionamento.class));
+            }
+        }
+
+        @Nested
+        @DisplayName("Testes de Obtenção de Entradas")
+        class TestesDeGetAllEntradas {
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Functional")
+            @DisplayName("Deve retornar uma lista de todas as entradas quando houver registros")
+            void getAllEntradas_comRegistros_retornaLista() {
+
+                Veiculo veiculo2 = new Veiculo("XYZ5678", "Moto", "Bis", "Vermelha");
+
+                RegistroEntrada registro1 = new RegistroEntrada(veiculo, 1);
+                RegistroEntrada registro2 = new RegistroEntrada(veiculo2, 2);
+
+                List<RegistroEntrada> listaDeEntradasMock = List.of(registro1, registro2);
+
+                when(registroEntradaRepository.findAll())
+                        .thenReturn(listaDeEntradasMock);
+
+                List<RegistroEntrada> resultado = estacionamentoService.getAllEntradas();
+
+                assertNotNull(resultado);
+                assertEquals(2, resultado.size());
+                assertTrue(resultado.contains(registro1));
+                assertTrue(resultado.contains(registro2));
+                assertEquals(veiculo.getPlaca(), resultado.get(0).getVeiculo().getPlaca());
+                assertEquals(veiculo2.getPlaca(), resultado.get(1).getVeiculo().getPlaca());
+            }
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Functional")
+            @DisplayName("Deve retornar uma lista vazia quando não houver registros de entrada")
+            void getAllEntradas_semRegistros_retornaListaVazia() {
+                when(registroEntradaRepository.findAll()).thenReturn(Collections.emptyList());
+
+                List<RegistroEntrada> resultado = estacionamentoService.getAllEntradas();
+
+                assertNotNull(resultado);
+                assertTrue(resultado.isEmpty());
+            }
+        }
     }
-
-
-
-    @Nested
-    @DisplayName("Testes de Busca de Estacionamento Atual")
-    class TestesDeBuscaEstacionamentoAtual {
-
-        @Test
-        @Tag("UnitTest")
-        @Tag("Functional")
-        @DisplayName("Buscar estacionamento atual retorna o estacionamento corretamente")
-        void buscarEstacionamentoAtual_comSucesso() {
-            when(estacionamentoRepository.findAll()).thenReturn(List.of(estacionamento));
-
-            Estacionamento resultado = estacionamentoService.buscarEstacionamentoAtual();
-
-            assertNotNull(resultado);
-            assertEquals(estacionamento.getNome(), resultado.getNome());
-        }
-
-        @Test
-        @Tag("UnitTest")
-        @Tag("Functional")
-        @DisplayName("Deve lançar IllegalArgumentException quando nenhum estacionamento atual é encontrado")
-        void buscarEstacionamentoAtual_nenhumEncontrado_lancaExcecao() {
-            when(estacionamentoRepository.findAll()).thenReturn(Collections.emptyList());
-
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                    estacionamentoService.buscarEstacionamentoAtual()
-            );
-
-            assertEquals("Nenhum estacionamento encontrado", exception.getMessage());
-        }
-    }
-
-    @Nested
-    @DisplayName("Testes de Busca de Estacionamento")
-    class TestesDeBuscaEstacionamento {
-
-        @Test
-        @Tag("UnitTest")
-        @Tag("Functional")
-        @DisplayName("Buscar estacionamento com sucesso")
-        void buscarEstacionamento_comSucesso() {
-            UUID estacionamentoIdParaTeste = UUID.randomUUID();
-
-            when(estacionamentoRepository.findById(estacionamentoIdParaTeste))
-                    .thenReturn(Optional.of(estacionamento));
-
-            Estacionamento resultado = estacionamentoService.buscarEstacionamento(estacionamentoIdParaTeste);
-
-            assertNotNull(resultado);
-            assertEquals(estacionamento.getNome(), resultado.getNome());
-            assertEquals(estacionamento.getEndereco(), resultado.getEndereco());
-            assertEquals(estacionamento.getCapacidade(), resultado.getCapacidade());
-        }
-
-        @Test
-        @Tag("UnitTest")
-        @DisplayName("Deve lançar IllegalArgumentException quando estacionamento não encontrado")
-        void buscarEstacionamento_naoEncontrado() {
-            UUID idNaoExistente = UUID.randomUUID();
-
-            when(estacionamentoRepository.findById(idNaoExistente))
-                    .thenReturn(Optional.empty());
-
-            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
-                    estacionamentoService.buscarEstacionamento(idNaoExistente)
-            );
-
-            assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-            assertTrue(exception.getReason().contains("Estacionamento não encontrado com o ID: " + idNaoExistente));
-
-        }
-    }
-
-    @Nested
-    @DisplayName("Testes de Criação de Estacionamento")
-    class TestesDeCriacaoEstacionamento {
-
-        @Test
-        @Tag("UnitTest")
-        @Tag("Functional")
-        @DisplayName("Criar estacionamento com sucesso")
-        void criarEstacionamento_comSucesso() {
-            CriarEstacionamentoDTO dto = new CriarEstacionamentoDTO(
-                    "Estacionamento Beira Mar",
-                    "Avenida Litoranea, 777",
-                    120
-            );
-
-            when(estacionamentoRepository.save(any(Estacionamento.class)))
-                    .thenAnswer(invocation -> {
-                        estacionamento = invocation.getArgument(0);
-                        return estacionamento;
-                    });
-
-            Estacionamento resultado = estacionamentoService.criarEstacionamento(dto);
-
-            assertNotNull(resultado);
-            assertEquals(dto.nome(), resultado.getNome());
-            assertEquals(dto.endereco(), resultado.getEndereco());
-            assertEquals(dto.capacidade(), resultado.getCapacidade());
-
-            verify(estacionamentoRepository, times(1)).save(any(Estacionamento.class));
-        }
-    }
-//
-//    @Nested
-//    @DisplayName("Testes de Obtenção de Entradas")
-//    class TestesDeGetAllEntradas {
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Deve retornar uma lista de entradas quando houver registros")
-//        void getAllEntradas_comRegistros() {
-//            RegistroEntrada registro1 = new RegistroEntrada();
-//            registro1.setVeiculo(veiculo);
-//            registro1.setHoraEntrada(LocalDateTime.now().minusHours(2));
-//
-//            RegistroEntrada registro2 = new RegistroEntrada();
-//            registro2.setVeiculo(veiculo);
-//            registro2.setHoraEntrada(LocalDateTime.now().minusHours(1));
-//
-//            when(registroEntradaRepository.findAll())
-//                    .thenReturn(List.of(registro1, registro2));
-//
-//            List<RegistroEntrada> entradas = estacionamentoService.getAllEntradas();
-//
-//            assertNotNull(entradas);
-//            assertEquals(2, entradas.size());
-//            assertEquals(registro1, entradas.get(0));
-//            assertEquals(registro2, entradas.get(1));
-//        }
-//    }
-}
 }
