@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Nested;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -142,26 +143,63 @@ class PagamentoServiceTest {
             verify(pagamentoRepository, times(1)).findById(uuidParaTeste);
         }
 
-//        @Test
-//        @Tag("TDD")
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Deve buscar pagamento por data")
-//        void deveBuscarPagamentoPorData() {
-//            LocalDate data = LocalDate.of(2025, 5, 2);
-//
-//            pagamento.setHoraEntrada(data.atTime(9, 0));
-//            pagamento.setHoraSaida(data.atTime(10, 0));
-//
-//            when(pagamentoRepository.findByHoraSaidaBetween(
-//                    data.atStartOfDay(),
-//                    data.atTime(23, 59, 59 ))
-//            ).thenReturn(List.of(pagamento));
-//
-//            List<Pagamento> resultado = service.buscarPorData(data);
-//
-//            assertThat(resultado).hasSize(1).containsExactly(pagamento);
-//        }
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve buscar pagamento por data")
+        void deveBuscarPagamentoPorData() {
+            LocalDate dataParaTeste = LocalDate.of(2025, 5, 2);
+            LocalDateTime inicioDoDia = dataParaTeste.atStartOfDay();
+            LocalDateTime fimDoDia = dataParaTeste.atTime(23, 59, 59);
+
+            RegistroEntrada mockRegistroParaPagamento = mock(RegistroEntrada.class);
+            when(mockRegistroParaPagamento.getVeiculo()).thenReturn(veiculo);
+
+            when(mockRegistroParaPagamento.getHoraEntrada()).thenReturn(dataParaTeste.atTime(8, 0));
+
+            CalculadoraDeTarifa calculadora = new CalculadoraTempoPermanencia(new ValorPermanencia());
+
+            Pagamento pagamentoNaData = new Pagamento(
+                    mockRegistroParaPagamento,
+                    dataParaTeste.atTime(10, 30, 0),
+                    calculadora
+            );
+
+            List<Pagamento> listaEsperadaDoRepositorio = List.of(pagamentoNaData);
+
+            when(pagamentoRepository.findByHoraSaidaBetween(inicioDoDia, fimDoDia))
+                    .thenReturn(listaEsperadaDoRepositorio);
+
+            List<Pagamento> resultado = pagamentoService.buscarPorData(dataParaTeste);
+
+            assertThat(resultado).isNotNull();
+            assertThat(resultado).hasSize(1);
+            assertThat(resultado).containsExactly(pagamentoNaData);
+
+            verify(pagamentoRepository, times(1)).findByHoraSaidaBetween(inicioDoDia, fimDoDia);
+
+        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve retornar lista vazia ao buscar por data sem pagamentos")
+        void buscarPorData_quandoNaoExistemPagamentosNaData_retornaListaVazia() {
+            LocalDate dataSemPagamentos = LocalDate.of(2025, 5, 3);
+            LocalDateTime inicioDoDia = dataSemPagamentos.atStartOfDay();
+            LocalDateTime fimDoDia = dataSemPagamentos.atTime(23, 59, 59);
+
+            when(pagamentoRepository.findByHoraSaidaBetween(inicioDoDia, fimDoDia))
+                    .thenReturn(Collections.emptyList());
+
+            List<Pagamento> resultado = pagamentoService.buscarPorData(dataSemPagamentos);
+
+            assertThat(resultado).isNotNull();
+            assertThat(resultado).isEmpty();
+            verify(pagamentoRepository, times(1)).findByHoraSaidaBetween(inicioDoDia, fimDoDia);
+        }
 //
 //        @Test
 //        @Tag("TDD")
