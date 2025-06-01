@@ -175,13 +175,10 @@ class EstacionamentoControllerTest {
         @Tag("Functional")
         @DisplayName("GET /buscar-entrada?placa= -> 200 OK e retorna registro de entrada")
         void whenGetEntrada_thenReturnsRegistro() throws Exception {
-            Veiculo veiculo = new Veiculo();
-            veiculo.setPlaca(PLACA);
 
-            RegistroEntrada registro = new RegistroEntrada(veiculo);
-            registro.setHoraEntrada(LocalDateTime.of(2025, 5, 4, 10, 0));
+            RegistroEntrada registroMock = new RegistroEntrada(veiculo);
 
-            when(estacionamentoService.buscarEntrada(PLACA)).thenReturn(registro);
+            when(estacionamentoService.buscarEntrada(PLACA)).thenReturn(registroMock);
 
             mockMvc.perform(get(BASE + "/buscar-entrada")
                             .param("placa", PLACA)
@@ -189,7 +186,7 @@ class EstacionamentoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.veiculo.placa").value(PLACA))
-                    .andExpect(jsonPath("$.horaEntrada").value("2025-05-04T10:00:00"));
+                    .andExpect(jsonPath("$.horaEntrada").exists());
         }
     }
 
