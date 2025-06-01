@@ -8,11 +8,14 @@ import br.ifsp.demo.repository.EstacionamentoRepository;
 import br.ifsp.demo.repository.PagamentoRepository;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +23,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class EstacionamentoServiceTest {
 
     @Mock
@@ -29,53 +33,32 @@ public class EstacionamentoServiceTest {
     private RegistroEntradaRepository registroEntradaRepository;
 
     @Mock
-    private PagamentoService pagamentoService;
-
-    @Mock
     private PagamentoRepository pagamentoRepository;
 
     @Mock
     private VeiculoService veiculoService;
 
+    @Mock
+    private CalculadoraDeTarifa calculadoraDeTarifa;
+
     @InjectMocks
     private EstacionamentoService estacionamentoService;
 
-    private Estacionamento estacionamento;
     private Veiculo veiculo;
+    private Estacionamento estacionamento;
     private RegistroEntrada registroEntrada;
+    private Integer vagaIdValida = 1;
 
-    private static final String PLACA_VEICULO = "ABC1234";
+    private final String PLACA = "BQF-1993";
+    private final String NOME_ESTACIONAMENTO = "Estacionamento Carros Velozes";
+    private final String ENDERECO_ESTACIONAMENTO = "Rua Muito Longe";
+    private final static int CAPACIDADE = 50;
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
-
-        veiculo = createVeiculo();
-        estacionamento = createEstacionamento();
-        registroEntrada = createRegistroEntrada();
-    }
-
-    private Veiculo createVeiculo() {
-        Veiculo veiculo = new Veiculo();
-        veiculo.setPlaca(PLACA_VEICULO);
-        veiculo.setTipoVeiculo("Carro");
-        veiculo.setModelo("Fusca");
-        veiculo.setCor("Azul");
-        return veiculo;
-    }
-
-    private Estacionamento createEstacionamento() {
-        Estacionamento estacionamento = new Estacionamento();
-        estacionamento.setNome("Estacionamento Central");
-        estacionamento.setEndereco("Rua X");
-        return estacionamento;
-    }
-
-    private RegistroEntrada createRegistroEntrada() {
-        RegistroEntrada registroEntrada = new RegistroEntrada();
-        registroEntrada.setVeiculo(veiculo);
-        registroEntrada.setHoraEntrada(LocalDateTime.now().minusHours(2));
-        return registroEntrada;
+        veiculo = new Veiculo(PLACA, "Carro", "Escort", "Prata");
+        estacionamento = new Estacionamento(NOME_ESTACIONAMENTO, ENDERECO_ESTACIONAMENTO, CAPACIDADE);
+        registroEntrada = new RegistroEntrada(veiculo, vagaIdValida);
     }
 
     @Nested
@@ -92,13 +75,21 @@ public class EstacionamentoServiceTest {
             when(estacionamentoRepository.findById(estacionamentoId))
                     .thenReturn(Optional.of(estacionamento));
 
-            when(registroEntradaRepository.save(any(RegistroEntrada.class)))
-                    .thenReturn(new RegistroEntrada(veiculo));
+            when(veiculoService.buscarPorPlaca(PLACA)).thenReturn(Optional.empty());
+            when(veiculoService.obterOuCadastrarVeiculo(veiculo)).thenReturn(veiculo);
+            when(registroEntradaRepository.count()).thenReturn(0L);
+            when(registroEntradaRepository.findAllOccupiedSpotIds()).thenReturn(Collections.emptyList());
 
-            RegistroEntrada resultado = estacionamentoService.registrarEntrada(veiculo, estacionamentoId);
+            when(registroEntradaRepository.save(any(RegistroEntrada.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+            RegistroEntrada resultado = estacionamentoService.registrar(veiculo, estacionamentoId);
 
             assertNotNull(resultado);
             assertEquals(veiculo, resultado.getVeiculo());
+            assertEquals(vagaIdValida, resultado.getVagaId());
+            verify(estacionamentoRepository).findById(estacionamentoId);
+            verify(veiculoService).obterOuCadastrarVeiculo(veiculo);
+            verify(registroEntradaRepository).count();
             verify(registroEntradaRepository, times(1)).save(any(RegistroEntrada.class));
         }
     }
