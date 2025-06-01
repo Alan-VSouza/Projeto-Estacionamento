@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.4.3</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>br.ifsp</groupId>
     <artifactId>demo-auth-app</artifactId>
@@ -28,6 +28,9 @@
     </scm>
     <properties>
         <java.version>21</java.version>
+        <lombok.version>1.18.34</lombok.version>
+        <mockito.version>5.14.2</mockito.version>
+        <pitest.version>1.16.1</pitest.version>
     </properties>
 
     <dependencies>
@@ -84,7 +87,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
+            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -113,7 +116,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.14.2</version>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -144,11 +147,6 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>0.11.5</version>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.pitest</groupId>
-            <artifactId>pitest-maven</artifactId>
-            <version>1.18.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.javafaker</groupId>
@@ -183,7 +181,7 @@
             <plugin>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
-                <version>1.18.1</version>
+                <version>${pitest.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.pitest</groupId>
@@ -192,12 +190,20 @@
                     </dependency>
                 </dependencies>
                 <configuration>
+                    <jvmArgs>
+                        <arg>-Xmx2048m</arg>
+                        <arg>-Xms1024m</arg>
+                    </jvmArgs>
                     <targetClasses>
                         <param>br.ifsp.demo*</param>
                     </targetClasses>
                     <targetTests>
                         <param>br.ifsp.demo*</param>
                     </targetTests>
+                    <outputFormats>
+                        <outputFormat>HTML</outputFormat>
+                    </outputFormats>
+                    <verbose>true</verbose>
                 </configuration>
             </plugin>
             <plugin>
@@ -216,12 +222,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>
-                        -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
-                        -Xshare:off
-                    </argLine>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
