@@ -140,3 +140,31 @@ export const getOccupiedSpots = async () => {
     throw error;
   }
 };
+
+export const getEstatisticasTempoReal = async () => {
+  const token = getToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/relatorios/estatisticas`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Erro ao buscar estatísticas em tempo real');
+    return await response.json();
+  } catch (error) {
+    console.error("Erro em getEstatisticasTempoReal:", error);
+    throw error;
+  }
+};
+
+export const getEstatisticasSemanais = async () => {
+  const token = getToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/relatorios/estatisticas/semanal`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Erro ao buscar estatísticas semanais');
+    return await response.json();
+  } catch (error) {
+    console.error("Erro em getEstatisticasSemanais:", error);
+    throw error;
+  }
+};

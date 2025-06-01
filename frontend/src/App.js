@@ -6,6 +6,7 @@ import './styles/App.css';
 import ParkingLot from './components/parking/ParkingLot';
 import LoginWebsite from './pages/Login/Login';
 import RegisterAdminPage from './pages/Login/RegisterAdminPage'; 
+import StatisticsPage from './pages/Statistics/StatisticsPage'; 
 import ReportsPage from './pages/Reports/ReportsPage';
 import VehicleHistoryPage from './pages/VehicleHistory/VehicleHistoryPage';
 import { validateToken } from './services/api/Api';
@@ -114,7 +115,7 @@ function App() {
                         </Link>
                       </li>
                       <li>
-                        <Link to="/reports" onClick={() => setMobileMenuActive(false)}>
+                        <Link to="/statistics" onClick={() => setMobileMenuActive(false)}>
                           Estatísticas
                         </Link>
                       </li>
@@ -207,6 +208,16 @@ function App() {
                   <ParkingLot initialTotalSpots={15} />
                 ) : (
                   <Navigate to="/login" replace /> 
+                )
+              } 
+            />
+            <Route 
+              path="/statistics" 
+              element={
+                isAuthenticated ? (
+                  <StatisticsPage />
+                ) : (
+                  <Navigate to="/login" replace />
                 )
               } 
             />

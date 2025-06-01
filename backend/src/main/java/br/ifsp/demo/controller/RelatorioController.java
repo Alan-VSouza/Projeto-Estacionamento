@@ -15,7 +15,9 @@ import org.springframework.core.io.Resource;
 import java.time.LocalDate;
 import java.nio.charset.StandardCharsets;
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/relatorios")
@@ -100,4 +102,51 @@ public class RelatorioController {
             throw new RuntimeException("Erro ao gerar PDF", e);
         }
     }
+
+    @GetMapping("/estatisticas")
+    public ResponseEntity<Map<String, Object>> getEstatisticasTempoReal() {
+        Map<String, Object> estatisticas = new HashMap<>();
+
+        estatisticas.put("vagasDisponiveis", relatorioService.vagasDisponiveis());
+        estatisticas.put("vagasOcupadas", relatorioService.vagasOcupadas());
+        estatisticas.put("totalVagas", 200);
+
+        RelatorioDTO relatorioHoje = relatorioService.gerarRelatorioDesempenho(LocalDate.now());
+        estatisticas.put("receitaHoje", relatorioHoje.receitaTotal());
+        estatisticas.put("veiculosAtendidosHoje", relatorioHoje.quantidade());
+        estatisticas.put("tempoMedioHoje", relatorioHoje.tempoMedioHoras());
+        estatisticas.put("ocupacaoMediaHoje", relatorioHoje.ocupacaoMedia());
+
+        double taxaOcupacaoAtual = (double) relatorioService.vagasOcupadas() / 200 * 100;
+        estatisticas.put("taxaOcupacaoAtual", taxaOcupacaoAtual);
+
+        return ResponseEntity.ok(estatisticas);
+    }
+
+    @GetMapping("/estatisticas/semanal")
+    public ResponseEntity<Map<String, Object>> getEstatisticasSemanais() {
+        Map<String, Object> estatisticas = new HashMap<>();
+
+        LocalDate hoje = LocalDate.now();
+        double receitaSemanal = 0;
+        int veiculosSemanal = 0;
+        double tempoMedioSemanal = 0;
+
+        for (int i = 0; i < 7; i++) {
+            LocalDate data = hoje.minusDays(i);
+            RelatorioDTO relatorio = relatorioService.gerarRelatorioDesempenho(data);
+            receitaSemanal += relatorio.receitaTotal();
+            veiculosSemanal += relatorio.quantidade();
+            tempoMedioSemanal += relatorio.tempoMedioHoras();
+        }
+
+        estatisticas.put("receitaSemanal", receitaSemanal);
+        estatisticas.put("veiculosSemanal", veiculosSemanal);
+        estatisticas.put("tempoMedioSemanal", tempoMedioSemanal / 7);
+        estatisticas.put("mediaDiariaReceita", receitaSemanal / 7);
+        estatisticas.put("mediaDiariaVeiculos", veiculosSemanal / 7.0);
+
+        return ResponseEntity.ok(estatisticas);
+    }
+
 }

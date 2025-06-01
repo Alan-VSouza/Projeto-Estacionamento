@@ -15,6 +15,7 @@
 @import './pages/parking.css';
 @import './pages/reports.css';
 @import './pages/history.css';
+@import './pages/statistics.css';
 
 @import './utils/responsive.css';
 @import './utils/utilities.css';
