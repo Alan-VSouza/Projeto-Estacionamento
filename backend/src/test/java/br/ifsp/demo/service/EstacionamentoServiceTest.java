@@ -519,5 +519,29 @@ public class EstacionamentoServiceTest {
 
             assertEquals("O ID do estacionamento não pode ser nulo.", exception.getMessage());
         }
+
+        @Test
+        @DisplayName("Registrar entrada: veículo existente mas sem entrada registrada - deve continuar normalmente")
+        void registrarEntrada_veiculoExistenteSemEntradaRegistrada() {
+            UUID estacionamentoId = UUID.randomUUID();
+            Integer vagaId = 7;
+
+            when(estacionamentoRepository.findById(estacionamentoId)).thenReturn(Optional.of(estacionamento));
+            when(registroEntradaRepository.findByVagaId(vagaId)).thenReturn(Optional.empty());
+            when(registroEntradaRepository.count()).thenReturn(0L);
+
+            when(veiculoService.buscarPorPlaca(veiculo.getPlaca())).thenReturn(Optional.of(veiculo));
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
+
+            when(veiculoService.obterOuCadastrarVeiculo(veiculo)).thenReturn(veiculo);
+            when(registroEntradaRepository.save(any(RegistroEntrada.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+            RegistroEntrada resultado = estacionamentoService.registrarEntrada(veiculo, estacionamentoId, vagaId);
+
+            assertNotNull(resultado);
+            assertEquals(veiculo.getPlaca(), resultado.getVeiculo().getPlaca());
+            assertEquals(vagaId, resultado.getVagaId());
+            verify(registroEntradaRepository).save(any(RegistroEntrada.class));
+        }
     }
 }
