@@ -158,5 +158,21 @@ class VeiculoServiceTest {
             assertSame(veiculoValido, resultado);
             verify(veiculoRepository, never()).save(any());
         }
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("ObterOuCadastrar deve cadastrar veículo novo se não existir")
+        void obterOuCadastrarVeiculo_quandoNaoExiste_deveCadastrarNovo() {
+            when(veiculoRepository.findByPlaca(veiculoValido.getPlaca()))
+                    .thenReturn(Optional.empty());
+            when(veiculoRepository.save(any(Veiculo.class)))
+                    .thenReturn(veiculoValido);
+
+            Veiculo resultado = veiculoService.obterOuCadastrarVeiculo(veiculoValido);
+
+            assertSame(veiculoValido, resultado);
+            verify(veiculoRepository).save(any(Veiculo.class));
+        }
     }
 }
