@@ -2,6 +2,7 @@ package br.ifsp.demo.controller;
 
 import br.ifsp.demo.components.CalculadoraTempoPermanencia;
 import br.ifsp.demo.components.ValorPermanencia;
+import br.ifsp.demo.dto.CriarEstacionamentoDTO;
 import br.ifsp.demo.dto.VeiculoComVagaDTO;
 import br.ifsp.demo.model.Estacionamento;
 import br.ifsp.demo.model.Pagamento;
@@ -50,7 +51,7 @@ class EstacionamentoControllerTest {
 
     private Veiculo veiculo;
     private Estacionamento estacionamento;
-    private VeiculoComVagaDTO dto;
+    private VeiculoComVagaDTO veiculoDTO;
 
     private static final String BASE = "/estacionamento";
     private static final String PLACA = "ABC1234";
@@ -58,9 +59,10 @@ class EstacionamentoControllerTest {
     @BeforeEach
     void setup() {
 
-        dto = new VeiculoComVagaDTO(PLACA, "Carro", "Teste", "Preto", null);
-        veiculo = new Veiculo(dto.placa(), dto.tipoVeiculo(), dto.modelo(), dto.cor());
-        estacionamento = new Estacionamento("Central", "Rua X", 50);
+        veiculoDTO = new VeiculoComVagaDTO(PLACA, "Carro", "Teste", "Preto", null);
+        veiculo = new Veiculo(veiculoDTO.placa(), veiculoDTO.tipoVeiculo(), veiculoDTO.modelo(), veiculoDTO.cor());
+        CriarEstacionamentoDTO estacionamentoDTO = new CriarEstacionamentoDTO("Central", "Rua X", 50);
+        estacionamento = new Estacionamento(estacionamentoDTO.nome(), estacionamentoDTO.endereco(), estacionamentoDTO.capacidade());
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -88,7 +90,7 @@ class EstacionamentoControllerTest {
 
             when(estacionamentoService.buscarEstacionamentoAtual()).thenReturn(estacionamento);
 
-            if (dto.vagaId() == null) {
+            if (veiculoDTO.vagaId() == null) {
                 when(estacionamentoService.findNextAvailableSpot()).thenReturn(1);
             }
             when(estacionamentoService.registrarEntrada(any(Veiculo.class), eq(estacionamentoID), any(Integer.class)))
@@ -96,7 +98,7 @@ class EstacionamentoControllerTest {
 
             mockMvc.perform(post(BASE + "/registar-entrada")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(dto)))
+                            .content(objectMapper.writeValueAsString(veiculoDTO)))
                     .andExpect(status().isOk())
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.veiculo.placa").value(PLACA))
@@ -200,8 +202,8 @@ class EstacionamentoControllerTest {
         @Tag("Functional")
         @DisplayName("POST /estacionamento -> 201 Created e retorna estacionamento criado")
         void whenPostCriarEstacionamento_thenReturnsCreated() throws Exception {
-            Estacionamento estacionamento = new Estacionamento("Central", "Rua X");
-            when(estacionamentoService.criarEstacionamento(any(Estacionamento.class)))
+
+            when(estacionamentoService.criarEstacionamento(any(CriarEstacionamentoDTO.class)))
                     .thenReturn(estacionamento);
 
             mockMvc.perform(post(BASE + "/criar-estacionamento")
@@ -223,19 +225,19 @@ class EstacionamentoControllerTest {
         @Tag("TDD")
         @Tag("UnitTest")
         @Tag("Functional")
-        @DisplayName("GET /estacionamento -> 200 OK e retorna estacionamento existente")
+        @DisplayName("GET /buscar-estacionamento/{id} -> 200 OK e retorna estacionamento existente")
         void whenGetEstacionamento_thenReturnsEstacionamento() throws Exception {
-            UUID idEstacionamento = UUID.randomUUID();
+            UUID idEstacionamentoParaTeste = UUID.randomUUID();
 
-            Estacionamento est = new Estacionamento("Central", "Rua X");
-            when(estacionamentoService.buscarEstacionamento(idEstacionamento)).thenReturn(est);
+            when(estacionamentoService.buscarEstacionamento(idEstacionamentoParaTeste)).thenReturn(estacionamento);
 
-            mockMvc.perform(get(BASE + "/buscar-estacionamento/" + idEstacionamento)
+            mockMvc.perform(get(BASE + "/buscar-estacionamento/" + idEstacionamentoParaTeste)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                    .andExpect(jsonPath("$.nome").value("Central"))
-                    .andExpect(jsonPath("$.endereco").value("Rua X"));
+                    .andExpect(jsonPath("$.nome").value(estacionamento.getNome()))
+                    .andExpect(jsonPath("$.endereco").value(estacionamento.getEndereco()))
+                    .andExpect(jsonPath("$.capacidade").value(estacionamento.getCapacidade()));
         }
     }
 
@@ -246,34 +248,31 @@ class EstacionamentoControllerTest {
         @Test
         @Tag("UnitTest")
         @Tag("Functional")
-        @DisplayName("POST /estacionamento/registrar-saida -> 200 OK quando veículo não registrado e entrada é registrada com sucesso")
+        @DisplayName("POST /estacionamento/registar-entrada -> 200 OK quando entrada é registrada com sucesso")
         void whenPostRegistrarEntrada_thenRegistersVehicleAndReturns200() throws Exception {
-            Veiculo veiculo = new Veiculo();
-            veiculo.setPlaca("FUSCA");
-            veiculo.setTipoVeiculo("Carro");
-            veiculo.setModelo("Fusca");
-            veiculo.setCor("Azul");
 
-            Estacionamento estacionamento = new Estacionamento("Central", "Rua X");
-            UUID estacionamentoId = estacionamento.getId();
+            UUID idDoEstacionamentoAtual = estacionamento.getId();
+            Integer vagaEsperada = 1;
+            RegistroEntrada registroMockRetornado = new RegistroEntrada(veiculo, vagaEsperada);
 
             when(estacionamentoService.buscarEstacionamentoAtual()).thenReturn(estacionamento);
 
-            RegistroEntrada registro = new RegistroEntrada(veiculo);
+            when(estacionamentoService.findNextAvailableSpot()).thenReturn(vagaEsperada);
 
-            when(estacionamentoService.registrarEntrada(any(Veiculo.class), eq(estacionamentoId)))
-                    .thenReturn(registro);
+            when(estacionamentoService.registrarEntrada(any(Veiculo.class), eq(idDoEstacionamentoAtual), eq(vagaEsperada)))
+                    .thenReturn(registroMockRetornado);
+
 
             mockMvc.perform(post(BASE + "/registar-entrada")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(veiculo))
-                            .param("idEstacionamento", estacionamentoId.toString()))
+                            .content(objectMapper.writeValueAsString(veiculoDTO)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.veiculo.placa").value("FUSCA"))
-                    .andExpect(jsonPath("$.veiculo.modelo").value("Fusca"))
-                    .andExpect(jsonPath("$.veiculo.tipoVeiculo").value("Carro"))
-                    .andExpect(jsonPath("$.veiculo.cor").value("Azul"));
+                    .andExpect(jsonPath("$.veiculo.placa").value(PLACA))
+                    .andExpect(jsonPath("$.veiculo.modelo").value(veiculoDTO.modelo()))
+                    .andExpect(jsonPath("$.veiculo.tipoVeiculo").value(veiculoDTO.tipoVeiculo()))
+                    .andExpect(jsonPath("$.veiculo.cor").value(veiculoDTO.cor()))
+                    .andExpect(jsonPath("$.vagaId").value(vagaEsperada));
         }
     }
 
@@ -287,13 +286,11 @@ class EstacionamentoControllerTest {
         @Tag("Functional")
         @DisplayName("GET /entradas -> retorna todas as entradas")
         void whenGetEntradas_thenReturnsAllEntries() throws Exception {
-            Veiculo veiculo1 = new Veiculo();
-            veiculo1.setPlaca("ABC1234");
-            RegistroEntrada registro1 = new RegistroEntrada(veiculo1);
 
-            Veiculo veiculo2 = new Veiculo();
-            veiculo2.setPlaca("DEF5678");
-            RegistroEntrada registro2 = new RegistroEntrada(veiculo2);
+            Veiculo veiculo2 = new Veiculo("BQF-1993", "Carro", "Escort", "prata");
+
+            RegistroEntrada registro1 = new RegistroEntrada(veiculo, 1);
+            RegistroEntrada registro2 = new RegistroEntrada(veiculo2, 2);
 
             List<RegistroEntrada> entradas = Arrays.asList(registro1, registro2);
 
@@ -303,7 +300,7 @@ class EstacionamentoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$[0].veiculo.placa").value("ABC1234"))
-                    .andExpect(jsonPath("$[1].veiculo.placa").value("DEF5678"));
+                    .andExpect(jsonPath("$[1].veiculo.placa").value("BQF-1993"));
         }
     }
 }
