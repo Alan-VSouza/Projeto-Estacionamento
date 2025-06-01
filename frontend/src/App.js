@@ -89,9 +89,11 @@ function App() {
       <div className="App">
         <header className="App-header">
           <h1>
-            <img src={logo} alt="Smart Parking Logo" className="header-logo" />
-            Smart Parking
-          </h1>
+            <a href='/'>
+              <img src={logo} alt="Smart Parking Logo" className="header-logo" />
+              Smart Parking
+            </a>
+            </h1>
           <nav>
             <ul className={`nav-list ${mobileMenuActive ? 'active' : ''}`}>
               {isAuthenticated && (
