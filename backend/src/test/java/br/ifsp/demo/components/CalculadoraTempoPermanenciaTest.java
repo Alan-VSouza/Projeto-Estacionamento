@@ -133,4 +133,19 @@ class CalculadoraTempoPermanenciaTest {
             assertEquals("Horário de saída não pode ser antes do horário de entrada", ex.getMessage());
         }
     }
+    @Nested
+    @DisplayName("Structural Tests")
+    class StructuralTests {
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Calcular permanência com entrada e saída iguais deve considerar 1 hora mínima")
+        void calcularPermanenciaComDuracaoZero() {
+            saida = entrada;
+
+            double resultado = calculadoraTempoPermanencia.calcularValor(entrada, saida);
+
+            assertEquals(10.0, resultado);
+        }
+    }
 }
