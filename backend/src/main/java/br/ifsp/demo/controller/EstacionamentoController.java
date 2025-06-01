@@ -238,4 +238,32 @@ public class EstacionamentoController {
             throw new RuntimeException("Erro ao gerar PDF", e);
         }
     }
+
+    @GetMapping("/relatorios/mensal")
+    public ResponseEntity<Map<String, Object>> gerarRelatorioMensal(
+            @RequestParam("mes") int mes,
+            @RequestParam("ano") int ano) {
+
+        Map<String, Object> relatorioMensal = relatorioService.gerarRelatorioMensal(mes, ano);
+        return ResponseEntity.ok(relatorioMensal);
+    }
+
+    @GetMapping("/relatorios/mensal/export/pdf")
+    public ResponseEntity<Resource> exportarRelatorioMensalPDF(
+            @RequestParam("mes") int mes,
+            @RequestParam("ano") int ano) {
+        try {
+            byte[] pdfContent = relatorioService.gerarRelatorioMensalPDF(mes, ano);
+
+            ByteArrayResource resource = new ByteArrayResource(pdfContent);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-mensal-" + mes + "-" + ano + ".pdf")
+                    .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
+                    .contentLength(resource.contentLength())
+                    .body(resource);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar PDF mensal", e);
+        }
+    }
 }

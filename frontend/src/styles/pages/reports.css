@@ -176,6 +176,54 @@
   font-size: 1.1em;
 }
 
+.monthly-revenue-report {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.report-card.best-day {
+  background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+  color: white;
+}
+
+.monthly-stats {
+  background: rgba(248, 249, 250, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 15px;
+  border-left: 4px solid #667eea;
+  margin: 20px 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+}
+
+.stat-label {
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.stat-value {
+  font-weight: 700;
+  color: #2d3748;
+}
+
 @media (max-width: 768px) {
   .report-header {
     flex-direction: column;

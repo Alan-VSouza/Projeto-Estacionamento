@@ -22,6 +22,10 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.io.font.constants.StandardFonts;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Comparator;
+import java.util.List;
 
 import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
@@ -30,8 +34,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.List;
 
 @Service
 public class RelatorioService {
@@ -217,5 +219,114 @@ public class RelatorioService {
     private double calcularOcupacaoMedia(double minutosOcupadosTotal) {
         long minutosNoDia = Duration.between(LocalDateTime.now().toLocalDate().atStartOfDay(), LocalDateTime.now()).toMinutes();
         return (double) Math.round(minutosOcupadosTotal / (minutosNoDia * NUMERO_VAGAS) * 100) / 100;
+    }
+
+    public Map<String, Object> gerarRelatorioMensal(int mes, int ano) {
+        LocalDate inicioMes = LocalDate.of(ano, mes, 1);
+        LocalDate fimMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth());
+
+        double receitaTotal = 0;
+        int totalVeiculos = 0;
+        double tempoTotalMinutos = 0;
+        Map<Integer, Double> receitaPorDia = new HashMap<>();
+        Map<Integer, Integer> veiculosPorDia = new HashMap<>();
+
+        for (LocalDate data = inicioMes; !data.isAfter(fimMes); data = data.plusDays(1)) {
+            RelatorioDTO relatorioDia = gerarRelatorioDesempenho(data);
+
+            int dia = data.getDayOfMonth();
+            receitaPorDia.put(dia, relatorioDia.receitaTotal());
+            veiculosPorDia.put(dia, relatorioDia.quantidade());
+
+            receitaTotal += relatorioDia.receitaTotal();
+            totalVeiculos += relatorioDia.quantidade();
+            tempoTotalMinutos += (relatorioDia.tempoMedioHoras() * relatorioDia.quantidade() * 60);
+        }
+
+        double tempoMedioHoras = totalVeiculos > 0 ? (tempoTotalMinutos / totalVeiculos) / 60.0 : 0;
+        double receitaMediaDiaria = receitaTotal / inicioMes.lengthOfMonth();
+        double veiculosMediaDiaria = (double) totalVeiculos / inicioMes.lengthOfMonth();
+
+        int melhorDia = receitaPorDia.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(1);
+
+        double melhorReceita = receitaPorDia.getOrDefault(melhorDia, 0.0);
+
+        Map<String, Object> resultado = new HashMap<>();
+        resultado.put("mes", mes);
+        resultado.put("ano", ano);
+        resultado.put("receitaTotal", receitaTotal);
+        resultado.put("totalVeiculos", totalVeiculos);
+        resultado.put("tempoMedioHoras", tempoMedioHoras);
+        resultado.put("receitaMediaDiaria", receitaMediaDiaria);
+        resultado.put("veiculosMediaDiaria", veiculosMediaDiaria);
+        resultado.put("melhorDia", melhorDia);
+        resultado.put("melhorReceita", melhorReceita);
+        resultado.put("receitaPorDia", receitaPorDia);
+        resultado.put("veiculosPorDia", veiculosPorDia);
+        resultado.put("diasNoMes", inicioMes.lengthOfMonth());
+
+        return resultado;
+    }
+
+    public byte[] gerarRelatorioMensalPDF(int mes, int ano) {
+        try {
+            Map<String, Object> dados = gerarRelatorioMensal(mes, ano);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PdfWriter writer = new PdfWriter(baos);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document document = new Document(pdfDoc);
+
+            PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+            PdfFont boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+
+            Paragraph title = new Paragraph("Relatório Mensal de Desempenho")
+                    .setFont(boldFont)
+                    .setFontSize(18)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(20);
+            document.add(title);
+
+            String[] meses = {"", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+                    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
+            Paragraph periodo = new Paragraph("Período: " + meses[mes] + " de " + ano)
+                    .setFont(font)
+                    .setFontSize(12)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(20);
+            document.add(periodo);
+
+            Table resumoTable = new Table(UnitValue.createPercentArray(new float[]{50, 50}))
+                    .setWidth(UnitValue.createPercentValue(100));
+
+            resumoTable.addHeaderCell(new Cell().add(new Paragraph("Métrica").setFont(boldFont)));
+            resumoTable.addHeaderCell(new Cell().add(new Paragraph("Valor").setFont(boldFont)));
+
+            resumoTable.addCell(new Cell().add(new Paragraph("Receita Total").setFont(font)));
+            resumoTable.addCell(new Cell().add(new Paragraph("R$ " + String.format("%.2f", dados.get("receitaTotal"))).setFont(font)));
+
+            resumoTable.addCell(new Cell().add(new Paragraph("Total de Veículos").setFont(font)));
+            resumoTable.addCell(new Cell().add(new Paragraph(dados.get("totalVeiculos").toString()).setFont(font)));
+
+            resumoTable.addCell(new Cell().add(new Paragraph("Tempo Médio (horas)").setFont(font)));
+            resumoTable.addCell(new Cell().add(new Paragraph(String.format("%.2f", dados.get("tempoMedioHoras"))).setFont(font)));
+
+            resumoTable.addCell(new Cell().add(new Paragraph("Receita Média Diária").setFont(font)));
+            resumoTable.addCell(new Cell().add(new Paragraph("R$ " + String.format("%.2f", dados.get("receitaMediaDiaria"))).setFont(font)));
+
+            resumoTable.addCell(new Cell().add(new Paragraph("Melhor Dia").setFont(font)));
+            resumoTable.addCell(new Cell().add(new Paragraph("Dia " + dados.get("melhorDia") + " (R$ " + String.format("%.2f", dados.get("melhorReceita")) + ")").setFont(font)));
+
+            document.add(resumoTable);
+
+            document.close();
+            return baos.toByteArray();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar PDF mensal", e);
+        }
     }
 }
