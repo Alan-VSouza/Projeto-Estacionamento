@@ -127,4 +127,22 @@ class VeiculoServiceTest {
             verify(veiculoRepository, never()).delete(any());
         }
     }
+
+    @Nested
+    @DisplayName("Structural Tests")
+    class StructuralTests {
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Salvar veículo com placa nula deve lançar exceção")
+        void salvarVeiculo_quandoPlacaNula_deveLancarIllegalArgumentException() {
+            IllegalArgumentException ex = assertThrows(
+                    IllegalArgumentException.class,
+                    () -> veiculoService.cadastrarVeiculo(null, "carro", "Fusca", "azul")
+            );
+
+            assertEquals("Placa não pode ser vazia", ex.getMessage());
+            verify(veiculoRepository, never()).save(any());
+        }
+    }
 }
