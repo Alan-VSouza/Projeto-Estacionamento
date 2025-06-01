@@ -200,71 +200,62 @@ class PagamentoServiceTest {
             assertThat(resultado).isEmpty();
             verify(pagamentoRepository, times(1)).findByHoraSaidaBetween(inicioDoDia, fimDoDia);
         }
-//
-//        @Test
-//        @Tag("TDD")
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Deve retornar o total arrecadado quando existem pagamentos")
-//        void deveRetornarTotalArrecadadoQuandoExistemPagamentos() {
-//            LocalDate data = LocalDate.of(2025, 5, 3);
-//            LocalDateTime inicio = data.atStartOfDay();
-//            LocalDateTime fim = data.atTime(23, 59, 59);
-//
-//            when(pagamentoRepository.somarPagamentosPorData(inicio, fim)).thenReturn(100.0);
-//
-//            double total = service.calcularTotalArrecadadoPorData(data);
-//
-//            assertEquals(100.0, total);
-//        }
-//
-//        @Test
-//        @Tag("TDD")
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("Deve retornar zero quando nao existirem pagamentos")
-//        void deveRetornarZeroQuandoNaoExistemPagamentos() {
-//            LocalDate data = LocalDate.of(2025, 5, 3);
-//            LocalDateTime inicio = data.atStartOfDay();
-//            LocalDateTime fim = data.atTime(23, 59, 59);
-//
-//            when(pagamentoRepository.somarPagamentosPorData(inicio, fim)).thenReturn(null);
-//
-//            double total = service.calcularTotalArrecadadoPorData(data);
-//
-//            assertEquals(0.0, total);
-//        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve retornar o total arrecadado quando existem pagamentos")
+        void deveRetornarTotalArrecadadoQuandoExistemPagamentos() {
+            LocalDate data = LocalDate.of(2025, 5, 3);
+            LocalDateTime inicio = data.atStartOfDay();
+            LocalDateTime fim = data.atTime(23, 59, 59);
+
+            when(pagamentoRepository.somarPagamentosPorData(inicio, fim)).thenReturn(100.0);
+
+            double total = pagamentoService.calcularTotalArrecadadoPorData(data);
+
+            assertEquals(100.0, total);
+        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve retornar zero quando nao existirem pagamentos")
+        void deveRetornarZeroQuandoNaoExistemPagamentos() {
+            LocalDate data = LocalDate.of(2025, 5, 3);
+            LocalDateTime inicio = data.atStartOfDay();
+            LocalDateTime fim = data.atTime(23, 59, 59);
+
+            when(pagamentoRepository.somarPagamentosPorData(inicio, fim)).thenReturn(null);
+
+            double total = pagamentoService.calcularTotalArrecadadoPorData(data);
+
+            assertEquals(0.0, total);
+        }
 
     }
-//
-//    @Nested
-//    @DisplayName("Testando mensagens de erro")
-//    class TestandoMensagensDeErro {
-//
-//        @ParameterizedTest
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @CsvSource(
-//                value = {
-//                        "null, 2025-04-30T17:00:00, 20.0, Hora de entrada não pode ser nula",
-//                        "2025-04-30T15:30:00, null, 20.0, Hora de saída não pode ser nula",
-//                },
-//                nullValues = "null"
-//        )
-//        void mensagensDeErroAoSalvarPagamento(String horaEntrada, String horaSaida, Double valor, String mensagem) {
-//            LocalDateTime entrada = horaEntrada == null ? null : LocalDateTime.parse(horaEntrada);
-//            LocalDateTime saida = horaSaida == null ? null : LocalDateTime.parse(horaSaida);
-//
-//            pagamento.setHoraEntrada(entrada);
-//            pagamento.setHoraSaida(saida);
-//            pagamento.setValor(valor);
-//
-//            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.salvarPagamento(pagamento));
-//            assertEquals(mensagem, exception.getMessage());
-//
-//            verify(pagamentoRepository, never()).save(any());
-//        }
-//
+
+    @Nested
+    @DisplayName("Testando mensagens de erro")
+    class TestandoMensagensDeErro {
+
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve lançar IllegalArgumentException ao tentar salvar um Pagamento nulo")
+        void salvarPagamento_quandoPagamentoEhNulo_lancaExcecao() {
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    pagamentoService.salvarPagamento(null)
+            );
+
+            assertEquals("O objeto de pagamento não pode ser nulo.", exception.getMessage());
+            verify(pagamentoRepository, never()).save(any(Pagamento.class));
+        }
+
 //        @Test
 //        @Tag("UnitTest")
 //        @Tag("Functional")
@@ -367,5 +358,5 @@ class PagamentoServiceTest {
 //            assertEquals(mensagem, exception.getMessage());
 //
 //        }
-//    }
+    }
 }
