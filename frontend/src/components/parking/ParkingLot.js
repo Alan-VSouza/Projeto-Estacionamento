@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify'; 
 import ParkingSpot from './ParkingSpot';
 import ParkingSummary from './ParkingSummary';
 import { fetchSpotsFromAPI, occupySpotInAPI, vacateSpotInAPI, cancelEntryInAPI } from '../../services/api/Api';
@@ -61,10 +62,18 @@ function ParkingLot({ }) {
       );
       
       console.log(`Vaga ${selectedSpotData.id} desocupada. Detalhes:`, apiResponse);
-      alert(`✅ Vaga ${selectedSpotData.id} desocupada com sucesso!`);
+
+      toast.success(`✅ Vaga ${selectedSpotData.id} desocupada com sucesso!`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } catch (err) {
       console.error("Erro ao desocupar vaga:", err);
-      alert(`❌ Erro: ${err.message || "Não foi possível desocupar a vaga."}`);
+
+      toast.error(`❌ Erro: ${err.message || "Não foi possível desocupar a vaga."}`, {
+        position: "top-right",
+        autoClose: 4000,
+      });
     }
   };
 
@@ -82,11 +91,18 @@ function ParkingLot({ }) {
             : s
         )
       );
-      
-      alert(`✅ Entrada da vaga ${selectedSpotData.id} cancelada com sucesso!`);
+
+      toast.success(`✅ Entrada da vaga ${selectedSpotData.id} cancelada com sucesso!`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } catch (err) {
       console.error("Erro ao cancelar entrada:", err);
-      alert(`❌ Erro: ${err.message || "Não foi possível cancelar a entrada."}`);
+
+      toast.error(`❌ Erro: ${err.message || "Não foi possível cancelar a entrada."}`, {
+        position: "top-right",
+        autoClose: 4000,
+      });
     }
   };
 
@@ -102,7 +118,11 @@ function ParkingLot({ }) {
       setSelectedSpotId(null);
     } catch (err) {
       console.error("Erro ao registrar entrada do veículo:", err);
-      alert(`Erro ao registrar entrada: ${err.message || "Falha ao comunicar com o servidor."}`);
+
+      toast.error(`❌ Erro ao registrar entrada: ${err.message || "Falha ao comunicar com o servidor."}`, {
+        position: "top-right",
+        autoClose: 4000,
+      });
     }
   };
 
