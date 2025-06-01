@@ -495,5 +495,17 @@ public class EstacionamentoServiceTest {
             assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
             assertEquals("Todas as vagas estão ocupadas", exception.getReason());
         }
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Deve lançar exceção ao tentar criar estacionamento com DTO nulo")
+        void criarEstacionamento_dtoNulo_lancaExcecao() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    estacionamentoService.criarEstacionamento(null)
+            );
+
+            assertEquals("Dados de criação do estacionamento não podem ser nulos", exception.getMessage());
+        }
     }
 }
