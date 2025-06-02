@@ -18,10 +18,11 @@ class PagamentoTest {
     private LocalDateTime saida;
     private LocalDateTime entrada;
     private RegistroEntrada registroEntrada;
+    private Veiculo veiculo;
 
     @BeforeEach
     void setUp() {
-        Veiculo veiculo = new Veiculo("123456", "carro", "escort", "prata");
+        veiculo = new Veiculo("123456", "carro", "escort", "prata");
         entrada = LocalDateTime.now();
         saida = entrada.plusHours(1);
         registroEntrada = new RegistroEntrada(veiculo, 1);
@@ -105,6 +106,23 @@ class PagamentoTest {
                 });
 
                 assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
+            }
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @DisplayName("Deve registrar saída com sucesso quando a tarifa calculada for zero")
+            void deveRegistrarSaidaComSucessoQuandoTarifaForZero() {
+                Estacionamento estacionamento = new Estacionamento("Nome", "Endereco", 10);
+                LocalDateTime horaSaida = registroEntrada.getHoraEntrada().plusHours(2);
+
+
+                when(calculadoraDeTarifa.calcularValor(any(LocalDateTime.class), any(LocalDateTime.class)))
+                        .thenReturn(0.0);
+
+                assertDoesNotThrow(() -> {
+                    estacionamento.registroSaida(registroEntrada, horaSaida, calculadoraDeTarifa);
+                });
             }
 
         }
@@ -194,6 +212,8 @@ class PagamentoTest {
 
                 assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
             }
+
         }
+
     }
 }
