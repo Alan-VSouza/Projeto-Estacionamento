@@ -508,101 +508,6 @@ class RelatorioServiceTest {
 
         }
 
-        @Test
-        @Tag("UnitTest")
-        @Tag("Mutation")
-        @DisplayName("Deve retornar null quando placa não for encontrada no recibo")
-        void deveRetornarNullQuandoPlacaNaoForEncontradaNoRecibo() {
-            String placaInexistente = "XYZ9999";
-            Pagamento pagamento1 = new Pagamento(
-                    new RegistroEntrada(
-                            new Veiculo("ABC1234", "carro", "carroA", "branco")),
-                    LocalDateTime.of(2025, 5, 3, 9, 0),
-                    LocalDateTime.of(2025, 5, 3, 11, 30),
-                    new CalculadoraTempoPermanencia(
-                            new ValorPermanencia()));
-
-            Pagamento pagamento2 = new Pagamento(
-                    new RegistroEntrada(
-                            new Veiculo("DEF5678", "carro", "carroB", "preto")),
-                    LocalDateTime.of(2025, 5, 3, 10, 0),
-                    LocalDateTime.of(2025, 5, 3, 12, 0),
-                    new CalculadoraTempoPermanencia(
-                            new ValorPermanencia()));
-
-            List<Pagamento> pagamentoList = List.of(pagamento1, pagamento2);
-            when(pagamentoRepository.findAll()).thenReturn(pagamentoList);
-            ReciboDTO recibo = relatorioService.gerarRecibo(placaInexistente);
-
-            assertNull(recibo, "Deve retornar null quando a placa não for encontrada");
-
-            verify(pagamentoRepository).findAll();
-        }
-
-        @Test
-        @Tag("UnitTest")
-        @Tag("Mutation")
-        @DisplayName("Deve filtrar corretamente apenas a placa específica")
-        void deveFiltrarCorretamenteApenasAPlacaEspecifica() {
-            String placaProcurada = "ABC1234";
-
-            Pagamento pagamentoCorreto = new Pagamento(
-                    new RegistroEntrada(
-                            new Veiculo(placaProcurada, "carro", "carroA", "branco")),
-                    LocalDateTime.of(2025, 5, 3, 14, 0),
-                    LocalDateTime.of(2025, 5, 3, 16, 30),
-                    new CalculadoraTempoPermanencia(
-                            new ValorPermanencia()));
-
-            Pagamento pagamentoIncorreto1 = new Pagamento(
-                    new RegistroEntrada(
-                            new Veiculo("XYZ9999", "carro", "carroB", "preto")),
-                    LocalDateTime.of(2025, 5, 3, 10, 0),
-                    LocalDateTime.of(2025, 5, 3, 12, 0),
-                    new CalculadoraTempoPermanencia(
-                            new ValorPermanencia()));
-
-            Pagamento pagamentoIncorreto2 = new Pagamento(
-                    new RegistroEntrada(
-                            new Veiculo("DEF5678", "carro", "carroC", "azul")),
-                    LocalDateTime.of(2025, 5, 3, 8, 0),
-                    LocalDateTime.of(2025, 5, 3, 10, 0),
-                    new CalculadoraTempoPermanencia(
-                            new ValorPermanencia()));
-
-            List<Pagamento> pagamentoList = List.of(
-                    pagamentoIncorreto1,
-                    pagamentoCorreto,
-                    pagamentoIncorreto2
-            );
-            when(pagamentoRepository.findAll()).thenReturn(pagamentoList);
-
-            ReciboDTO recibo = relatorioService.gerarRecibo(placaProcurada);
-
-            assertNotNull(recibo);
-            assertEquals(placaProcurada, recibo.placa());
-            assertEquals(LocalDateTime.of(2025, 5, 3, 14, 0), recibo.entrada());
-            assertEquals(LocalDateTime.of(2025, 5, 3, 16, 30), recibo.saida());
-            assertEquals(pagamentoCorreto.getValor(), recibo.valorTotal());
-
-            verify(pagamentoRepository).findAll();
-        }
-
-        @Test
-        @Tag("UnitTest")
-        @Tag("Mutation")
-        @DisplayName("Deve retornar null quando lista de pagamentos estiver vazia")
-        void deveRetornarNullQuandoListaDePagamentosEstiverVazia() {
-            String qualquerPlaca = "ABC1234";
-
-            when(pagamentoRepository.findAll()).thenReturn(Collections.emptyList());
-
-            ReciboDTO recibo = relatorioService.gerarRecibo(qualquerPlaca);
-
-            assertNull(recibo, "Deve retornar null quando não há pagamentos");
-            verify(pagamentoRepository).findAll();
-        }
-
 
         @Nested
         @DisplayName("Testes para Matar Mutantes Sobreviventes")
@@ -718,6 +623,103 @@ class RelatorioServiceTest {
                 relatorioServiceSpy.gerarRelatorioCSV(dataTeste);
 
             }
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @DisplayName("Deve retornar null quando placa não for encontrada no recibo")
+            void deveRetornarNullQuandoPlacaNaoForEncontradaNoRecibo() {
+                String placaInexistente = "XYZ9999";
+                Pagamento pagamento1 = new Pagamento(
+                        new RegistroEntrada(
+                                new Veiculo("ABC1234", "carro", "carroA", "branco")),
+                        LocalDateTime.of(2025, 5, 3, 9, 0),
+                        LocalDateTime.of(2025, 5, 3, 11, 30),
+                        new CalculadoraTempoPermanencia(
+                                new ValorPermanencia()));
+
+                Pagamento pagamento2 = new Pagamento(
+                        new RegistroEntrada(
+                                new Veiculo("DEF5678", "carro", "carroB", "preto")),
+                        LocalDateTime.of(2025, 5, 3, 10, 0),
+                        LocalDateTime.of(2025, 5, 3, 12, 0),
+                        new CalculadoraTempoPermanencia(
+                                new ValorPermanencia()));
+
+                List<Pagamento> pagamentoList = List.of(pagamento1, pagamento2);
+                when(pagamentoRepository.findAll()).thenReturn(pagamentoList);
+                ReciboDTO recibo = relatorioService.gerarRecibo(placaInexistente);
+
+                assertNull(recibo, "Deve retornar null quando a placa não for encontrada");
+
+                verify(pagamentoRepository).findAll();
+            }
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @DisplayName("Deve filtrar corretamente apenas a placa específica")
+            void deveFiltrarCorretamenteApenasAPlacaEspecifica() {
+                String placaProcurada = "ABC1234";
+
+                Pagamento pagamentoCorreto = new Pagamento(
+                        new RegistroEntrada(
+                                new Veiculo(placaProcurada, "carro", "carroA", "branco")),
+                        LocalDateTime.of(2025, 5, 3, 14, 0),
+                        LocalDateTime.of(2025, 5, 3, 16, 30),
+                        new CalculadoraTempoPermanencia(
+                                new ValorPermanencia()));
+
+                Pagamento pagamentoIncorreto1 = new Pagamento(
+                        new RegistroEntrada(
+                                new Veiculo("XYZ9999", "carro", "carroB", "preto")),
+                        LocalDateTime.of(2025, 5, 3, 10, 0),
+                        LocalDateTime.of(2025, 5, 3, 12, 0),
+                        new CalculadoraTempoPermanencia(
+                                new ValorPermanencia()));
+
+                Pagamento pagamentoIncorreto2 = new Pagamento(
+                        new RegistroEntrada(
+                                new Veiculo("DEF5678", "carro", "carroC", "azul")),
+                        LocalDateTime.of(2025, 5, 3, 8, 0),
+                        LocalDateTime.of(2025, 5, 3, 10, 0),
+                        new CalculadoraTempoPermanencia(
+                                new ValorPermanencia()));
+
+                List<Pagamento> pagamentoList = List.of(
+                        pagamentoIncorreto1,
+                        pagamentoCorreto,
+                        pagamentoIncorreto2
+                );
+                when(pagamentoRepository.findAll()).thenReturn(pagamentoList);
+
+                ReciboDTO recibo = relatorioService.gerarRecibo(placaProcurada);
+
+                assertNotNull(recibo);
+                assertEquals(placaProcurada, recibo.placa());
+                assertEquals(LocalDateTime.of(2025, 5, 3, 14, 0), recibo.entrada());
+                assertEquals(LocalDateTime.of(2025, 5, 3, 16, 30), recibo.saida());
+                assertEquals(pagamentoCorreto.getValor(), recibo.valorTotal());
+
+                verify(pagamentoRepository).findAll();
+            }
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @DisplayName("Deve retornar null quando lista de pagamentos estiver vazia")
+            void deveRetornarNullQuandoListaDePagamentosEstiverVazia() {
+                String qualquerPlaca = "ABC1234";
+
+                when(pagamentoRepository.findAll()).thenReturn(Collections.emptyList());
+
+                ReciboDTO recibo = relatorioService.gerarRecibo(qualquerPlaca);
+
+                assertNull(recibo, "Deve retornar null quando não há pagamentos");
+                verify(pagamentoRepository).findAll();
+            }
         }
+
+
     }
 }
