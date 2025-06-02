@@ -34,6 +34,19 @@ class EstacionamentoTest {
                 assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
             }
 
+            @ParameterizedTest
+            @ValueSource(strings = {"", "  ", "\t"})
+            @DisplayName("Deve lançar exceção quando o endereço for vazio ou em branco")
+            void deveLancarExcecaoQuandoEnderecoForVazioOuEmBranco(String enderecoInvalido) {
+                String mensagemEsperada = "Endereço do estacionamento não pode ser nulo ou vazio";
+
+                IllegalArgumentException excecao = assertThrows(IllegalArgumentException.class, () -> {
+                    new Estacionamento("Nome Válido", enderecoInvalido, 100);
+                });
+
+                assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
+            }
+
 
         }
     }
