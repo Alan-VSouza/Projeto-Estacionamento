@@ -10,6 +10,8 @@ import br.ifsp.demo.repository.PagamentoRepository;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -410,6 +412,7 @@ public class EstacionamentoServiceTest {
             }
         }
     }
+
     @Nested
     @DisplayName("Structural Tests")
     class StructuralTests {
@@ -544,4 +547,52 @@ public class EstacionamentoServiceTest {
             verify(registroEntradaRepository).save(any(RegistroEntrada.class));
         }
     }
+
+    @Nested
+    @DisplayName("Testes estruturais para validações de mensagem de erro")
+    class TestesEstruturaisParaValidacaoDeMensagemDeErro {
+
+        @ParameterizedTest
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @CsvSource(
+                value = {
+                        "NULL_VAL,   EXISTE_ID,            10,         Veiculo não pode ser nulo",
+                        "VALIDO,     NULL_VAL,             10,         ID do estacionamento não pode ser nulo",
+                        "VALIDO,     EXISTE_ID,            NULL_VAL,   Número da vaga não pode ser nulo",
+                        "VALIDO,     EXISTE_ID,            0,          Número da vaga deve ser maior que zero",
+                        "VALIDO,     EXISTE_ID,            -1,         Número da vaga deve ser maior que zero"
+                },
+                nullValues = {"NULL_VAL"}
+        )
+        @DisplayName("Deve lançar IllegalArgumentException para parâmetros inválidos")
+        void registrarEntrada_comParametrosInvalidos_lancaIllegalArgumentException(
+                String veiculoStr,
+                String idEstacionamentoStr,
+                String vagaIdStr,
+                String mensagemEsperada
+        ) {
+            Veiculo veiculoParam = "VALIDO".equals(veiculoStr) ? veiculo : null;
+
+            UUID idEstacionamentoParam = "EXISTE_ID".equals(idEstacionamentoStr) ? UUID.randomUUID() :
+                    (idEstacionamentoStr == null ? null : UUID.fromString(idEstacionamentoStr));
+
+            Integer vagaIdParam = "NULL_VAL".equals(vagaIdStr) ? null :
+                    (vagaIdStr == null ? null : Integer.parseInt(vagaIdStr));
+
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    estacionamentoService.registrarEntrada(veiculoParam, idEstacionamentoParam, vagaIdParam)
+            );
+
+            assertEquals(mensagemEsperada, exception.getMessage());
+
+            verify(estacionamentoRepository, never()).findById(any());
+            verify(registroEntradaRepository, never()).save(any());
+        }
+
+
+    }
+
+
 }
