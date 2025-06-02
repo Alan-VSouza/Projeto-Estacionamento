@@ -24,6 +24,9 @@ public class PagamentoService {
     }
 
     public void deletarPagamento(UUID uuid) {
+        if(uuid == null)
+            throw new IllegalArgumentException("UUID não pode ser nulo");
+
         if (!pagamentoRepository.existsById(uuid)) {
             throw new IllegalArgumentException("Pagamento com UUID " + uuid + " não encontrado.");
         }

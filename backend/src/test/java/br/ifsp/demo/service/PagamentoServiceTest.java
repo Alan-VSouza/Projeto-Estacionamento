@@ -257,17 +257,23 @@ class PagamentoServiceTest {
         }
 
 
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("mensgaem de erro ao tentar excluir pagamento nulo")
-//        void mensagemDeErroAoExcluirPagamentoNulo() {
-//
-//            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, ()-> service.deletarPagamento(null));
-//            assertEquals("Pagamento não pode ser nulo", exception.getMessage());
-//
-//        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("mensgaem de erro ao tentar excluir pagamento nulo")
+        void mensagemDeErroAoExcluirPagamentoNulo() {
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    pagamentoService.deletarPagamento(null)
+            );
+
+            assertEquals("UUID não pode ser nulo", exception.getMessage());
+
+            verify(pagamentoRepository, never()).existsById(any());
+            verify(pagamentoRepository, never()).deleteById(any());
+
+        }
 //
 //        @ParameterizedTest
 //        @Tag("UnitTest")
