@@ -39,16 +39,13 @@ import java.time.format.DateTimeFormatter;
 public class RelatorioService {
 
     private final PagamentoRepository pagamentoRepository;
-    private final VeiculoRepository veiculoRepository;
     private final RegistroEntradaRepository registroEntradaRepository;
     private static final int NUMERO_VAGAS = 200;
 
     @Autowired
     public RelatorioService(PagamentoRepository pagamentoRepository,
-                            VeiculoRepository veiculoRepository,
                             RegistroEntradaRepository registroEntradaRepository) {
         this.pagamentoRepository = pagamentoRepository;
-        this.veiculoRepository = veiculoRepository;
         this.registroEntradaRepository = registroEntradaRepository;
     }
 
