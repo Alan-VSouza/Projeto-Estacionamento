@@ -3,6 +3,7 @@ package br.ifsp.demo.service;
 import br.ifsp.demo.components.CalculadoraTempoPermanencia;
 import br.ifsp.demo.components.ValorPermanencia;
 import br.ifsp.demo.dto.HistoricoDTO;
+import br.ifsp.demo.dto.ReciboDTO;
 import br.ifsp.demo.dto.RelatorioDTO;
 import br.ifsp.demo.model.Pagamento;
 import br.ifsp.demo.model.RegistroEntrada;
@@ -214,116 +215,116 @@ class RelatorioServiceTest {
             @Tag("UnitTest")
             @Tag("Functional")
             @DisplayName("Deve gerar CSV corretamente com dados válidos")
-            void gerarRelatorioCSV_comDadosValidos_retornaStringCSVCorreta () {
-            LocalDate dataTeste = LocalDate.of(2025, 6, 1);
-            RelatorioDTO mockRelatorioDto = new RelatorioDTO(
-                    10,
-                    2.5,
-                    250.75,
-                    0.65
-            );
+            void gerarRelatorioCSV_comDadosValidos_retornaStringCSVCorreta() {
+                LocalDate dataTeste = LocalDate.of(2025, 6, 1);
+                RelatorioDTO mockRelatorioDto = new RelatorioDTO(
+                        10,
+                        2.5,
+                        250.75,
+                        0.65
+                );
 
-            doReturn(mockRelatorioDto).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+                doReturn(mockRelatorioDto).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
 
-            String csvResult = relatorioServiceSpy.gerarRelatorioCSV(dataTeste);
+                String csvResult = relatorioServiceSpy.gerarRelatorioCSV(dataTeste);
 
-            assertNotNull(csvResult);
+                assertNotNull(csvResult);
 
-            String expectedHeader = "Métrica,Valor";
-            String expectedDataLine = "Data," + dataTeste.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            String expectedReceitaLine = "Receita Total,\"R$ " + String.format("%.2f", mockRelatorioDto.receitaTotal()) + "\"";
-            String expectedQuantidadeLine = "Quantidade de Veículos," + mockRelatorioDto.quantidade();
-            String expectedTempoMedioLine = "Tempo Médio (horas),\"" + String.format("%.2f", mockRelatorioDto.tempoMedioHoras()) + "\"";
-            String expectedOcupacaoLine = "Ocupação Média,\"" + String.format("%.2f%%", mockRelatorioDto.ocupacaoMedia() * 100) + "\"";
+                String expectedHeader = "Métrica,Valor";
+                String expectedDataLine = "Data," + dataTeste.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                String expectedReceitaLine = "Receita Total,\"R$ " + String.format("%.2f", mockRelatorioDto.receitaTotal()) + "\"";
+                String expectedQuantidadeLine = "Quantidade de Veículos," + mockRelatorioDto.quantidade();
+                String expectedTempoMedioLine = "Tempo Médio (horas),\"" + String.format("%.2f", mockRelatorioDto.tempoMedioHoras()) + "\"";
+                String expectedOcupacaoLine = "Ocupação Média,\"" + String.format("%.2f%%", mockRelatorioDto.ocupacaoMedia() * 100) + "\"";
 
-            String[] lines = csvResult.split("\n");
-            assertEquals(expectedHeader, lines[0].trim());
-            assertEquals(expectedDataLine, lines[1].trim());
-            assertEquals(expectedReceitaLine, lines[2].trim());
-            assertEquals(expectedQuantidadeLine, lines[3].trim());
-            assertEquals(expectedTempoMedioLine, lines[4].trim());
-            assertEquals(expectedOcupacaoLine, lines[5].trim());
+                String[] lines = csvResult.split("\n");
+                assertEquals(expectedHeader, lines[0].trim());
+                assertEquals(expectedDataLine, lines[1].trim());
+                assertEquals(expectedReceitaLine, lines[2].trim());
+                assertEquals(expectedQuantidadeLine, lines[3].trim());
+                assertEquals(expectedTempoMedioLine, lines[4].trim());
+                assertEquals(expectedOcupacaoLine, lines[5].trim());
 
-            verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
-        }
+                verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+            }
 
             @Test
             @Tag("UnitTest")
             @Tag("Functional")
             @DisplayName("Deve lançar RuntimeException encapsulada quando gerarRelatorioDesempenho falhar")
-            void gerarRelatorioCSV_quandoGerarRelatorioDesempenhoFalha_lancaRuntimeException () {
-            LocalDate dataTeste = LocalDate.of(2025, 6, 1);
-            RuntimeException causaDaFalha = new RuntimeException("Falha simulada ao gerar desempenho");
+            void gerarRelatorioCSV_quandoGerarRelatorioDesempenhoFalha_lancaRuntimeException() {
+                LocalDate dataTeste = LocalDate.of(2025, 6, 1);
+                RuntimeException causaDaFalha = new RuntimeException("Falha simulada ao gerar desempenho");
 
-            doThrow(causaDaFalha).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+                doThrow(causaDaFalha).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
 
-            RuntimeException exceptionLancada = assertThrows(RuntimeException.class, () -> {
-                relatorioServiceSpy.gerarRelatorioCSV(dataTeste);
-            });
+                RuntimeException exceptionLancada = assertThrows(RuntimeException.class, () -> {
+                    relatorioServiceSpy.gerarRelatorioCSV(dataTeste);
+                });
 
-            assertEquals("Erro ao gerar CSV", exceptionLancada.getMessage());
-            assertSame(causaDaFalha, exceptionLancada.getCause());
-            verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
-        }
+                assertEquals("Erro ao gerar CSV", exceptionLancada.getMessage());
+                assertSame(causaDaFalha, exceptionLancada.getCause());
+                verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+            }
         }
 
         @Nested
         @DisplayName("PDF Testes")
-        class PDFTestes{
+        class PDFTestes {
             @Test
             @Tag("UnitTest")
             @Tag("Functional")
             @DisplayName("Deve gerar array de bytes do PDF corretamente com dados válidos")
-            void gerarRelatorioPDF_comDadosValidos_retornaByteArrayNaoVazio () {
-            LocalDate dataTeste = LocalDate.of(2025, 7, 15);
-            RelatorioDTO mockRelatorioDto = new RelatorioDTO(
-                    15,
-                    3.1,
-                    350.50,
-                    0.75
-            );
+            void gerarRelatorioPDF_comDadosValidos_retornaByteArrayNaoVazio() {
+                LocalDate dataTeste = LocalDate.of(2025, 7, 15);
+                RelatorioDTO mockRelatorioDto = new RelatorioDTO(
+                        15,
+                        3.1,
+                        350.50,
+                        0.75
+                );
 
-            doReturn(mockRelatorioDto).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+                doReturn(mockRelatorioDto).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
 
-            byte[] pdfBytes = relatorioServiceSpy.gerarRelatorioPDF(dataTeste);
+                byte[] pdfBytes = relatorioServiceSpy.gerarRelatorioPDF(dataTeste);
 
-            assertNotNull(pdfBytes, "O array de bytes do PDF não deveria ser nulo.");
-            assertTrue(pdfBytes.length > 0, "O array de bytes do PDF não deveria estar vazio.");
+                assertNotNull(pdfBytes, "O array de bytes do PDF não deveria ser nulo.");
+                assertTrue(pdfBytes.length > 0, "O array de bytes do PDF não deveria estar vazio.");
 
-            if (pdfBytes.length > 4) {
-                String pdfHeader = new String(pdfBytes, 0, 4);
-                assertEquals("%PDF", pdfHeader, "O output não parece ser um ficheiro PDF válido (cabeçalho incorreto).");
+                if (pdfBytes.length > 4) {
+                    String pdfHeader = new String(pdfBytes, 0, 4);
+                    assertEquals("%PDF", pdfHeader, "O output não parece ser um ficheiro PDF válido (cabeçalho incorreto).");
+                }
+
+                verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
             }
-
-            verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
-        }
 
             @Test
             @Tag("UnitTest")
             @Tag("Functional")
             @DisplayName("Deve lançar RuntimeException encapsulada quando gerarRelatorioDesempenho falhar ao gerar PDF")
-            void gerarRelatorioPDF_quandoGerarRelatorioDesempenhoFalha_lancaRuntimeException () {
-            LocalDate dataTeste = LocalDate.of(2025, 7, 15);
-            RuntimeException causaDaFalha = new RuntimeException("Falha simulada ao obter dados para PDF");
+            void gerarRelatorioPDF_quandoGerarRelatorioDesempenhoFalha_lancaRuntimeException() {
+                LocalDate dataTeste = LocalDate.of(2025, 7, 15);
+                RuntimeException causaDaFalha = new RuntimeException("Falha simulada ao obter dados para PDF");
 
-            doThrow(causaDaFalha).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+                doThrow(causaDaFalha).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
 
-            RuntimeException exceptionLancada = assertThrows(RuntimeException.class, () -> {
-                relatorioServiceSpy.gerarRelatorioPDF(dataTeste);
-            });
+                RuntimeException exceptionLancada = assertThrows(RuntimeException.class, () -> {
+                    relatorioServiceSpy.gerarRelatorioPDF(dataTeste);
+                });
 
-            assertEquals("Erro ao gerar PDF", exceptionLancada.getMessage());
-            assertSame(causaDaFalha, exceptionLancada.getCause(), "A causa da exceção não é a esperada.");
-            verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
-        }
+                assertEquals("Erro ao gerar PDF", exceptionLancada.getMessage());
+                assertSame(causaDaFalha, exceptionLancada.getCause(), "A causa da exceção não é a esperada.");
+                verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+            }
 
             @Test
             @Tag("UnitTest")
             @Tag("Functional")
             @DisplayName("Deve lançar RuntimeException se ocorrer erro na biblioteca iText ao gerar PDF (Placeholder)")
-            void gerarRelatorioPDF_quandoITextFalha_lancaRuntimeException () {
+            void gerarRelatorioPDF_quandoITextFalha_lancaRuntimeException() {
 
-            assertTrue(true, "Teste para falha específica do iText requereria refatoração ou mocks mais complexos e não está implementado.");
+                assertTrue(true, "Teste para falha específica do iText requereria refatoração ou mocks mais complexos e não está implementado.");
             }
         }
 
@@ -360,7 +361,7 @@ class RelatorioServiceTest {
             @Tag("Structural")
             @Tag("UnitTest")
             @DisplayName("Deve calcular relatório mensal corretamente para mês com atividade em múltiplos dias")
-            void gerarRelatorioMensal_comAtividadeEmMultiplosDias () {
+            void gerarRelatorioMensal_comAtividadeEmMultiplosDias() {
                 int ano = 2025;
                 int mes = 1;
                 LocalDate dia1 = LocalDate.of(ano, mes, 1);
@@ -411,7 +412,7 @@ class RelatorioServiceTest {
             @Tag("Structural")
             @Tag("UnitTest")
             @DisplayName("Deve calcular relatório mensal com zero veículos e zero receita")
-            void gerarRelatorioMensal_semAtividade_retornaValoresZerados () {
+            void gerarRelatorioMensal_semAtividade_retornaValoresZerados() {
                 int ano = 2025;
                 int mes = 2;
                 RelatorioDTO relatorioDiaZero = new RelatorioDTO(0, 0.0, 0.0, 0.0);
@@ -503,8 +504,101 @@ class RelatorioServiceTest {
 
         }
 
+        @Test
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Deve retornar null quando placa não for encontrada no recibo")
+        void deveRetornarNullQuandoPlacaNaoForEncontradaNoRecibo() {
+            String placaInexistente = "XYZ9999";
+            Pagamento pagamento1 = new Pagamento(
+                    new RegistroEntrada(
+                            new Veiculo("ABC1234", "carro", "carroA", "branco")),
+                    LocalDateTime.of(2025, 5, 3, 9, 0),
+                    LocalDateTime.of(2025, 5, 3, 11, 30),
+                    new CalculadoraTempoPermanencia(
+                            new ValorPermanencia()));
+
+            Pagamento pagamento2 = new Pagamento(
+                    new RegistroEntrada(
+                            new Veiculo("DEF5678", "carro", "carroB", "preto")),
+                    LocalDateTime.of(2025, 5, 3, 10, 0),
+                    LocalDateTime.of(2025, 5, 3, 12, 0),
+                    new CalculadoraTempoPermanencia(
+                            new ValorPermanencia()));
+
+            List<Pagamento> pagamentoList = List.of(pagamento1, pagamento2);
+            when(pagamentoRepository.findAll()).thenReturn(pagamentoList);
+            ReciboDTO recibo = relatorioService.gerarRecibo(placaInexistente);
+
+            assertNull(recibo, "Deve retornar null quando a placa não for encontrada");
+
+            verify(pagamentoRepository).findAll();
+        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Deve filtrar corretamente apenas a placa específica")
+        void deveFiltrarCorretamenteApenasAPlacaEspecifica() {
+            String placaProcurada = "ABC1234";
+
+            Pagamento pagamentoCorreto = new Pagamento(
+                    new RegistroEntrada(
+                            new Veiculo(placaProcurada, "carro", "carroA", "branco")),
+                    LocalDateTime.of(2025, 5, 3, 14, 0),
+                    LocalDateTime.of(2025, 5, 3, 16, 30),
+                    new CalculadoraTempoPermanencia(
+                            new ValorPermanencia()));
+
+            Pagamento pagamentoIncorreto1 = new Pagamento(
+                    new RegistroEntrada(
+                            new Veiculo("XYZ9999", "carro", "carroB", "preto")),
+                    LocalDateTime.of(2025, 5, 3, 10, 0),
+                    LocalDateTime.of(2025, 5, 3, 12, 0),
+                    new CalculadoraTempoPermanencia(
+                            new ValorPermanencia()));
+
+            Pagamento pagamentoIncorreto2 = new Pagamento(
+                    new RegistroEntrada(
+                            new Veiculo("DEF5678", "carro", "carroC", "azul")),
+                    LocalDateTime.of(2025, 5, 3, 8, 0),
+                    LocalDateTime.of(2025, 5, 3, 10, 0),
+                    new CalculadoraTempoPermanencia(
+                            new ValorPermanencia()));
+
+            List<Pagamento> pagamentoList = List.of(
+                    pagamentoIncorreto1,
+                    pagamentoCorreto,
+                    pagamentoIncorreto2
+            );
+            when(pagamentoRepository.findAll()).thenReturn(pagamentoList);
+
+            ReciboDTO recibo = relatorioService.gerarRecibo(placaProcurada);
+
+            assertNotNull(recibo);
+            assertEquals(placaProcurada, recibo.placa());
+            assertEquals(LocalDateTime.of(2025, 5, 3, 14, 0), recibo.entrada());
+            assertEquals(LocalDateTime.of(2025, 5, 3, 16, 30), recibo.saida());
+            assertEquals(pagamentoCorreto.getValor(), recibo.valorTotal());
+
+            verify(pagamentoRepository).findAll();
+        }
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Deve retornar null quando lista de pagamentos estiver vazia")
+        void deveRetornarNullQuandoListaDePagamentosEstiverVazia() {
+            String qualquerPlaca = "ABC1234";
+
+            when(pagamentoRepository.findAll()).thenReturn(Collections.emptyList());
+
+            ReciboDTO recibo = relatorioService.gerarRecibo(qualquerPlaca);
+
+            assertNull(recibo, "Deve retornar null quando não há pagamentos");
+            verify(pagamentoRepository).findAll();
+        }
     }
-
-
-
 }
