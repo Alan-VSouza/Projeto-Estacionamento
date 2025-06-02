@@ -222,6 +222,10 @@
                         <param>br.ifsp.demo.exception.*Test</param>
                         <param>br.ifsp.demo.security.*Test</param>
                         <param>br.edu.ifsp.testing.practice.*</param>
+                        <param>br.edu.ifsp.testing.practice.*</param>
+                        <param>**/*TriangleUtils*</param>
+                        <param>**/*IntegrationTest</param>
+                        <param>**/*IT</param>
                     </excludedTestClasses>
 
                     <verbose>true</verbose>
