@@ -621,7 +621,29 @@ public class EstacionamentoServiceTest {
 
         }
 
+        @ParameterizedTest
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @CsvSource(
+                value = {
+                        "NULL_VAL,        Placa não pode ser nula ou vazia",
+                        "''      ,         Placa não pode ser nula ou vazia",
+                },
+                nullValues = {"NULL_VAL"}
+        )
+        @DisplayName("Deve lançar IllegalArgument para parametros inválidos ao registrar saida")
+        void deveLancarIllegalArgumentParaParametrosInvalidosAoRegistrarSaida(
+                String placa,
+                String mensagem
+        ) {
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    estacionamentoService.registrarSaida(placa));
+
+            assertEquals(mensagem, exception.getMessage());
+        }
     }
+
 
 
 }
