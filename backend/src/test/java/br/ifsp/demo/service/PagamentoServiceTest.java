@@ -274,25 +274,37 @@ class PagamentoServiceTest {
             verify(pagamentoRepository, never()).deleteById(any());
 
         }
-//
-//        @ParameterizedTest
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @CsvSource(
-//                value ={
-//                "null, Uuid não pode ser nulo",
-//                "123e4567-e89b-12d3-a456-426614174000, Esse pagamento não existe"
-//            },
-//                nullValues = "null"
-//        )
-//        @DisplayName("mensagem de erro se if for nulo ou inexistente")
-//        void mensagemDeErroAoBuscarPagamentoPorUuidNulo(String uuid, String mensagem) {
-//
-//            UUID uuidPagamento = uuid == null ? null : UUID.fromString(uuid);
-//
-//            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.buscarPorId(uuidPagamento));
-//            assertEquals(mensagem, exception.getMessage());
-//
-//        }
+
+        @ParameterizedTest
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @CsvSource(
+                value = {
+                        "null, UUID não pode ser nulo",
+                        "123e4567-e89b-12d3-a456-426614174000, Pagamento com UUID 123e4567-e89b-12d3-a456-426614174000 não encontrado."
+                },
+                nullValues = "null"
+        )
+        @DisplayName("Deve lançar exceções corretas ao buscar pagamento por UUID nulo ou inexistente")
+        void buscarPorId_comUuidNuloOuInexistente_lancaIllegalArgumentExceptionComMensagemCorreta(String uuidStr, String mensagemEsperada) {
+
+            UUID uuidParaTeste = (uuidStr == null) ? null : UUID.fromString(uuidStr);
+
+            if (uuidParaTeste != null) {
+                when(pagamentoRepository.findById(uuidParaTeste)).thenReturn(Optional.empty());
+            }
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    pagamentoService.buscarPorId(uuidParaTeste)
+            );
+
+            assertEquals(mensagemEsperada, exception.getMessage());
+
+            if (uuidParaTeste != null) {
+                verify(pagamentoRepository, times(1)).findById(uuidParaTeste);
+            } else {
+                verify(pagamentoRepository, never()).findById(any());
+            }
+        }
     }
 }
