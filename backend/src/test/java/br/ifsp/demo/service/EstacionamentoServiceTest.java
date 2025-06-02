@@ -641,8 +641,12 @@ public class EstacionamentoServiceTest {
                     estacionamentoService.registrarSaida(placa));
 
             assertEquals(mensagem, exception.getMessage());
+            verify(estacionamentoRepository, never()).save(any());
+            verify(estacionamentoRepository, never()).delete(any());
         }
     }
+
+
 
 
 
