@@ -1,7 +1,16 @@
+.auth-page-wrapper {
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
 .login-container,
 .register-admin-container {
   max-width: 450px;
-  margin: 0 auto;
+  width: 100%;
   padding: 40px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
@@ -9,6 +18,7 @@
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.3);
   animation: authPageEnter 0.6s ease-out;
+  margin: 0;
 }
 
 .login-container h2,
@@ -41,6 +51,7 @@
   display: flex;
   flex-direction: column;
   gap: 25px;
+  align-items: stretch;
 }
 
 .login-container form > div,
@@ -49,6 +60,7 @@
   flex-direction: column;
   gap: 8px;
   animation: fieldSlideIn 0.5s ease-out;
+  width: 100%;
 }
 
 .login-container label,
@@ -57,10 +69,12 @@
   color: #4a5568; 
   font-size: 0.95em;
   margin-bottom: 5px;
+  text-align: left; 
 }
 
 .login-container input,
 .register-admin-container input {
+  width: 100%; 
   padding: 15px 18px;
   border: 2px solid #e2e8f0;
   border-radius: 12px;
@@ -68,6 +82,7 @@
   transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
+  box-sizing: border-box; 
 }
 
 .login-container input:focus,
@@ -93,6 +108,8 @@
   text-align: center;
   margin: 10px 0;
   animation: messageSlideIn 0.3s ease-out;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .login-container p[style*="red"],
@@ -111,8 +128,33 @@
   box-shadow: 0 4px 12px rgba(47, 133, 90, 0.15);
 }
 
+.error-message {
+  color: #c53030;
+  font-size: 0.9em;
+  margin-top: 5px;
+  padding: 8px;
+  background: #fed7d7;
+  border-radius: 5px;
+  border-left: 4px solid #f56565;
+  text-align: left; 
+}
+
+.input-error {
+  border: 2px solid #f56565 !important;
+  background-color: #fed7d7;
+}
+
+.login-container small,
+.register-admin-container small {
+  color: #666;
+  font-size: 0.8em;
+  text-align: left;
+  margin-top: 3px;
+}
+
 .login-container button,
 .register-admin-container button {
+  width: 100%; 
   padding: 16px 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -124,6 +166,7 @@
   transition: all 0.3s ease;
   box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
   margin-top: 10px;
+  box-sizing: border-box;
 }
 
 .login-container button:hover,
@@ -178,3 +221,70 @@
 .register-admin-container form > div:nth-child(4) { animation-delay: 0.4s; }
 .register-admin-container form > div:nth-child(5) { animation-delay: 0.5s; }
 .register-admin-container form > div:nth-child(6) { animation-delay: 0.6s; }
+
+@media (max-width: 768px) {
+  .auth-page-wrapper {
+    padding: 15px;
+  }
+  
+  .login-container,
+  .register-admin-container {
+    max-width: 100%;
+    padding: 30px 25px;
+  }
+  
+  .login-container h2,
+  .register-admin-container h2 {
+    font-size: 1.8em;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container,
+  .register-admin-container {
+    padding: 25px 20px;
+  }
+  
+  .login-container h2,
+  .register-admin-container h2 {
+    font-size: 1.6em;
+  }
+}
+
+@keyframes authPageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fieldSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes buttonSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
