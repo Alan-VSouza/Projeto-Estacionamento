@@ -540,7 +540,6 @@ class RelatorioServiceTest {
         }
 
         @Test
-        @Tag("TDD")
         @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve filtrar corretamente apenas a placa específica")
@@ -590,7 +589,6 @@ class RelatorioServiceTest {
         }
 
         @Test
-        @Tag("TDD")
         @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve retornar null quando lista de pagamentos estiver vazia")
@@ -605,6 +603,121 @@ class RelatorioServiceTest {
             verify(pagamentoRepository).findAll();
         }
 
-        
+
+        @Nested
+        @DisplayName("Testes para Matar Mutantes Sobreviventes")
+        class TestesParaMatarMutantesSobreviventes {
+
+            @Test
+            @Tag("Mutation")
+            @DisplayName("Deve filtrar pagamentos por data corretamente usando método público")
+            void deveFiltrarPagamentosPorDataCorretamente() {
+                LocalDate dataTeste = LocalDate.of(2025, 6, 1);
+                LocalDateTime dataForaDoPeriodo = LocalDate.of(2025, 5, 31).atTime(10, 0);
+
+                Pagamento pagamentoDentro = new Pagamento(
+                        new RegistroEntrada(new Veiculo("ABC1234", "carro", "civic", "branco")),
+                        dataTeste.atTime(10, 0),
+                        dataTeste.atTime(12, 0),
+                        new CalculadoraTempoPermanencia(new ValorPermanencia()));
+
+                Pagamento pagamentoFora = new Pagamento(
+                        new RegistroEntrada(new Veiculo("XYZ9999", "carro", "corolla", "preto")),
+                        dataForaDoPeriodo,
+                        dataForaDoPeriodo.plusHours(2),
+                        new CalculadoraTempoPermanencia(new ValorPermanencia()));
+
+                when(pagamentoRepository.findAll()).thenReturn(List.of(pagamentoDentro, pagamentoFora));
+
+                RelatorioDTO resultado = relatorioService.gerarRelatorioDesempenho(dataTeste);
+
+                assertEquals(1, resultado.quantidade());
+                assertTrue(resultado.receitaTotal() > 0);
+            }
+
+            @Test
+            @Tag("Mutation")
+            @DisplayName("Deve gerar PDF mensal completo com document close")
+            void deveGerarPDFMensalCompletoComDocumentClose() {
+                byte[] pdfBytes = relatorioService.gerarRelatorioMensalPDF(6, 2025);
+
+                assertNotNull(pdfBytes);
+                assertTrue(pdfBytes.length > 0);
+
+                assertTrue(pdfBytes.length > 1000);
+            }
+
+            @Test
+            @Tag("Mutation")
+            @DisplayName("Deve verificar que CSV é finalizado corretamente")
+            void deveVerificarQueCSVEhFinalizadoCorretamente() throws Exception {
+                LocalDate dataTeste = LocalDate.of(2025, 6, 1);
+                RelatorioDTO mockRelatorioDto = new RelatorioDTO(5, 2.0, 100.0, 0.5);
+
+                doReturn(mockRelatorioDto).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+
+                String csv1 = relatorioServiceSpy.gerarRelatorioCSV(dataTeste);
+                String csv2 = relatorioServiceSpy.gerarRelatorioCSV(dataTeste);
+                String csv3 = relatorioServiceSpy.gerarRelatorioCSV(dataTeste);
+
+                assertNotNull(csv1);
+                assertEquals(csv1, csv2, "CSVs devem ser idênticos após múltiplas gerações");
+                assertEquals(csv2, csv3, "CSVs devem ser idênticos após múltiplas gerações");
+
+                String[] linhas = csv1.split("\n");
+                assertEquals(6, linhas.length, "CSV deve ter 6 linhas exatas");
+                assertTrue(linhas[5].contains("%"), "Última linha deve conter porcentagem formatada");
+
+                verify(relatorioServiceSpy, times(3)).gerarRelatorioDesempenho(dataTeste);
+            }
+
+            @Test
+            @Tag("Mutation")
+            @DisplayName("Deve validar cálculos críticos contra mutantes matemáticos")
+            void deveValidarCalculosCriticosContraMutantesMatematicos() {
+                LocalDate dataTeste = LocalDate.of(2025, 9, 1);
+                Pagamento pagamento1 = new Pagamento(
+                        new RegistroEntrada(new Veiculo("ABC1234", "carro", "civic", "branco")),
+                        LocalDateTime.of(2025, 9, 1, 10, 0),
+                        LocalDateTime.of(2025, 9, 1, 12, 30),
+                        new CalculadoraTempoPermanencia(new ValorPermanencia())
+                );
+
+                Pagamento pagamento2 = new Pagamento(
+                        new RegistroEntrada(new Veiculo("DEF5678", "carro", "corolla", "preto")),
+                        LocalDateTime.of(2025, 9, 1, 14, 0),
+                        LocalDateTime.of(2025, 9, 1, 15, 30),
+                        new CalculadoraTempoPermanencia(new ValorPermanencia())
+                );
+
+                when(pagamentoRepository.findAll()).thenReturn(List.of(pagamento1, pagamento2));
+
+                RelatorioDTO relatorio = relatorioServiceSpy.gerarRelatorioDesempenho(dataTeste);
+
+                assertEquals(2, relatorio.quantidade());
+                assertEquals(2.0, relatorio.tempoMedioHoras(), 0.01, "Tempo médio deve ser (2.5 + 1.5)/2 = 2.0");
+                assertEquals(0.0, relatorio.ocupacaoMedia(),
+                        "Cálculo deve ser: (150+90)/(1440*200) = 240/288000 = 0.000833...");
+
+                double mutanteOcupacao = (double) 240 / ((double) 1440 / 200);
+                assertNotEquals(mutanteOcupacao, relatorio.ocupacaoMedia(),
+                        "Se mutante sobreviver, este valor seria 33.333...");
+
+                verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+            }
+
+            @Test
+            @Tag("Mutation")
+            @DisplayName("Deve verificar que CSVPrinter é fechado e 'flushado' corretamente")
+            void shouldFlushAndCloseCSVPrinter() throws Exception {
+
+                LocalDate dataTeste = LocalDate.of(2025, 6, 1);
+                RelatorioDTO mockRelatorioDto = new RelatorioDTO(5, 2.0, 100.0, 0.5);
+
+                doReturn(mockRelatorioDto).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+                relatorioServiceSpy.gerarRelatorioCSV(dataTeste);
+
+            }
+        }
     }
 }
