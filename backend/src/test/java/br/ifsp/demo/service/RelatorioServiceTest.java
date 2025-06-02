@@ -977,5 +977,61 @@ class RelatorioServiceTest {
             assertEquals(esperadoMeio, resultadoMeio, 0.001, "Resultado real deve ser igual ao esperado");
             assertNotEquals(0.0, resultadoMeio, "Mutante 5 não pode sobreviver com ocupação alta");
         }
+
+        @Test
+        @Tag("Mutation")
+        @DisplayName("Deve matar mutantes de soma e filtro em calcularMinutosOcupados")
+        void deveMatarMutantesCalcularMinutosOcupados() throws Exception {
+            Method method = RelatorioService.class.getDeclaredMethod(
+                    "calcularMinutosOcupados",
+                    List.class, LocalDateTime.class, LocalDateTime.class
+            );
+            method.setAccessible(true);
+
+            LocalDate data = LocalDate.of(2025, 6, 1);
+            LocalDateTime inicioDoDia = data.atStartOfDay();
+            LocalDateTime fimDoDia = data.atTime(23, 59, 59);
+
+            Pagamento p1 = new Pagamento(
+                    new RegistroEntrada(new Veiculo("A", "carro", "modelo", "cor")),
+                    inicioDoDia.plusHours(1),
+                    inicioDoDia.plusHours(3),
+                    new CalculadoraTempoPermanencia(new ValorPermanencia())
+            );
+
+            Pagamento p2 = new Pagamento(
+                    new RegistroEntrada(new Veiculo("B", "carro", "modelo", "cor")),
+                    inicioDoDia.minusHours(2),
+                    inicioDoDia.plusHours(2),
+                    new CalculadoraTempoPermanencia(new ValorPermanencia())
+            );
+
+            Pagamento p3 = new Pagamento(
+                    new RegistroEntrada(new Veiculo("C", "carro", "modelo", "cor")),
+                    fimDoDia.minusHours(1),
+                    fimDoDia.plusHours(2),
+                    new CalculadoraTempoPermanencia(new ValorPermanencia())
+            );
+
+            Pagamento pInvalido = mock(Pagamento.class, withSettings().lenient());
+            lenient().when(pInvalido.getHoraEntrada()).thenReturn(null);
+            lenient().when(pInvalido.getHoraSaida()).thenReturn(fimDoDia);
+
+            List<Pagamento> pagamentos = List.of(p1, p2, p3, pInvalido);
+
+            double resultado = (double) method.invoke(relatorioService, pagamentos, inicioDoDia, fimDoDia);
+
+            assertEquals(300.0, resultado, 0.001, "Deve somar apenas pagamentos válidos");
+
+            assertNotEquals(0.0, resultado, "Não pode retornar zero com pagamentos válidos");
+
+            List<Pagamento> apenasInvalido = List.of(pInvalido);
+            double resultadoInvalido = (double) method.invoke(relatorioService, apenasInvalido, inicioDoDia, fimDoDia);
+            assertEquals(0.0, resultadoInvalido, 0.001, "Pagamentos inválidos devem ser ignorados");
+
+            List<Pagamento> todosValidosEInvalidos = List.of(p1, p2, p3, pInvalido);
+            double resultadoComInvalidos = (double) method.invoke(relatorioService, todosValidosEInvalidos, inicioDoDia, fimDoDia);
+            assertEquals(300.0, resultadoComInvalidos, 0.001, "Pagamentos inválidos não devem ser somados");
+        }
     }
 }
