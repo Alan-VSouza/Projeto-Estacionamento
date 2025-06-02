@@ -18,7 +18,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -696,6 +701,23 @@ public class EstacionamentoServiceTest {
     @Nested
     @DisplayName("Testes de Mutante")
     class TestesDeMutante {
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Retorna Not found quando nao encontra estacionamento")
+        void retornaNotFoundQuandoNaoEncontraEstacionamento() {
+
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->{
+                estacionamentoService.registrarEntrada(veiculo, UUID.randomUUID(), 10);
+            });
+
+            assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+            assertThat(exception.getMessage()).isEqualTo("404 NOT_FOUND \"Estacionamento não encontrado\"");
+
+        }
+
+
 
 
 
