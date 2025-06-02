@@ -2,6 +2,8 @@ package br.ifsp.demo.model;
 
 import br.ifsp.demo.service.CalculadoraDeTarifa;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -178,7 +180,7 @@ class PagamentoTest {
             void deveLancarUmaExcecaoQuandoORHoraDeSaidaForNulo() {
 
                 IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                    Pagamento pagamento = new Pagamento(registroEntrada, null,saida, calculadoraDeTarifa);
+                    Pagamento pagamento = new Pagamento(registroEntrada, null, saida, calculadoraDeTarifa);
                 });
 
                 assertThat(exception.getMessage()).isEqualTo("Hora de entrada não pode ser nula");
@@ -191,7 +193,7 @@ class PagamentoTest {
             void deveLancarUmaExcecaoQuandoORHoraDeEntradaForNulo() {
 
                 IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                    Pagamento pagamento = new Pagamento(registroEntrada, entrada,null, calculadoraDeTarifa);
+                    Pagamento pagamento = new Pagamento(registroEntrada, entrada, null, calculadoraDeTarifa);
                 });
 
                 assertThat(exception.getMessage()).isEqualTo("Hora de saída não pode ser nula");
@@ -239,8 +241,23 @@ class PagamentoTest {
                 assertThat(excecao.getMessage()).isEqualTo("Valor da tarifa não pode ser negativo");
             }
 
+            @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @DisplayName("Deve criar Pagamento com valor zero sem lançar exceção")
+            void deveCriarPagamentoComValorZeroSemLancarExcecao() {
+                when(calculadoraDeTarifa.calcularValor(any(LocalDateTime.class), any(LocalDateTime.class)))
+                        .thenReturn(0.0);
 
+                Pagamento pagamento = assertDoesNotThrow(() ->
+                        new Pagamento(registroEntrada, entrada, saida, calculadoraDeTarifa)
+                );
+
+                assertNotNull(pagamento);
+                assertEquals(0.0, pagamento.getValor());
+            }
         }
 
     }
+
 }
