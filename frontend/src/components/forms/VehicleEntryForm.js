@@ -133,9 +133,46 @@ function VehicleEntryForm({ spotId, onSubmit, onCancel }) {
   const [errors, setErrors] = useState({});
 
   const capitalizeFirstLetter = (string) => {
-  if (!string) return '';
-  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-};
+    if (!string) return '';
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+
+  const validarPlaca = (placa) => {
+  const placaLimpa = placa.trim();
+  
+  if (!placaLimpa) {
+    return "Placa é obrigatória";
+  }
+
+  if (/[^a-zA-Z0-9]/.test(placaLimpa)) {
+    return "❌ Placa não pode conter caracteres especiais (@#!$%-). Use apenas letras e números.";
+  }
+
+  if (placaLimpa.length !== 7) {
+    return "❌ Placa deve ter exatamente 7 caracteres (ABC1234).";
+  }
+
+  if (/[a-z]/.test(placaLimpa)) {
+    return "❌ Todas as letras da placa devem ser maiúsculas.";
+  }
+
+  const formatoAntigo = /^[A-Z]{3}[0-9]{4}$/; 
+  const formatoMercosulCarro = /^[A-Z]{3}[0-9]{1}[A-Z]{1}[0-9]{2}$/; 
+  const formatoMercosulMoto = /^[A-Z]{3}[0-9]{2}[A-Z]{1}[0-9]{1}$/; 
+  
+  if (!formatoAntigo.test(placaLimpa) && 
+      !formatoMercosulCarro.test(placaLimpa) && 
+      !formatoMercosulMoto.test(placaLimpa)) {
+    return "❌ Formato de placa inválido. Use: ABC1234 (antigo) ou ABC1A23 (Mercosul).";
+  }
+  
+    return null; 
+  };
+
+  const formatarPlaca = (placa) => {
+    if (!placa) return '';
+    return placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  };
 
   const validarModelo = (modelo) => {
     const modeloLimpo = modelo.trim();
@@ -188,10 +225,16 @@ function VehicleEntryForm({ spotId, onSubmit, onCancel }) {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    if (name === 'modelo') {
+    if (name === 'placa') {
+      const placaFormatada = formatarPlaca(value);
+      setFormData(prev => ({ ...prev, [name]: placaFormatada }));
+
+      const erroPlaca = validarPlaca(placaFormatada);
+      setErrors(prev => ({ ...prev, placa: erroPlaca }));
+      
+    } else if (name === 'modelo') {
       const modeloFormatado = capitalizeFirstLetter(value);
       setFormData(prev => ({ ...prev, [name]: modeloFormatado }));
-
       const erroModelo = validarModelo(value);
       setErrors(prev => ({ ...prev, modelo: erroModelo }));
       
@@ -207,6 +250,13 @@ function VehicleEntryForm({ spotId, onSubmit, onCancel }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    const erroPlaca = validarPlaca(formData.placa);
+    if (erroPlaca) {
+      setErrors(prev => ({ ...prev, placa: erroPlaca }));
+      toast.error(erroPlaca);
+      return;
+    }
 
     const erroModelo = validarModelo(formData.modelo);
     if (erroModelo) {
@@ -219,11 +269,6 @@ function VehicleEntryForm({ spotId, onSubmit, onCancel }) {
     if (erroCor) {
       setErrors(prev => ({ ...prev, cor: erroCor }));
       toast.error(erroCor);
-      return;
-    }
-    
-    if (!formData.placa.trim()) {
-      toast.error('❌ Placa é obrigatória');
       return;
     }
     
@@ -243,11 +288,21 @@ function VehicleEntryForm({ spotId, onSubmit, onCancel }) {
               name="placa"
               value={formData.placa}
               onChange={handleInputChange}
-              placeholder="ABC-1234"
+              placeholder="ABC1234"
               maxLength="7"
-              style={inputStyles}
+              style={errors.placa ? inputErrorStyles : inputStyles}
               required
             />
+            {errors.placa && (
+              <div style={errorMessageStyles}>
+                {errors.placa}
+              </div>
+            )}
+            <small style={inputHintStyles}>
+              ✅ Letras serão automaticamente maiúsculas<br/>
+              ✅ Formatos aceitos: ABC1234 (antigo) ou ABC1A23 (Mercosul)<br/>
+              ❌ Não use símbolos: @#!$%-, etc.
+            </small>
           </div>
 
           <div style={formGroupStyles}>
