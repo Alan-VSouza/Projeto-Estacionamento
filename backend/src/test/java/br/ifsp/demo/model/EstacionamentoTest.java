@@ -3,11 +3,15 @@ package br.ifsp.demo.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 import br.ifsp.demo.exception.EstacionamentoLotadoException;
+import br.ifsp.demo.service.CalculadoraDeTarifa;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.time.LocalDateTime;
 
 class EstacionamentoTest {
 
@@ -118,6 +122,28 @@ class EstacionamentoTest {
 
                 EstacionamentoLotadoException excecao = assertThrows(EstacionamentoLotadoException.class, () -> {
                     estacionamento.registrarEntrada(veiculo, ocupacaoAtual);
+                });
+
+                assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
+            }
+        }
+
+        @Nested
+        @DisplayName("Testes do Método registroSaida")
+        class TestesDoMetodoRegistroSaida {
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @DisplayName("Deve lançar exceção quando o RegistroEntrada for nulo")
+            void deveLancarExcecaoQuandoRegistroEntradaForNulo() {
+
+                String mensagemEsperada = "Registro de entrada não pode ser nulo";
+
+                CalculadoraDeTarifa calculadoraMock = mock(CalculadoraDeTarifa.class);
+
+                IllegalArgumentException excecao = assertThrows(IllegalArgumentException.class, () -> {
+                    estacionamento.registroSaida(null, LocalDateTime.now(), calculadoraMock);
                 });
 
                 assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
