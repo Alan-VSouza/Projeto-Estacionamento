@@ -65,4 +65,31 @@ class CorValidValidatorTest {
 
         verifyNoInteractions(context);
     }
+
+    @Test
+    @DisplayName("Deve aceitar cores com espaços nas bordas")
+    void deveAceitarCoresComEspacos() {
+        assertTrue(validator.isValid("  branco  ", context));
+        assertTrue(validator.isValid("\tpreto\t", context));
+        assertTrue(validator.isValid("\nvermelho\n", context));
+
+        verifyNoInteractions(context);
+    }
+
+    @Test
+    @DisplayName("Deve aceitar cores compostas válidas")
+    void deveAceitarCoresCompostasValidas() {
+        assertTrue(validator.isValid("off white", context));
+        assertTrue(validator.isValid("verde claro", context));
+        assertTrue(validator.isValid("azul marinho", context));
+
+        verifyNoInteractions(context);
+    }
+
+    @Test
+    @DisplayName("Deve rejeitar cor null")
+    void deveRejeitarCorNull() {
+        assertFalse(validator.isValid(null, context));
+        verifyNoInteractions(context);
+    }
 }
