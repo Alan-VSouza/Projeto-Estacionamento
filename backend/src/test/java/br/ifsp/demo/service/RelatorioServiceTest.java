@@ -201,10 +201,64 @@ class RelatorioServiceTest {
     }
 
     @Nested
-    @DisplayName("Testes estruturais")
-    class TestesEstruturais {
+    @DisplayName("Testes funcionais")
+    class TestesFuncionais {
 
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve gerar CSV corretamente com dados válidos")
+        void gerarRelatorioCSV_comDadosValidos_retornaStringCSVCorreta() {
+            LocalDate dataTeste = LocalDate.of(2025, 6, 1);
+            RelatorioDTO mockRelatorioDto = new RelatorioDTO(
+                    10,
+                    2.5,
+                    250.75,
+                    0.65
+            );
 
+            doReturn(mockRelatorioDto).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+
+            String csvResult = relatorioServiceSpy.gerarRelatorioCSV(dataTeste);
+
+            assertNotNull(csvResult);
+
+            String expectedHeader = "Métrica,Valor";
+            String expectedDataLine = "Data," + dataTeste.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            String expectedReceitaLine = "Receita Total,\"R$ " + String.format("%.2f", mockRelatorioDto.receitaTotal()) + "\"";
+            String expectedQuantidadeLine = "Quantidade de Veículos," + mockRelatorioDto.quantidade();
+            String expectedTempoMedioLine = "Tempo Médio (horas),\"" + String.format("%.2f", mockRelatorioDto.tempoMedioHoras()) + "\"";
+            String expectedOcupacaoLine = "Ocupação Média,\"" + String.format("%.2f%%", mockRelatorioDto.ocupacaoMedia() * 100) + "\"";
+
+            String[] lines = csvResult.split("\n");
+            assertEquals(expectedHeader, lines[0].trim());
+            assertEquals(expectedDataLine, lines[1].trim());
+            assertEquals(expectedReceitaLine, lines[2].trim());
+            assertEquals(expectedQuantidadeLine, lines[3].trim());
+            assertEquals(expectedTempoMedioLine, lines[4].trim());
+            assertEquals(expectedOcupacaoLine, lines[5].trim());
+
+            verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve lançar RuntimeException encapsulada quando gerarRelatorioDesempenho falhar")
+        void gerarRelatorioCSV_quandoGerarRelatorioDesempenhoFalha_lancaRuntimeException() {
+            LocalDate dataTeste = LocalDate.of(2025, 6, 1);
+            RuntimeException causaDaFalha = new RuntimeException("Falha simulada ao gerar desempenho");
+
+            doThrow(causaDaFalha).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+
+            RuntimeException exceptionLancada = assertThrows(RuntimeException.class, () -> {
+                relatorioServiceSpy.gerarRelatorioCSV(dataTeste);
+            });
+
+            assertEquals("Erro ao gerar CSV", exceptionLancada.getMessage());
+            assertSame(causaDaFalha, exceptionLancada.getCause());
+            verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+        }
 
     }
 
