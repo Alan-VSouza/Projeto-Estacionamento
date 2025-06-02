@@ -177,4 +177,45 @@ class CorValidValidatorTest {
         );
         verify(violationBuilder).addConstraintViolation();
     }
+
+    @Test
+    @DisplayName("Deve rejeitar cores curtas com espaços")
+    void deveRejeitarCoresCurtasComEspacos() {
+        assertFalse(validator.isValid("  a  ", context));
+        assertFalse(validator.isValid("\tab\t", context));
+
+        verify(context, times(2)).disableDefaultConstraintViolation();
+        verify(context, times(2)).buildConstraintViolationWithTemplate(
+                "Cor deve ter pelo menos 3 caracteres"
+        );
+        verify(violationBuilder, times(2)).addConstraintViolation();
+    }
+
+    @Test
+    @DisplayName("Deve aceitar cor com exatamente 3 caracteres")
+    void deveAceitarCorCom3Caracteres() {
+        assertTrue(validator.isValid("azul", context));
+        assertTrue(validator.isValid("cor", context));
+
+        verifyNoInteractions(context);
+    }
+
+    @Test
+    @DisplayName("Deve aceitar cores com acentos")
+    void deveAceitarCoresComAcentos() {
+        assertTrue(validator.isValid("índigo", context));
+        assertTrue(validator.isValid("salmão", context));
+        assertTrue(validator.isValid("açafrão", context));
+
+        verifyNoInteractions(context);
+    }
+
+    @Test
+    @DisplayName("Deve aceitar cores muito longas")
+    void deveAceitarCoresMuitoLongas() {
+        assertTrue(validator.isValid("verde esmeralda claro", context));
+        assertTrue(validator.isValid("azul turquesa metalizado", context));
+
+        verifyNoInteractions(context);
+    }
 }
