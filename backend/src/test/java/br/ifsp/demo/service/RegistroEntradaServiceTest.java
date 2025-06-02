@@ -113,24 +113,29 @@ public class RegistroEntradaServiceTest {
             verify(registroEntradaRepository, times(1)).save(any(RegistroEntrada.class));
         }
     }
-//
-//    @Nested
-//    @DisplayName("Testes de Cancelamento de Entrada")
-//    class TestesDeCancelamentoEntrada {
-//
-//        @Test
-//        @Tag("Functional")
-//        @Tag("UnitTest")
-//        @DisplayName("Deve cancelar check-in com sucesso")
-//        void cancelarCheckIn_comSucesso() {
-//            when(veiculoService.buscarPorPlaca(PLACA_VEICULO)).thenReturn(Optional.of(veiculo));
-//            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
-//
-//            boolean sucesso = registroEntradaService.cancelarCheckIn(veiculo, MOTIVO_CANCELAMENTO);
-//
-//            assertTrue(sucesso);
-//            verify(registroEntradaRepository, times(1)).delete(registroEntrada);
-//            verify(logSistema, times(1)).registrarCancelamento(PLACA_VEICULO, MOTIVO_CANCELAMENTO);
-//        }
-//    }
-//}
+
+    @Nested
+    @DisplayName("Testes de Cancelamento de Entrada")
+    class TestesDeCancelamentoEntrada {
+
+        @Test
+        @Tag("Functional")
+        @Tag("UnitTest")
+        @DisplayName("Deve cancelar check-in com sucesso")
+        void cancelarCheckIn_comSucesso() {
+
+            when(veiculoService.buscarPorPlaca(PLACA_VEICULO))
+                    .thenReturn(Optional.of(veiculo));
+
+            when(registroEntradaRepository.findByVeiculo(veiculo))
+                    .thenReturn(Optional.of(registroEntrada));
+
+
+            boolean sucesso = registroEntradaService.cancelarCheckIn(veiculo, MOTIVO_CANCELAMENTO);
+
+            assertTrue(sucesso);
+            verify(registroEntradaRepository, times(1)).delete(registroEntrada);
+            verify(logSistema, times(1)).registrarCancelamento(PLACA_VEICULO, MOTIVO_CANCELAMENTO);
+        }
+    }
+}
