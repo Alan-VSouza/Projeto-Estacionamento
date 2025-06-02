@@ -717,7 +717,21 @@ public class EstacionamentoServiceTest {
 
         }
 
+        @Test
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Deve encontrar a vaga 200 quando todas as 199 anteriores estiverem ocupadas")
+        void findNextAvailableSpot_deveEncontrarVaga200QuandoAnterioresOcupadas() {
+            List<Integer> vagasOcupadas = IntStream.rangeClosed(1, 199)
+                    .boxed()
+                    .collect(Collectors.toList());
 
+            when(registroEntradaRepository.findAllOccupiedSpotIds()).thenReturn(vagasOcupadas);
+
+            Integer vagaEncontrada = estacionamentoService.findNextAvailableSpot();
+
+            assertThat(vagaEncontrada).isEqualTo(200);
+        }
 
 
 
