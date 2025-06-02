@@ -239,6 +239,7 @@ class PagamentoTest {
                 assertThat(excecao.getMessage()).isEqualTo("Valor da tarifa não pode ser negativo");
             }
 
+
         }
 
     }

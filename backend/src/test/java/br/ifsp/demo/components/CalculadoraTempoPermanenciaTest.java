@@ -186,8 +186,43 @@ class CalculadoraTempoPermanenciaTest {
     @DisplayName("Testes de Mutante")
     class TestesDeMutante {
 
+        @Test
+        @DisplayName("Deve cobrar o valor limite de 6 horas para permanência de exatas 6 horas")
+        void deveCalcularValorParaExatasSeisHoras() {
+            LocalDateTime saida = entrada.plusHours(5).plusMinutes(1);
 
+            double valorEsperado = 35.0;
+
+            double valorCalculado = calculadoraTempoPermanencia.calcularValor(entrada, saida);
+
+            assertEquals(valorEsperado, valorCalculado);
+        }
+
+        @Test
+        @DisplayName("Deve cobrar o valor limite de 12 horas para permanência de exatas 12 horas")
+        void deveCalcularValorParaExatasDozeHoras() {
+            LocalDateTime saida = entrada.plusHours(11).plusMinutes(1);
+
+            double valorEsperado = 55.0;
+
+            double valorCalculado = calculadoraTempoPermanencia.calcularValor(entrada, saida);
+
+            assertEquals(valorEsperado, valorCalculado);
+        }
+
+        @Test
+        @DisplayName("Deve cobrar o valor limite de 24 horas para permanência de exatas 24 horas")
+        void deveCalcularValorParaExatasVinteEQuatroHoras() {
+            LocalDateTime saida = entrada.plusHours(23).plusMinutes(1);
+
+            double valorEsperado = 120.0;
+
+            double valorCalculado = calculadoraTempoPermanencia.calcularValor(entrada, saida);
+
+            assertEquals(valorEsperado, valorCalculado);
+
+
+        }
     }
-
 
 }
