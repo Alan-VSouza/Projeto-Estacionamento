@@ -723,5 +723,95 @@ class RelatorioServiceTest {
             assertNull(recibo, "Deve retornar null quando não há pagamentos");
             verify(pagamentoRepository).findAll();
         }
+
+        @Test
+        @Tag("Mutation")
+        @DisplayName("Deve calcular médias diárias corretas no relatório mensal")
+        void deveCalcularMediasDiariasCorretasNoRelatorioMensal() {
+            LocalDate dataAbril = LocalDate.of(2025, 4, 15);
+            LocalDate dataFevereiro = LocalDate.of(2025, 2, 15);
+
+            Pagamento pagamentoAbril = new Pagamento(
+                    new RegistroEntrada(new Veiculo("ABC1234", "carro", "civic", "branco")),
+                    dataAbril.atTime(10, 0),
+                    dataAbril.atTime(12, 0),
+                    new CalculadoraTempoPermanencia(new ValorPermanencia())
+            );
+
+            when(pagamentoRepository.findAll()).thenReturn(List.of(pagamentoAbril));
+
+            Map<String, Object> resultadoAbril = relatorioService.gerarRelatorioMensal(4, 2025);
+
+            assertNotNull(resultadoAbril);
+
+            double receitaTotalAbril = (Double) resultadoAbril.get("receitaTotal");
+            int totalVeiculosAbril = (Integer) resultadoAbril.get("totalVeiculos");
+            int diasAbril = (Integer) resultadoAbril.get("diasNoMes");
+
+            assertEquals(30, diasAbril, "Abril deve ter 30 dias");
+
+            if (receitaTotalAbril > 0) {
+                double receitaMediaEsperada = receitaTotalAbril / 30;
+                double receitaMediaMutante = receitaTotalAbril * 30;
+
+                if (resultadoAbril.containsKey("receitaMediaDiaria")) {
+                    double receitaMediaCalculada = (Double) resultadoAbril.get("receitaMediaDiaria");
+                    assertEquals(receitaMediaEsperada, receitaMediaCalculada, 0.01,
+                            "Receita média deve ser receitaTotal / diasNoMes");
+
+                    assertNotEquals(receitaMediaMutante, receitaMediaCalculada,
+                            "Mutante de multiplicação deve dar resultado diferente");
+                }
+            }
+
+            if (totalVeiculosAbril > 0) {
+                double veiculosMediaEsperada = (double) totalVeiculosAbril / 30;
+                double veiculosMediaMutante = (double) totalVeiculosAbril * 30;
+
+                if (resultadoAbril.containsKey("veiculosMediaDiaria")) {
+                    double veiculosMediaCalculada = (Double) resultadoAbril.get("veiculosMediaDiaria");
+                    assertEquals(veiculosMediaEsperada, veiculosMediaCalculada, 0.01,
+                            "Veículos média deve ser totalVeiculos / diasNoMes");
+
+                    assertNotEquals(veiculosMediaMutante, veiculosMediaCalculada,
+                            "Mutante de multiplicação deve dar resultado diferente");
+                }
+            }
+        }
+
+        @Test
+        @Tag("Mutation")
+        @DisplayName("Deve detectar mutantes de divisão com valores específicos")
+        void deveDetectarMutantesDeDivisaoComValoresEspecificos() {
+
+            double receitaTotal = 3000.0;
+            int totalVeiculos = 60;
+            int diasNoMes = 30;
+
+            double receitaMediaCorreta = receitaTotal / diasNoMes;
+            double receitaMediaMutante = receitaTotal * diasNoMes;
+
+            assertEquals(100.0, receitaMediaCorreta, 0.01, "3000 / 30 = 100");
+            assertEquals(90000.0, receitaMediaMutante, 0.01, "3000 * 30 = 90000");
+            assertNotEquals(receitaMediaCorreta, receitaMediaMutante,
+                    "Divisão e multiplicação devem dar resultados diferentes");
+
+            double veiculosMediaCorreta = (double) totalVeiculos / diasNoMes;
+            double veiculosMediaMutante = (double) totalVeiculos * diasNoMes;
+
+            assertEquals(2.0, veiculosMediaCorreta, 0.01, "60 / 30 = 2");
+            assertEquals(1800.0, veiculosMediaMutante, 0.01, "60 * 30 = 1800");
+            assertNotEquals(veiculosMediaCorreta, veiculosMediaMutante,
+                    "Divisão e multiplicação devem dar resultados diferentes");
+
+            int diasFevereiro = 28;
+            double receitaMediaFev = receitaTotal / diasFevereiro;
+            double receitaMediaMutanteFev = receitaTotal * diasFevereiro;
+
+            assertEquals(107.14, receitaMediaFev, 0.01, "3000 / 28 ≈ 107.14");
+            assertEquals(84000.0, receitaMediaMutanteFev, 0.01, "3000 * 28 = 84000");
+            assertNotEquals(receitaMediaFev, receitaMediaMutanteFev,
+                    "Para fevereiro, divisão e multiplicação devem ser diferentes");
+        }
     }
 }
