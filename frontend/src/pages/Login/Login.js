@@ -35,7 +35,7 @@ function LoginWebsite({ onLoginSuccess }) {
       return "Senha é obrigatória";
     }
 
-    if (/[^a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senhaLimpa)) {
+    if (/[^a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(senhaLimpa))  {
       return "❌ Senha contém caracteres não permitidos";
     }
     

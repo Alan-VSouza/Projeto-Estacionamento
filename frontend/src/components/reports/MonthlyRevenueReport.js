@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react'; 
 import { toast } from 'react-toastify';
 
 const API_BASE_URL = 'http://localhost:8080';
@@ -51,7 +51,7 @@ function MonthlyRevenueReport() {
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
 
-  const loadReport = async () => {
+  const loadReport = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -63,11 +63,11 @@ function MonthlyRevenueReport() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedMonth, selectedYear]);
 
   useEffect(() => {
     loadReport();
-  }, [selectedMonth, selectedYear]);
+  }, [loadReport]);
 
   const handleExportPDF = async () => {
     setExporting(true);

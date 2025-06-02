@@ -6,7 +6,7 @@ import { fetchSpotsFromAPI, occupySpotInAPI, vacateSpotInAPI, cancelEntryInAPI }
 import VehicleEntryForm from '../forms/VehicleEntryForm';
 import ActionModal from '../ActionModal';
 
-function ParkingLot({ }) {
+function ParkingLot() {
   const [spots, setSpots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
