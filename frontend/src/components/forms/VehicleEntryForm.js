@@ -132,47 +132,89 @@ function VehicleEntryForm({ spotId, onSubmit, onCancel }) {
   
   const [errors, setErrors] = useState({});
 
-  const validarCor = (cor) => {
-  const corLimpa = cor.trim();
+  const capitalizeFirstLetter = (string) => {
+  if (!string) return '';
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
 
-  if (!corLimpa) {
-    return "Cor é obrigatória";
-  }
-
-  if (/^\d+$/.test(corLimpa)) {
-    return "❌ Cor não pode ser apenas números. Use nomes como: branco, preto, azul, etc.";
-  }
-
-  if (/[^a-zA-ZÀ-ÿ\s]/.test(corLimpa)) {
-    return "❌ Cor não pode conter caracteres especiais (@#!$%). Use apenas letras.";
-  }
-
-  if (/\d{3,}/.test(corLimpa)) {
-    return "❌ Cor não pode conter sequências de números. Use nomes de cores.";
-  }
-  
-  
-  if (corLimpa.length < 3) {
-    return "❌ Cor deve ter pelo menos 3 caracteres";
-  }
-  
+  const validarModelo = (modelo) => {
+    const modeloLimpo = modelo.trim();
+    
+    if (!modeloLimpo) {
+      return "Modelo é obrigatório";
+    }
+    
+    if (/^\d+$/.test(modeloLimpo)) {
+      return "❌ Modelo não pode ser apenas números.";
+    }
+    
+    if (/[^a-zA-ZÀ-ÿ\s\d]/.test(modeloLimpo)) {
+      return "❌ Modelo não pode conter caracteres especiais (@#!$%).";
+    }
+    
+    if (modeloLimpo.length < 2) {
+      return "❌ Modelo deve ter pelo menos 2 caracteres";
+    }
+    
     return null; 
   };
 
+  const validarCor = (cor) => {
+    const corLimpa = cor.trim();
+
+    if (!corLimpa) {
+      return "Cor é obrigatória";
+    }
+
+    if (/^\d+$/.test(corLimpa)) {
+      return "❌ Cor não pode ser apenas números. Use nomes como: branco, preto, azul, etc.";
+    }
+
+    if (/[^a-zA-ZÀ-ÿ\s]/.test(corLimpa)) {
+      return "❌ Cor não pode conter caracteres especiais (@#!$%). Use apenas letras.";
+    }
+
+    if (/\d{3,}/.test(corLimpa)) {
+      return "❌ Cor não pode conter sequências de números. Use nomes de cores.";
+    }
+    
+    if (corLimpa.length < 3) {
+      return "❌ Cor deve ter pelo menos 3 caracteres";
+    }
+    
+    return null; 
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
     
-    if (name === 'cor') {
+    if (name === 'modelo') {
+      const modeloFormatado = capitalizeFirstLetter(value);
+      setFormData(prev => ({ ...prev, [name]: modeloFormatado }));
+
+      const erroModelo = validarModelo(value);
+      setErrors(prev => ({ ...prev, modelo: erroModelo }));
+      
+    } else if (name === 'cor') {
+      setFormData(prev => ({ ...prev, [name]: value }));
       const erroCor = validarCor(value);
       setErrors(prev => ({ ...prev, cor: erroCor }));
+      
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
+    const erroModelo = validarModelo(formData.modelo);
+    if (erroModelo) {
+      setErrors(prev => ({ ...prev, modelo: erroModelo }));
+      toast.error(erroModelo);
+      return;
+    }
+
     const erroCor = validarCor(formData.cor);
     if (erroCor) {
       setErrors(prev => ({ ...prev, cor: erroCor }));
@@ -185,14 +227,8 @@ function VehicleEntryForm({ spotId, onSubmit, onCancel }) {
       return;
     }
     
-    if (!formData.modelo.trim()) {
-      toast.error('❌ Modelo é obrigatório');
-      return;
-    }
-    
     onSubmit(formData);
   };
-
   return (
     <>
       <div style={overlayStyles} onClick={onCancel} />
@@ -208,7 +244,7 @@ function VehicleEntryForm({ spotId, onSubmit, onCancel }) {
               value={formData.placa}
               onChange={handleInputChange}
               placeholder="ABC-1234"
-              maxLength="8"
+              maxLength="7"
               style={inputStyles}
               required
             />
@@ -238,9 +274,18 @@ function VehicleEntryForm({ spotId, onSubmit, onCancel }) {
               value={formData.modelo}
               onChange={handleInputChange}
               placeholder="Ex: Civic, Corolla"
-              style={inputStyles}
+              style={errors.modelo ? inputErrorStyles : inputStyles}
               required
             />
+            {errors.modelo && (
+              <div style={errorMessageStyles}>
+                {errors.modelo}
+              </div>
+            )}
+            <small style={inputHintStyles}>
+              ✅ Primeira letra será automaticamente maiúscula<br/>
+              ❌ Não use apenas números: 123, 456, etc.
+            </small>
           </div>
 
           <div style={formGroupStyles}>
