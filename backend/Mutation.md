@@ -1,5 +1,4 @@
-# Análise de Mutantes Equivalentes
-
+# Análise de Mutantes e Cobertura de Teste
 
 ## Tabela de Mutantes Equivalentes: `CalculadoraTempoPermanencia`
 
@@ -16,3 +15,16 @@
 | Linha | Mutante | Justificativa da Equivalência |
 | :--- | :--- | :--- |
 | N/A | Nenhum | A classe `ValorPermanencia` contém apenas métodos `get` que retornam valores constantes. Mutações nessa classe (ex: alterar um valor de retorno) seriam facilmente "mortas" por qualquer teste que utilize a `CalculadoraTempoPermanencia`, não gerando mutantes equivalentes complexos como os da classe de lógica. |
+
+---
+
+## Análise de Cobertura: Construtores de Entidades JPA
+
+A justificativa abaixo se aplica a todas as entidades do sistema que possuem um construtor `protected` sem argumentos.
+
+| Classe | Linha Não Coberta | Justificativa da Não Cobertura |
+| :--- | :--- | :--- |
+| `Estacionamento` | `protected Estacionamento() {}` | **Requisito do Framework JPA/Hibernate.** <br><br> Este construtor é de uso exclusivo do framework para criar instâncias da entidade via "Reflection" ao carregar dados do banco. Ele é `protected` para impedir seu uso na lógica de negócio. Por não conter lógica da aplicação, a linha não é coberta por testes unitários e **deve ser excluída dos relatórios de cobertura de teste.** |
+| `Pagamento` | `protected Pagamento() {}` | Mesma justificativa da linha acima. |
+| `RegistroEntrada` | `protected RegistroEntrada() {}` | Mesma justificativa da linha acima. |
+| `Veiculo` | `protected Veiculo() {}` | Mesma justificativa da linha acima. |
