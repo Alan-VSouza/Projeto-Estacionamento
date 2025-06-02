@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { getDailyRevenueReport, exportReportPDF, exportReportCSV } from '../../services/api/reportsApi';
+import ReactCardFlip from 'react-card-flip'; 
 
 function DailyRevenueReport() {
   const [reportData, setReportData] = useState(null);
@@ -8,6 +9,13 @@ function DailyRevenueReport() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [exporting, setExporting] = useState(false);
+
+  const [flippedCards, setFlippedCards] = useState({
+    revenue: false,
+    vehicles: false,
+    avgTime: false,
+    occupancy: false
+  });
 
   const loadReport = async (date) => {
     setLoading(true);
@@ -80,6 +88,13 @@ function DailyRevenueReport() {
     return `${h}h ${m}m`;
   };
 
+  const toggleFlip = (card) => {
+    setFlippedCards(prev => ({
+      ...prev,
+      [card]: !prev[card]
+    }));
+  };
+
   return (
     <div className="daily-revenue-report">
       <div className="report-header">
@@ -103,24 +118,69 @@ function DailyRevenueReport() {
       {reportData && !loading && (
         <div className="report-content">
           <div className="report-cards">
-            <div className="report-card revenue">
-              <h3>Receita Total</h3>
-              <div className="value">{formatCurrency(reportData.receitaTotal || 0)}</div>
+
+            <div onClick={() => toggleFlip('revenue')}>
+              <ReactCardFlip isFlipped={flippedCards.revenue} flipDirection="horizontal">
+                <div className="report-card revenue">
+                  <h3>Receita Total</h3>
+                  <div className="value">{formatCurrency(reportData.receitaTotal || 0)}</div>
+                  <small style={{fontSize: '0.8em', opacity: 0.8}}>Clique para ver a descrição</small>
+                </div>
+                <div className="report-card revenue">
+                  <h3>Receita Total</h3>
+                  <div className="value" style={{fontSize: '0.9em', marginTop: '10px'}}>
+                    Soma do valor de todos os pagamentos realizados no dia.
+                  </div>
+                </div>
+              </ReactCardFlip>
             </div>
-            
-            <div className="report-card vehicles">
-              <h3>Veículos Atendidos</h3>
-              <div className="value">{reportData.quantidade || 0}</div>
+
+            <div onClick={() => toggleFlip('vehicles')}>
+              <ReactCardFlip isFlipped={flippedCards.vehicles} flipDirection="horizontal">
+                <div className="report-card vehicles">
+                  <h3>Veículos Atendidos</h3>
+                  <div className="value">{reportData.quantidade || 0}</div>
+                  <small style={{fontSize: '0.8em', opacity: 0.8}}>Clique para ver a descrição</small>
+                </div>
+                <div className="report-card vehicles">
+                  <h3>Veículos Atendidos</h3>
+                  <div className="value" style={{fontSize: '0.9em', marginTop: '10px'}}>
+                    Quantidade de veículos que utilizaram o estacionamento no dia.
+                  </div>
+                </div>
+              </ReactCardFlip>
             </div>
-            
-            <div className="report-card avg-time">
-              <h3>Tempo Médio</h3>
-              <div className="value">{formatTime(reportData.tempoMedioHoras || 0)}</div>
+
+            <div onClick={() => toggleFlip('avgTime')}>
+              <ReactCardFlip isFlipped={flippedCards.avgTime} flipDirection="horizontal">
+                <div className="report-card avg-time">
+                  <h3>Tempo Médio</h3>
+                  <div className="value">{formatTime(reportData.tempoMedioHoras || 0)}</div>
+                  <small style={{fontSize: '0.8em', opacity: 0.8}}>Clique para ver a descrição</small>
+                </div>
+                <div className="report-card avg-time">
+                  <h3>Tempo Médio</h3>
+                  <div className="value" style={{fontSize: '0.9em', marginTop: '10px'}}>
+                    Média de permanência dos veículos no estacionamento no dia.
+                  </div>
+                </div>
+              </ReactCardFlip>
             </div>
-            
-            <div className="report-card occupancy">
-              <h3>Taxa de Ocupação</h3>
-              <div className="value">{((reportData.ocupacaoMedia || 0) * 100).toFixed(1)}%</div>
+
+            <div onClick={() => toggleFlip('occupancy')}>
+              <ReactCardFlip isFlipped={flippedCards.occupancy} flipDirection="horizontal">
+                <div className="report-card occupancy">
+                  <h3>Taxa de Ocupação</h3>
+                  <div className="value">{((reportData.ocupacaoMedia || 0) * 100).toFixed(1)}%</div>
+                  <small style={{fontSize: '0.8em', opacity: 0.8}}>Clique para ver a descrição</small>
+                </div>
+                <div className="report-card occupancy">
+                  <h3>Taxa de Ocupação</h3>
+                  <div className="value" style={{fontSize: '0.9em', marginTop: '10px'}}>
+                    Porcentagem média de vagas ocupadas ao longo do dia.
+                  </div>
+                </div>
+              </ReactCardFlip>
             </div>
           </div>
 
