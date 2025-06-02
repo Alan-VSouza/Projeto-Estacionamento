@@ -591,6 +591,35 @@ public class EstacionamentoServiceTest {
             verify(registroEntradaRepository, never()).save(any());
         }
 
+        @ParameterizedTest
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @CsvSource(
+                value = {
+                        "NULL_VAL,   EXISTE_ID,        Veiculo para registro não pode ser nulo",
+                        "VALIDO,     NULL_VAL,         ID do estacionamento não pode ser nulo",
+                        },
+                nullValues = {"NULL_VAL"}
+        )
+        @DisplayName("Deve lançar IllegalArgument para parametros inválidos ao registrar estacionamento")
+        void deveLancarIllegalArgumentParaParametrosInvalidosAoRegistrarEstacionamento(
+                String veiculoStr,
+                String idEstacinamentoStr,
+                String mensagem
+        ) {
+            Veiculo veiculoParam = "VALIDO".equals(veiculoStr) ? veiculo : null;
+
+            UUID idEstacionamentoParam = "EXISTE_ID".equals(idEstacinamentoStr) ? UUID.randomUUID() :
+                    (idEstacinamentoStr == null ? null : UUID.fromString(idEstacinamentoStr));
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                estacionamentoService.registrar(veiculoParam, idEstacionamentoParam)
+            );
+
+            assertEquals(mensagem, exception.getMessage());
+            verify(estacionamentoRepository, never()).save(any());
+
+        }
 
     }
 
