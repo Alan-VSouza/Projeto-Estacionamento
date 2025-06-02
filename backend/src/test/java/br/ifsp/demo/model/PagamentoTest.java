@@ -91,6 +91,21 @@ class PagamentoTest {
                 assertThat(excecao.getMessage()).isEqualTo("Hora de saída não pode ser antes da hora de entrada");
             }
 
+            @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @DisplayName("Deve lançar exceção quando o valor da tarifa for negativo")
+            void deveLancarExcecaoQuandoValorForNegativo() {
+                String mensagemEsperada = "Valor da tarifa não pode ser negativo";
+                when(calculadoraDeTarifa.calcularValor(any(LocalDateTime.class), any(LocalDateTime.class)))
+                        .thenReturn(-10.0);
+
+                IllegalArgumentException excecao = assertThrows(IllegalArgumentException.class, () -> {
+                    new Pagamento(registroEntrada, saida, calculadoraDeTarifa);
+                });
+
+                assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
+            }
 
         }
     }
