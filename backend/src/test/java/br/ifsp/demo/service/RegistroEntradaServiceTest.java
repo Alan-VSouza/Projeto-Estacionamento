@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -137,5 +138,50 @@ public class RegistroEntradaServiceTest {
             verify(registroEntradaRepository, times(1)).delete(registroEntrada);
             verify(logSistema, times(1)).registrarCancelamento(PLACA_VEICULO, MOTIVO_CANCELAMENTO);
         }
+    }
+
+    @Nested
+    @DisplayName("Testes de Mutante")
+    class TestesDeMutante {
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Deve lançar exceção quando veículo não for encontrado ao cancelar check-in")
+        void cancelarCheckIn_quandoVeiculoNaoEncontrado_deveLancarExcecao() {
+
+            String placaVeiculo = "XYZ-1234";
+            Veiculo veiculo1 = new Veiculo(placaVeiculo, "carro", "corolla","branco" );
+
+            when(veiculoService.buscarPorPlaca(placaVeiculo)).thenReturn(Optional.empty());
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                registroEntradaService.cancelarCheckIn(veiculo1, MOTIVO_CANCELAMENTO);
+            });
+
+            assertThat(exception.getMessage()).isEqualTo("Veículo não encontrado");
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Deve lançar exceção quando Veículo é encontrado MAS não possui RegistroEntrada, ao cancelar check-in")
+        void cancelarCheckIn_quandoVeiculoEncontradoMasRegistroEntradaNao_deveLancarExcecao() {
+            String placaVeiculo = "ABC-7890";
+            Veiculo veiculoExistenteMock = mock(Veiculo.class);
+            String motivoCancelamento = "Teste";
+
+            when(veiculoService.buscarPorPlaca(placaVeiculo)).thenReturn(Optional.of(veiculoExistenteMock));
+
+            when(registroEntradaRepository.findByVeiculo(veiculoExistenteMock))
+                    .thenReturn(Optional.empty());
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                registroEntradaService.cancelarCheckIn(veiculoExistenteMock, MOTIVO_CANCELAMENTO);
+            });
+
+            assertThat(exception.getMessage()).isEqualTo("Veículo não registrado no estacionamento");
+        }
+
     }
 }

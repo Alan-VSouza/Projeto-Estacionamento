@@ -26,7 +26,6 @@ public class Pagamento {
     @Column(nullable = false)
     private double valor;
 
-    protected Pagamento() {}
 
     public Pagamento(RegistroEntrada registroEntrada, LocalDateTime horaSaida, CalculadoraDeTarifa tarifa) {
         if(registroEntrada == null)
