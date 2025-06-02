@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -332,6 +333,25 @@ class RelatorioServiceTest {
     @Nested
     @DisplayName("Testes estruturais")
     class TestesEstruturais {
+
+        @Test
+        @Tag("TDD")
+        @Tag("UnitTest")
+        @Tag("Structural")
+        @DisplayName("Deve retornar relatório com valores zerados quando não há pagamentos no dia")
+        void gerarRelatorioDesempenho_semPagamentosNoDia_retornaRelatorioZerado() {
+            LocalDate dataTeste = LocalDate.of(2025, 5, 4);
+
+            when(pagamentoRepository.findAll()).thenReturn(Collections.emptyList());
+
+            RelatorioDTO relatorio = relatorioServiceSpy.gerarRelatorioDesempenho(dataTeste);
+
+            assertNotNull(relatorio);
+            assertEquals(0, relatorio.quantidade());
+            assertEquals(0.0, relatorio.tempoMedioHoras(), 0.01);
+            assertEquals(0.0, relatorio.receitaTotal(), 0.01);
+            assertEquals(0.0, relatorio.ocupacaoMedia(), 0.01);
+        }
 
         @Nested
         @DisplayName("Relatorio mensal testes")
