@@ -36,6 +36,8 @@ public class Veiculo {
     private static final Pattern APENAS_NUMEROS = Pattern.compile("^\\d+$");
     private static final Pattern CARACTERES_ESPECIAIS = Pattern.compile("[^a-zA-ZÀ-ÿ\\s]");
 
+    protected Veiculo() {}
+
     public Veiculo(String placa, String tipoVeiculo, String modelo, String cor) {
 
         if(placa == null || placa.trim().isEmpty())

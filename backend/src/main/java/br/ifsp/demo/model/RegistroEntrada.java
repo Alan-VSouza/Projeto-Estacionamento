@@ -24,6 +24,8 @@ public class RegistroEntrada {
     @Column(nullable = false)
     private Integer vagaId;
 
+    protected RegistroEntrada() {}
+
     public RegistroEntrada(Veiculo veiculo, Integer vagaId) {
         if(veiculo == null) {
             throw new IllegalArgumentException("Veículo não pode ser nulo");

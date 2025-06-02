@@ -355,6 +355,8 @@ class RelatorioServiceTest {
         }
 
         @Nested
+        @Tag("Structural")
+        @Tag("UnitTest")
         @DisplayName("Relatorio mensal testes")
         class RelatorioMensalTestes {
             @Test
@@ -447,6 +449,8 @@ class RelatorioServiceTest {
         }
 
         @Nested
+        @Tag("Structural")
+        @Tag("UnitTest")
         @DisplayName("Relatorio mensal PDF testes")
         class RelatorioMensalPDFTestes {
 
@@ -600,5 +604,7 @@ class RelatorioServiceTest {
             assertNull(recibo, "Deve retornar null quando não há pagamentos");
             verify(pagamentoRepository).findAll();
         }
+
+        
     }
 }

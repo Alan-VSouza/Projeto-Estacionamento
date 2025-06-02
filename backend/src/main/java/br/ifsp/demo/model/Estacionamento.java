@@ -21,6 +21,7 @@ public class Estacionamento {
     private String endereco;
     private int capacidade;
 
+    protected Estacionamento() {}
 
     public Estacionamento(String nome, String endereco, int capacidade) {
 

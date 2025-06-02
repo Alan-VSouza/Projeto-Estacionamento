@@ -108,8 +108,6 @@ public class RelatorioService {
             csvPrinter.printRecord("Tempo Médio (horas)", String.format("%.2f", relatorio.tempoMedioHoras()));
             csvPrinter.printRecord("Ocupação Média", String.format("%.2f%%", relatorio.ocupacaoMedia() * 100));
 
-            csvPrinter.flush();
-            csvPrinter.close();
 
             return sw.toString();
         } catch (Exception e) {
