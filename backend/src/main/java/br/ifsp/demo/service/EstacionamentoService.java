@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.IllegalFormatWidthException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,14 +46,31 @@ public class EstacionamentoService {
 
     @Transactional
     public RegistroEntrada registrarEntrada(Veiculo veiculo, UUID idEstacionamento, Integer vagaId) {
+
+        if(veiculo == null)
+            throw new IllegalArgumentException("Veiculo não pode ser nulo");
+
+        if(idEstacionamento == null)
+            throw new IllegalArgumentException("ID do estacionamento não pode ser nulo");
+
+        if(vagaId == null)
+            throw new IllegalArgumentException("Número da vaga não pode ser nulo");
+
+        if(vagaId <= 0)
+            throw new IllegalArgumentException("Número da vaga deve ser maior que zero");
+
         Estacionamento estacionamento = estacionamentoRepository.findById(idEstacionamento)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estacionamento não encontrado"));
+
         Optional<RegistroEntrada> vagaOcupada = registroEntradaRepository.findByVagaId(vagaId);
+
         if (vagaOcupada.isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Vaga " + vagaId + " já está ocupada");
         }
+
         long veiculosEstacionados = registroEntradaRepository.count();
+
         if (veiculosEstacionados >= estacionamento.getCapacidade()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Estacionamento lotado. Capacidade máxima atingida.");
@@ -85,15 +103,27 @@ public class EstacionamentoService {
 
     @Transactional
     public RegistroEntrada registrar(Veiculo veiculoDados, UUID idEstacionamento) {
+        if(veiculoDados == null)
+            throw new IllegalArgumentException("Veiculo para registro não pode ser nulo");
+
+        if(idEstacionamento == null)
+            throw new IllegalArgumentException("ID do estacionamento não pode ser nulo");
+
         Integer vagaId = findNextAvailableSpot();
         return registrarEntrada(veiculoDados, idEstacionamento, vagaId);
     }
 
     @Transactional
     public Pagamento registrarSaida(String placa) {
+
+        if(placa == null || placa.trim().isEmpty())
+            throw new IllegalArgumentException("Placa não pode ser nula ou vazia");
+
         Estacionamento estacionamento = buscarEstacionamentoAtual();
+
         Veiculo veiculo = veiculoService.buscarPorPlaca(placa)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veículo não está registrado"));
+
         RegistroEntrada registroEntrada = registroEntradaRepository.findByVeiculo(veiculo)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhum registro de entrada ativo para esse veículo"));
 
@@ -133,8 +163,13 @@ public class EstacionamentoService {
     }
 
     public boolean cancelarEntrada(String placa) {
+
+        if(placa == null || placa.trim().isEmpty())
+            throw new IllegalArgumentException("Placa não pode ser nula ou vazia");
+
         Veiculo veiculo = veiculoService.buscarPorPlaca(placa)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veiculo não encontrado"));
+
         RegistroEntrada entrada = registroEntradaRepository.findByVeiculo(veiculo)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veículo não possui entrada registrada para cancelar"));
 
@@ -143,6 +178,10 @@ public class EstacionamentoService {
     }
 
     public RegistroEntrada buscarEntrada(String placa) {
+
+        if(placa == null || placa.trim().isEmpty())
+            throw new IllegalArgumentException("Placa não pode ser nula ou vazia");
+
         Veiculo veiculo = veiculoService.buscarPorPlaca(placa)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Esse veículo não está no estacionamento"));
 
