@@ -5,14 +5,21 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import br.ifsp.demo.exception.EstacionamentoLotadoException;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class EstacionamentoTest {
+
+    private Estacionamento estacionamento;
+    private Veiculo veiculo;
+
+    @BeforeEach
+    void setup() {
+        estacionamento = new Estacionamento("Estacionamento Teste", "Rua Teste", 10);
+        veiculo = new Veiculo("ABC-1234", "carro", "escort", "prata");
+    }
+
 
     @Nested
     @DisplayName("Testes de mutante")
@@ -79,6 +86,42 @@ class EstacionamentoTest {
                 assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
             }
 
+        }
+
+        @Nested
+        @DisplayName("Testes do Método registrarEntrada")
+        class TestesDoMetodoRegistrarEntrada {
+
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @DisplayName("Deve registrar entrada com sucesso quando há vaga")
+            void deveRegistrarEntradaComSucessoQuandoHaVaga() {
+                int ocupacaoAtual = 5;
+
+                RegistroEntrada registro = assertDoesNotThrow(() ->
+                        estacionamento.registrarEntrada(veiculo, ocupacaoAtual)
+                );
+
+                assertThat(registro).isNotNull();
+                assertThat(registro.getVeiculo()).isEqualTo(veiculo);
+            }
+
+            @ParameterizedTest
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @ValueSource(ints = {10, 11})
+            @DisplayName("Deve lançar exceção quando o estacionamento estiver lotado")
+            void deveLancarExcecaoQuandoEstacionamentoEstiverLotado(int ocupacaoAtual) {
+                String mensagemEsperada = "O estacionamento está lotado";
+
+                EstacionamentoLotadoException excecao = assertThrows(EstacionamentoLotadoException.class, () -> {
+                    estacionamento.registrarEntrada(veiculo, ocupacaoAtual);
+                });
+
+                assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
+            }
         }
     }
 }
