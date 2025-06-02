@@ -65,6 +65,20 @@ class EstacionamentoTest {
                 });
                 assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
             }
+
+            @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @DisplayName("Deve lançar exceção quando a capacidade for exatamente zero")
+            void deveLancarExcecaoQuandoCapacidadeForZero() {
+                String mensagemEsperada = "Capacidade do estacionamento precisa ser maior que zero";
+
+                IllegalArgumentException excecao = assertThrows(IllegalArgumentException.class, () -> {
+                    new Estacionamento("Nome Válido", "Endereço Válido", 0);
+                });
+                assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
+            }
+
         }
     }
 }
