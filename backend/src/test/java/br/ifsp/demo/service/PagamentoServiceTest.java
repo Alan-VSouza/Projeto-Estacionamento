@@ -275,29 +275,6 @@ class PagamentoServiceTest {
 
         }
 //
-//        @ParameterizedTest
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @CsvSource(
-//                value = {
-//                        "null, 2025-04-30T15:30:00, 2025-04-30T17:00:00, 15.0, Uuid não pode ser nulo",
-//                        "123e4567-e89b-12d3-a456-426614174000, null, 2025-04-30T17:00:00, 15.0, Entrada não pode ser nulo",
-//                        "123e4567-e89b-12d3-a456-426614174000, 2025-04-30T17:00:00, null, 10.0, Saída não pode ser nulo",
-//                },
-//                nullValues = "null"
-//        )
-//        void mensagensDeErroAoAtualizarPagamento(String uuid, String horaEntrada, String horaSaida, double valor, String mensagem) {
-//            LocalDateTime entrada = horaEntrada == null ? null : LocalDateTime.parse(horaEntrada);
-//            LocalDateTime saida = horaSaida == null ? null : LocalDateTime.parse(horaSaida);
-//            UUID uuidPagamento = uuid == null ? null : UUID.fromString(uuid);
-//
-//            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.atualizarPagamento(
-//                    uuidPagamento, entrada, saida, veiculo.getPlaca(), valor
-//            ));
-//            assertEquals(mensagem, exception.getMessage());
-//
-//        }
-//
 //        @Test
 //        @Tag("UnitTest")
 //        @Tag("Functional")
