@@ -135,4 +135,46 @@ class CorValidValidatorTest {
         verify(violationBuilder).addConstraintViolation();
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"azul@", "verde#", "vermelho!", "preto$", "branco%",
+            "cor&", "teste*", "azul()", "verde+", "cor=",
+            "teste[", "cor]", "azul{", "verde}", "cor|",
+            "teste\\", "azul:", "verde;", "cor\"", "teste'",
+            "azul<", "verde>", "cor?", "teste/"})
+    @DisplayName("Deve rejeitar cores com caracteres especiais")
+    void deveRejeitarCoresComCaracteresEspeciais(String corComEspeciais) {
+        assertFalse(validator.isValid(corComEspeciais, context));
+
+        verify(context).disableDefaultConstraintViolation();
+        verify(context).buildConstraintViolationWithTemplate(
+                "Cor não pode conter caracteres especiais (@#!$%). Use apenas letras."
+        );
+        verify(violationBuilder).addConstraintViolation();
+    }
+
+    @Test
+    @DisplayName("Deve rejeitar cores com múltiplos caracteres especiais")
+    void deveRejeitarCoresComMultiplosEspeciais() {
+        assertFalse(validator.isValid("azul@#$", context));
+        assertFalse(validator.isValid("verde!@#", context));
+
+        verify(context, times(2)).disableDefaultConstraintViolation();
+        verify(context, times(2)).buildConstraintViolationWithTemplate(
+                "Cor não pode conter caracteres especiais (@#!$%). Use apenas letras."
+        );
+        verify(violationBuilder, times(2)).addConstraintViolation();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"a", "ab", "x", "zz"})
+    @DisplayName("Deve rejeitar cores com menos de 3 caracteres")
+    void deveRejeitarCoresMuitoCurtas(String corCurta) {
+        assertFalse(validator.isValid(corCurta, context));
+
+        verify(context).disableDefaultConstraintViolation();
+        verify(context).buildConstraintViolationWithTemplate(
+                "Cor deve ter pelo menos 3 caracteres"
+        );
+        verify(violationBuilder).addConstraintViolation();
+    }
 }
