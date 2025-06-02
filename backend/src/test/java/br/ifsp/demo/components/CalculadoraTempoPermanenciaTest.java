@@ -3,10 +3,12 @@ package br.ifsp.demo.components;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 class CalculadoraTempoPermanenciaTest {
 
@@ -133,9 +135,11 @@ class CalculadoraTempoPermanenciaTest {
             assertEquals("Horário de saída não pode ser antes do horário de entrada", ex.getMessage());
         }
     }
+
     @Nested
     @DisplayName("Structural Tests")
     class StructuralTests {
+
         @Test
         @Tag("Structural")
         @Tag("UnitTest")
@@ -147,33 +151,43 @@ class CalculadoraTempoPermanenciaTest {
 
             assertEquals(10.0, resultado);
         }
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Deve lançar exceção quando entrada for nula")
+        void deveLancarExcecaoQuandoEntradaForNula() {
+            LocalDateTime saida = LocalDateTime.now().plusHours(1);
+
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+                calculadoraTempoPermanencia.calcularValor(null, saida);
+            });
+
+            assertEquals("horas não podem ser nulas", ex.getMessage());
+        }
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Deve lançar exceção quando saída for nula")
+        void deveLancarExcecaoQuandoSaidaForNula() {
+            LocalDateTime entrada = LocalDateTime.now();
+
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+                calculadoraTempoPermanencia.calcularValor(entrada, null);
+            });
+
+            assertEquals("horas não podem ser nulas", ex.getMessage());
+        }
+
     }
 
-    @Test
-    @Tag("Structural")
-    @Tag("UnitTest")
-    @DisplayName("Deve lançar exceção quando entrada for nula")
-    void deveLancarExcecaoQuandoEntradaForNula() {
-        LocalDateTime saida = LocalDateTime.now().plusHours(1);
+    @Nested
+    @DisplayName("Testes de Mutante")
+    class TestesDeMutante {
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-            calculadoraTempoPermanencia.calcularValor(null, saida);
-        });
 
-        assertEquals("horas não podem ser nulas", ex.getMessage());
     }
 
-    @Test
-    @Tag("Structural")
-    @Tag("UnitTest")
-    @DisplayName("Deve lançar exceção quando saída for nula")
-    void deveLancarExcecaoQuandoSaidaForNula() {
-        LocalDateTime entrada = LocalDateTime.now();
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-            calculadoraTempoPermanencia.calcularValor(entrada, null);
-        });
-
-        assertEquals("horas não podem ser nulas", ex.getMessage());
-    }
 }

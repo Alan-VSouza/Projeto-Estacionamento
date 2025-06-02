@@ -173,6 +173,11 @@
             <version>4.29.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -189,6 +194,8 @@
                     </dependency>
                 </dependencies>
                 <configuration>
+                    <historyInputFile>${project.build.directory}/pit-history.txt</historyInputFile>
+                    <historyOutputFile>${project.build.directory}/pit-history.txt</historyOutputFile>
                     <jvmArgs>
                         <arg>-Xmx2048m</arg>
                         <arg>-Xms1024m</arg>
