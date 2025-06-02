@@ -218,4 +218,43 @@ class CorValidValidatorTest {
 
         verifyNoInteractions(context);
     }
+
+    @Test
+    @DisplayName("Deve configurar mensagem customizada para números")
+    void deveConfigurarMensagemCustomizadaParaNumeros() {
+        validator.isValid("123", context);
+
+        verify(context).disableDefaultConstraintViolation();
+        verify(context).buildConstraintViolationWithTemplate(
+                "Cor não pode ser um número. Use nomes como: branco, preto, azul, etc."
+        );
+        verify(violationBuilder).addConstraintViolation();
+        verifyNoMoreInteractions(context, violationBuilder);
+    }
+
+    @Test
+    @DisplayName("Deve configurar mensagem customizada para caracteres especiais")
+    void deveConfigurarMensagemCustomizadaParaEspeciais() {
+        validator.isValid("azul@", context);
+
+        verify(context).disableDefaultConstraintViolation();
+        verify(context).buildConstraintViolationWithTemplate(
+                "Cor não pode conter caracteres especiais (@#!$%). Use apenas letras."
+        );
+        verify(violationBuilder).addConstraintViolation();
+        verifyNoMoreInteractions(context, violationBuilder);
+    }
+
+    @Test
+    @DisplayName("Deve configurar mensagem customizada para tamanho mínimo")
+    void deveConfigurarMensagemCustomizadaParaTamanho() {
+        validator.isValid("ab", context);
+
+        verify(context).disableDefaultConstraintViolation();
+        verify(context).buildConstraintViolationWithTemplate(
+                "Cor deve ter pelo menos 3 caracteres"
+        );
+        verify(violationBuilder).addConstraintViolation();
+        verifyNoMoreInteractions(context, violationBuilder);
+    }
 }
