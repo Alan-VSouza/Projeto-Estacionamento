@@ -3,7 +3,9 @@ package br.ifsp.demo.model;
 import br.ifsp.demo.service.CalculadoraDeTarifa;
 import org.junit.jupiter.api.*;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,6 +36,31 @@ class PagamentoTest {
     @Nested
     @DisplayName("Teste de Mutante")
     class TesteDeMutante {
+
+        @Test
+        @DisplayName("Deve retornar o UUID correto quando ele for definido via Reflection")
+        void deveRetornarUuidCorreto() throws Exception {
+            RegistroEntrada mockRegistroEntrada = mock(RegistroEntrada.class);
+            CalculadoraDeTarifa mockCalculadora = mock(CalculadoraDeTarifa.class);
+            Veiculo mockVeiculo = mock(Veiculo.class);
+            LocalDateTime agora = LocalDateTime.now();
+
+            when(mockRegistroEntrada.getVeiculo()).thenReturn(mockVeiculo);
+            when(mockRegistroEntrada.getHoraEntrada()).thenReturn(agora);
+            when(mockCalculadora.calcularValor(any(), any())).thenReturn(50.0);
+
+            Pagamento pagamento = new Pagamento(mockRegistroEntrada, agora.plusHours(2), mockCalculadora);
+
+            UUID idDeTeste = UUID.randomUUID();
+            Field campoUuid = Pagamento.class.getDeclaredField("uuid");
+            campoUuid.setAccessible(true);
+            campoUuid.set(pagamento, idDeTeste);
+
+            UUID idRetornado = pagamento.getUuid();
+
+            assertThat(idRetornado).isNotNull();
+            assertThat(idRetornado).isEqualTo(idDeTeste);
+        }
 
         @Nested
         @DisplayName("Testes do Construtor")
