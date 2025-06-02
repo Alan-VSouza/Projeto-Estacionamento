@@ -8,9 +8,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.lang.reflect.Field;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class VeiculoTest {
@@ -22,7 +23,7 @@ class VeiculoTest {
 
     @Nested
     @DisplayName("Teste de Mutante")
-    class TesteDeMutante {
+    class TesteDeMutante  {
 
         @Test
         @Tag("UnitTest")
@@ -113,15 +114,21 @@ class VeiculoTest {
         @Test
         @Tag("UnitTest")
         @Tag("Mutation")
-        @DisplayName("Deve retornar o Id corretamente")
-        void deveRetornarIdCorretamente() {
-            Veiculo veiculoMock = mock(Veiculo.class);
-            Long idEsperado = 123L;
-            when(veiculoMock.getId()).thenReturn(idEsperado);
+        @DisplayName("Deve retornar o Id corretamente quando definido via Reflection")
+        void deveRetornarIdCorretamente() throws Exception {
 
-            Long idRetornado = veiculoMock.getId();
+            Veiculo veiculo = new Veiculo("ABC-1234", "Carro", "Sedan", "Preto");
+            Long idDeTeste = 123L;
 
-            assertEquals(idEsperado, idRetornado);
+
+            Field campoId = Veiculo.class.getDeclaredField("id");
+            campoId.setAccessible(true);
+            campoId.set(veiculo, idDeTeste);
+
+            Long idRetornado = veiculo.getId();
+
+            assertNotNull(idRetornado);
+            assertEquals(idDeTeste, idRetornado);
         }
     }
 
