@@ -938,5 +938,44 @@ class RelatorioServiceTest {
             assertEquals(resultado2.ocupacaoMedia(), resultado.ocupacaoMedia(), 0.001,
                     "Pagamentos inválidos não devem influenciar o resultado");
         }
+
+        @Test
+        @Tag("Mutation")
+        @DisplayName("Deve matar mutantes de multiplicação/divisão e return 0.0 em calcularOcupacaoMedia")
+        void deveMatarMutantesCalcularOcupacaoMedia() throws Exception {
+            Method method = RelatorioService.class.getDeclaredMethod("calcularOcupacaoMedia", double.class);
+            method.setAccessible(true);
+
+            long minutosNoDia = Duration.between(LocalDateTime.now().toLocalDate().atStartOfDay(), LocalDateTime.now()).toMinutes();
+            int NUMERO_VAGAS = 200;
+
+            double minutosOcupadosTotal = minutosNoDia * NUMERO_VAGAS * 0.01; 
+
+            double esperado = (double) Math.round((minutosOcupadosTotal / (minutosNoDia * NUMERO_VAGAS)) * 100) / 100;
+
+            double mutante1 = (double) Math.round((minutosOcupadosTotal / (minutosNoDia / (double) NUMERO_VAGAS)) * 100) / 100;
+
+            double mutante2 = (double) Math.round((minutosOcupadosTotal * (minutosNoDia * NUMERO_VAGAS)) * 100) / 100;
+
+            double mutante5 = 0.0;
+
+            double resultado = (double) method.invoke(relatorioService, minutosOcupadosTotal);
+
+            assertEquals(0.01, esperado, 0.001, "Esperado: 1% de ocupação");
+            assertEquals(esperado, resultado, 0.001, "Resultado real deve ser igual ao esperado");
+
+            assertNotEquals(mutante1, resultado, "Mutante 1 (divisão errada) deve ser diferente do correto");
+
+            assertNotEquals(mutante2, resultado, "Mutante 2 (multiplicação errada) deve ser diferente do correto");
+
+            assertNotEquals(mutante5, resultado, "Mutante 5 (sempre zero) deve ser diferente do correto");
+
+            minutosOcupadosTotal = minutosNoDia * NUMERO_VAGAS * 0.5;
+            double esperadoMeio = (double) Math.round((minutosOcupadosTotal / (minutosNoDia * NUMERO_VAGAS)) * 100) / 100;
+            double resultadoMeio = (double) method.invoke(relatorioService, minutosOcupadosTotal);
+            assertEquals(0.5, esperadoMeio, 0.001, "Esperado: 50% de ocupação");
+            assertEquals(esperadoMeio, resultadoMeio, 0.001, "Resultado real deve ser igual ao esperado");
+            assertNotEquals(0.0, resultadoMeio, "Mutante 5 não pode sobreviver com ocupação alta");
+        }
     }
 }
