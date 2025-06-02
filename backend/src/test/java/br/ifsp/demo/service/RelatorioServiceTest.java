@@ -851,5 +851,38 @@ class RelatorioServiceTest {
                 assertTrue(extractedText.contains("Receita Total"), "O PDF deve conter os headers da tabela");
             }
         }
+
+        @Test
+        @Tag("Mutation")
+        @DisplayName("Deve garantir que ocupação média no PDF é multiplicada por 100 (mata mutante de divisão)")
+        void deveGarantirOcupacaoMediaMultiplicadaPor100NoPDF() throws Exception {
+            LocalDate data = LocalDate.of(2025, 6, 1);
+
+            double ocupacaoMedia = 0.75;
+            RelatorioDTO relatorioDTO = new RelatorioDTO(10, 2.0, 100.0, ocupacaoMedia);
+
+            doReturn(relatorioDTO).when(relatorioServiceSpy).gerarRelatorioDesempenho(data);
+
+            byte[] pdfBytes = relatorioServiceSpy.gerarRelatorioPDF(data);
+
+            assertNotNull(pdfBytes, "O PDF não deve ser nulo");
+            assertTrue(pdfBytes.length > 500, "O PDF deve ter tamanho razoável");
+
+            try (PDDocument document = PDDocument.load(pdfBytes)) {
+                PDFTextStripper stripper = new PDFTextStripper();
+                String extractedText = stripper.getText(document);
+                System.out.println("Texto extraído do PDF:\n" + extractedText);
+
+                String normalized = extractedText.replace("\n", "").replace("\r", "").replace(" ", "");
+
+                assertTrue(normalized.contains("75.00%") || normalized.contains("75,00%"),
+                        "O PDF deve conter ocupação média como 75.00% ou 75,00%");
+
+                assertFalse(normalized.contains("0.01%") || normalized.contains("0,01%"),
+                        "O PDF não pode conter ocupação média como 0.01% ou 0,01%");
+                assertFalse(normalized.contains("0.75%") || normalized.contains("0,75%"),
+                        "O PDF não pode conter ocupação média como 0.75% ou 0,75%");
+            }
+        }
     }
 }
