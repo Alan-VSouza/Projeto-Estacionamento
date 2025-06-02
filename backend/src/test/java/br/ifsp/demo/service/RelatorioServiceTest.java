@@ -11,6 +11,8 @@ import br.ifsp.demo.model.Veiculo;
 import br.ifsp.demo.repository.PagamentoRepository;
 import br.ifsp.demo.repository.RegistroEntradaRepository;
 import br.ifsp.demo.repository.VeiculoRepository;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -725,6 +728,7 @@ class RelatorioServiceTest {
         }
 
         @Test
+        @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve calcular médias diárias corretas no relatório mensal")
         void deveCalcularMediasDiariasCorretasNoRelatorioMensal() {
@@ -780,6 +784,7 @@ class RelatorioServiceTest {
         }
 
         @Test
+        @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve detectar mutantes de divisão com valores específicos")
         void deveDetectarMutantesDeDivisaoComValoresEspecificos() {
@@ -812,6 +817,39 @@ class RelatorioServiceTest {
             assertEquals(84000.0, receitaMediaMutanteFev, 0.01, "3000 * 28 = 84000");
             assertNotEquals(receitaMediaFev, receitaMediaMutanteFev,
                     "Para fevereiro, divisão e multiplicação devem ser diferentes");
+        }
+        @Test
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Deve garantir PDF íntegro e conter dados do relatório (mata mutante de document.close())")
+        void deveGarantirPdfIntegroComDocumentClose() throws Exception {
+            LocalDate data = LocalDate.of(2025, 6, 1);
+
+            Pagamento pagamento = new Pagamento(
+                    new RegistroEntrada(new Veiculo("ABC1234", "carro", "civic", "branco")),
+                    data.atTime(10, 0),
+                    data.atTime(12, 0),
+                    new CalculadoraTempoPermanencia(new ValorPermanencia())
+            );
+            when(pagamentoRepository.findAll()).thenReturn(List.of(pagamento));
+
+            byte[] pdfBytes = relatorioService.gerarRelatorioPDF(data);
+
+            assertNotNull(pdfBytes, "O PDF não deve ser nulo");
+            assertTrue(pdfBytes.length > 500, "O PDF deve ter tamanho razoável (não corrompido)");
+
+            String header = new String(pdfBytes, 0, Math.min(4, pdfBytes.length), StandardCharsets.ISO_8859_1);
+            assertTrue(header.startsWith("%PDF"), "O PDF deve começar com o header %PDF");
+            String pdfString = new String(pdfBytes, StandardCharsets.ISO_8859_1);
+            assertTrue(pdfString.contains("%%EOF"), "O PDF deve terminar com %%EOF");
+
+            try (PDDocument document = PDDocument.load(pdfBytes)) {
+                PDFTextStripper stripper = new PDFTextStripper();
+                String extractedText = stripper.getText(document);
+
+                assertTrue(extractedText.contains("Relatório Diário de Desempenho"), "O PDF deve conter o título do relatório");
+                assertTrue(extractedText.contains("Receita Total"), "O PDF deve conter os headers da tabela");
+            }
         }
     }
 }
