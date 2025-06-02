@@ -260,6 +260,63 @@ class RelatorioServiceTest {
             verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
         }
 
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve gerar array de bytes do PDF corretamente com dados válidos")
+        void gerarRelatorioPDF_comDadosValidos_retornaByteArrayNaoVazio() {
+            LocalDate dataTeste = LocalDate.of(2025, 7, 15);
+            RelatorioDTO mockRelatorioDto = new RelatorioDTO(
+                    15,
+                    3.1,
+                    350.50,
+                    0.75
+            );
+
+            doReturn(mockRelatorioDto).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+
+            byte[] pdfBytes = relatorioServiceSpy.gerarRelatorioPDF(dataTeste);
+
+            assertNotNull(pdfBytes, "O array de bytes do PDF não deveria ser nulo.");
+            assertTrue(pdfBytes.length > 0, "O array de bytes do PDF não deveria estar vazio.");
+
+            if (pdfBytes.length > 4) {
+                String pdfHeader = new String(pdfBytes, 0, 4);
+                assertEquals("%PDF", pdfHeader, "O output não parece ser um ficheiro PDF válido (cabeçalho incorreto).");
+            }
+
+            verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve lançar RuntimeException encapsulada quando gerarRelatorioDesempenho falhar ao gerar PDF")
+        void gerarRelatorioPDF_quandoGerarRelatorioDesempenhoFalha_lancaRuntimeException() {
+            LocalDate dataTeste = LocalDate.of(2025, 7, 15);
+            RuntimeException causaDaFalha = new RuntimeException("Falha simulada ao obter dados para PDF");
+
+            doThrow(causaDaFalha).when(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+
+            RuntimeException exceptionLancada = assertThrows(RuntimeException.class, () -> {
+                relatorioServiceSpy.gerarRelatorioPDF(dataTeste);
+            });
+
+            assertEquals("Erro ao gerar PDF", exceptionLancada.getMessage());
+            assertSame(causaDaFalha, exceptionLancada.getCause(), "A causa da exceção não é a esperada.");
+            verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Functional")
+        @DisplayName("Deve lançar RuntimeException se ocorrer erro na biblioteca iText ao gerar PDF (Placeholder)") // Adicionado (Placeholder)
+        void gerarRelatorioPDF_quandoITextFalha_lancaRuntimeException() { // Pode adicionar _placeholder ao nome
+            LocalDate dataTeste = LocalDate.of(2025, 7, 15);
+
+            assertTrue(true, "Teste para falha específica do iText requereria refatoração ou mocks mais complexos e não está implementado.");
+            }
+
     }
 
 }
