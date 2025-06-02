@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -883,6 +884,23 @@ class RelatorioServiceTest {
                 assertFalse(normalized.contains("0.75%") || normalized.contains("0,75%"),
                         "O PDF não pode conter ocupação média como 0.75% ou 0,75%");
             }
+        }
+
+        @Test
+        @Tag("Mutation")
+        @DisplayName("Deve matar mutante de boundary em calcularTempoMedioHoras")
+        void deveMatarMutanteDeBoundaryEmCalcularTempoMedioHoras() throws Exception {
+            Method method = RelatorioService.class.getDeclaredMethod("calcularTempoMedioHoras", int.class, double.class);
+            method.setAccessible(true);
+
+            double resultadoZero = (double) method.invoke(relatorioService, 0, 120.0);
+            assertEquals(0.0, resultadoZero, 0.001, "Com quantidade 0, deve retornar 0.0");
+
+            double resultadoUm = (double) method.invoke(relatorioService, 1, 120.0);
+            assertEquals(2.0, resultadoUm, 0.001, "Com quantidade 1, deve retornar 2.0");
+
+            double resultadoNegativo = (double) method.invoke(relatorioService, -1, 120.0);
+            assertEquals(0.0, resultadoNegativo, 0.001, "Com quantidade negativa, deve retornar 0.0");
         }
     }
 }
