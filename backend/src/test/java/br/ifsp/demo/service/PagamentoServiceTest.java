@@ -275,43 +275,6 @@ class PagamentoServiceTest {
 
         }
 //
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("mensagem de erro ao atualizar pagamento com veiculo nulo")
-//        void mensagemDeErroAoAtualizarPagamentoNulo() {
-//
-//            VeiculoNaoEncontradoException exception = assertThrows(VeiculoNaoEncontradoException.class, ()-> service.atualizarPagamento(
-//                    UUID.randomUUID(), LocalDateTime.now().minusHours(2), LocalDateTime.now(), null, 0
-//            ));
-//            assertEquals("Veículo não existe no banco de dados", exception.getMessage());
-//
-//        }
-//
-//        @Test
-//        @Tag("UnitTest")
-//        @Tag("Functional")
-//        @DisplayName("mensagem de erro ao atualizar pagamento com UUID inexistente")
-//        void mensagemDeErroAoAtualizarPagamentoInexistente() {
-//            UUID uuidInexistente = UUID.randomUUID();
-//
-//            when(veiculoService.buscarPorPlaca(pagamento.getPlaca())).thenReturn(Optional.ofNullable(veiculo));
-//            when(pagamentoRepository.findById(uuidInexistente)).thenReturn(Optional.empty());
-//
-//            PagamentoNaoEncontradoException exception = assertThrows(PagamentoNaoEncontradoException.class, () ->
-//                    service.atualizarPagamento(
-//                            uuidInexistente,
-//                            LocalDateTime.now().minusHours(1),
-//                            LocalDateTime.now(),
-//                            veiculo.getPlaca(),
-//                            10.0
-//                    )
-//            );
-//
-//            assertEquals("Pagamento não encontrado", exception.getMessage());
-//            verify(pagamentoRepository).findById(uuidInexistente);
-//        }
-//
 //        @ParameterizedTest
 //        @Tag("UnitTest")
 //        @Tag("Functional")
