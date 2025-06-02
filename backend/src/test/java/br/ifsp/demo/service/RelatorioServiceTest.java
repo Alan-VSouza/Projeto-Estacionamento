@@ -854,6 +854,7 @@ class RelatorioServiceTest {
         }
 
         @Test
+        @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve garantir que ocupação média no PDF é multiplicada por 100 (mata mutante de divisão)")
         void deveGarantirOcupacaoMediaMultiplicadaPor100NoPDF() throws Exception {
@@ -887,6 +888,7 @@ class RelatorioServiceTest {
         }
 
         @Test
+        @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve matar mutante de boundary em calcularTempoMedioHoras")
         void deveMatarMutanteDeBoundaryEmCalcularTempoMedioHoras() throws Exception {
@@ -901,6 +903,40 @@ class RelatorioServiceTest {
 
             double resultadoNegativo = (double) method.invoke(relatorioService, -1, 120.0);
             assertEquals(0.0, resultadoNegativo, 0.001, "Com quantidade negativa, deve retornar 0.0");
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Deve matar mutante de filtro sempre verdadeiro em calcularMinutosOcupados")
+        void deveMatarMutanteFiltroSempreVerdadeiro() {
+            LocalDate data = LocalDate.of(2025, 6, 1);
+            LocalDateTime inicioDoDia = data.atStartOfDay();
+
+            Pagamento p1 = new Pagamento(
+                    new RegistroEntrada(new Veiculo("A", "carro", "modelo", "cor")),
+                    inicioDoDia,
+                    inicioDoDia.plusMinutes(1500),
+                    new CalculadoraTempoPermanencia(new ValorPermanencia())
+            );
+            Pagamento pInvalido = mock(Pagamento.class);
+            when(pInvalido.getHoraEntrada()).thenReturn(null);
+            when(pInvalido.getHoraSaida()).thenReturn(inicioDoDia.plusMinutes(10));
+
+            when(pagamentoRepository.findAll()).thenReturn(List.of(p1, pInvalido));
+            RelatorioDTO resultado = relatorioService.gerarRelatorioDesempenho(data);
+
+            Pagamento p2 = new Pagamento(
+                    new RegistroEntrada(new Veiculo("B", "carro", "modelo", "cor")),
+                    inicioDoDia,
+                    inicioDoDia.plusMinutes(1500),
+                    new CalculadoraTempoPermanencia(new ValorPermanencia())
+            );
+            when(pagamentoRepository.findAll()).thenReturn(List.of(p1, p2));
+            RelatorioDTO resultado2 = relatorioService.gerarRelatorioDesempenho(data);
+
+            assertEquals(resultado2.ocupacaoMedia(), resultado.ocupacaoMedia(), 0.001,
+                    "Pagamentos inválidos não devem influenciar o resultado");
         }
     }
 }
