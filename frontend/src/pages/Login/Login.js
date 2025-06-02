@@ -40,7 +40,7 @@ function LoginWebsite({ onLoginSuccess }) {
     }
     
     if (senhaLimpa.length < 6) {
-      return "❌ Senha deve ter pelo menos 6 caracteres";
+      return "❌ Senha deve ter pelo menos 8 caracteres";
     }
     
     return null;
@@ -138,7 +138,7 @@ function LoginWebsite({ onLoginSuccess }) {
               </div>
             )}
             <small>
-              ✅ Mínimo 6 caracteres, sem símbolos especiais
+              ✅ Mínimo 8 caracteres, sem símbolos especiais
             </small>
           </div>
           
