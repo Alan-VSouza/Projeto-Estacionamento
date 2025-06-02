@@ -734,6 +734,44 @@ public class EstacionamentoServiceTest {
         }
 
 
+        @Test
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Retorna Not found quando nao encontra veiculo registrado")
+        void retornaNotFoundQuandoNaoEncontraVeiculoRegistrado() {
+
+            Estacionamento estacionamentoMock = mock(Estacionamento.class);
+            when(estacionamentoRepository.findAll()).thenReturn(List.of(estacionamentoMock));
+
+            when(veiculoService.buscarPorPlaca("aaaaaa")).thenReturn(Optional.empty());
+
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+                estacionamentoService.registrarSaida("aaaaaa");
+            });
+
+            assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+            assertThat(exception.getMessage()).isEqualTo("404 NOT_FOUND \"Veículo não está registrado\"");
+
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Retorna Not found quando nao encontra veiculo registrado ao cancelar entrada")
+        void retornaNotFoundQuandoNaoEncontraVeiculoRegistradoAoCancelarEntrada() {
+
+            when(veiculoService.buscarPorPlaca("aaaaaa")).thenReturn(Optional.empty());
+
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+                estacionamentoService.cancelarEntrada("aaaaaa");
+            });
+
+            assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+            assertThat(exception.getMessage()).isEqualTo("404 NOT_FOUND \"Veiculo não encontrado\"");
+
+        }
+
+
 
     }
 
