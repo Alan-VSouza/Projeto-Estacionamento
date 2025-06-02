@@ -11,7 +11,9 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 class EstacionamentoTest {
 
@@ -155,8 +157,27 @@ class EstacionamentoTest {
         @DisplayName("Testes do corpo da classe")
         class TestesDoCorpoDaClasse {
 
+            @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @DisplayName("Deve retornar o ID correto quando ele for definido")
+            void deveRetornarIdCorreto() throws Exception {
+                Estacionamento estacionamento = new Estacionamento("Estacionamento Legal", "Rua Válida, 123", 100);
+                UUID idDeTeste = UUID.randomUUID();
+
+                Field campoId = Estacionamento.class.getDeclaredField("id");
+                campoId.setAccessible(true);
+                campoId.set(estacionamento, idDeTeste);
+
+                UUID idRetornado = estacionamento.getId();
+
+                assertThat(idRetornado).isNotNull();
+                assertThat(idRetornado).isEqualTo(idDeTeste);
+            }
 
             @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
             @DisplayName("Deve retornar excecao ao setar endereco nulo")
             void deveRetornarExcecaoAoSetarEnderecoNulo() {
 
@@ -168,6 +189,8 @@ class EstacionamentoTest {
             }
 
             @Test
+            @Tag("UnitTest")
+            @Tag("Mutation")
             @DisplayName("Deve retornar excecao ao setar nome nulo")
             void deveRetornarExcecaoAoSetarNomeNulo() {
 
