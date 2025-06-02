@@ -252,6 +252,37 @@
   margin: 20px 0;
 }
 
+.input-error {
+  border: 2px solid #f56565 !important;
+  background-color: #fed7d7;
+}
+
+.placa-error-message {
+  color: #c53030;
+  font-size: 0.9em;
+  margin-top: 8px;
+  padding: 8px;
+  background: #fed7d7;
+  border-radius: 5px;
+  border-left: 4px solid #f56565;
+}
+
+.search-hints {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.search-hints small {
+  color: #666;
+  font-size: 0.8em;
+  line-height: 1.4;
+}
+
+.search-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .search-input-group {
     flex-direction: column;
