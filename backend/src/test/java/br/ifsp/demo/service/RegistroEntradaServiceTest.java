@@ -167,20 +167,22 @@ public class RegistroEntradaServiceTest {
         @Tag("Mutation")
         @DisplayName("Deve lançar exceção quando Veículo é encontrado MAS não possui RegistroEntrada, ao cancelar check-in")
         void cancelarCheckIn_quandoVeiculoEncontradoMasRegistroEntradaNao_deveLancarExcecao() {
-            String placaVeiculo = "ABC-7890";
+            String placaParaTeste = "ABC-7890";
             Veiculo veiculoExistenteMock = mock(Veiculo.class);
             String motivoCancelamento = "Teste";
 
-            when(veiculoService.buscarPorPlaca(placaVeiculo)).thenReturn(Optional.of(veiculoExistenteMock));
+            when(veiculoExistenteMock.getPlaca()).thenReturn(placaParaTeste);
+            when(veiculoService.buscarPorPlaca(placaParaTeste)).thenReturn(Optional.of(veiculoExistenteMock));
 
             when(registroEntradaRepository.findByVeiculo(veiculoExistenteMock))
                     .thenReturn(Optional.empty());
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                registroEntradaService.cancelarCheckIn(veiculoExistenteMock, MOTIVO_CANCELAMENTO);
+                registroEntradaService.cancelarCheckIn(veiculoExistenteMock, motivoCancelamento);
             });
 
             assertThat(exception.getMessage()).isEqualTo("Veículo não registrado no estacionamento");
+
         }
 
     }
