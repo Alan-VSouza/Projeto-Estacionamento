@@ -36,10 +36,12 @@ public class RegistroEntradaServiceTest {
     private RegistroEntradaService registroEntradaService;
 
     private Veiculo veiculo;
+    private RegistroEntrada registroEntrada;
 
     @BeforeEach
     void setup() {
         veiculo = new Veiculo(PLACA_VEICULO, "Carro", "Fusca", "Azul");
+        registroEntrada = new RegistroEntrada(veiculo);
     }
 
 
@@ -68,40 +70,47 @@ public class RegistroEntradaServiceTest {
             verify(registroEntradaRepository, times(1)).findByVeiculo(veiculo);
             verify(registroEntradaRepository, times(1)).save(any(RegistroEntrada.class));
         }
-//
-//        @Test
-//        @Tag("Functional")
-//        @Tag("UnitTest")
-//        @Tag("TDD")
-//        @DisplayName("Deve lançar IllegalArgumentException quando o veículo já estiver registrado")
-//        void registrarEntrada_veiculoJaRegistrado() {
-//            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
-//
-//            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-//                    () -> registroEntradaService.registrarEntrada(veiculo));
-//
-//            assertEquals(MENSAGEM_VEICULO_JA_REGISTRADO, ex.getMessage());
-//            verify(registroEntradaRepository, times(0)).save(any());
-//        }
-//
-//        @Test
-//        @Tag("Functional")
-//        @Tag("UnitTest")
-//        @DisplayName("Deve registrar corretamente o horário de entrada do veículo")
-//        void registrarEntrada_comHorarioCorreto() {
-//            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
-//            when(registroEntradaRepository.save(any())).thenAnswer(invocation -> {
-//                RegistroEntrada entrada = invocation.getArgument(0);
-//                entrada.setHoraEntrada(LocalDateTime.now());
-//                return entrada;
-//            });
-//
-//            RegistroEntrada resultado = registroEntradaService.registrarEntrada(veiculo);
-//
-//            assertNotNull(resultado);
-//            assertEquals(veiculo, resultado.getVeiculo());
-//            assertNotNull(resultado.getHoraEntrada());
-//            verify(registroEntradaRepository, times(1)).save(any());
+
+        @Test
+        @Tag("Functional")
+        @Tag("UnitTest")
+        @Tag("TDD")
+        @DisplayName("Deve lançar IllegalArgumentException quando o veículo já estiver registrado")
+        void registrarEntrada_veiculoJaRegistrado() {
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.of(registroEntrada));
+
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                    () -> registroEntradaService.registrarEntrada(veiculo));
+
+            assertEquals(MENSAGEM_VEICULO_JA_REGISTRADO, ex.getMessage());
+            verify(registroEntradaRepository, times(0)).save(any());
+        }
+
+        @Test
+        @Tag("Functional")
+        @Tag("UnitTest")
+        @DisplayName("Deve registrar corretamente o horário de entrada do veículo")
+        void registrarEntrada_comHorarioCorreto() {
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
+
+            when(registroEntradaRepository.save(any(RegistroEntrada.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+            LocalDateTime antesDaChamada = LocalDateTime.now();
+            RegistroEntrada resultado = registroEntradaService.registrarEntrada(veiculo);
+            LocalDateTime depoisDaChamada = LocalDateTime.now();
+
+            assertNotNull(resultado);
+            assertEquals(veiculo, resultado.getVeiculo());
+            assertNotNull(resultado.getHoraEntrada());
+
+            assertTrue(resultado.getHoraEntrada().equals(antesDaChamada) || resultado.getHoraEntrada().isAfter(antesDaChamada),
+                    "Hora de entrada deveria ser igual ou depois do momento antes da chamada.");
+            assertTrue(resultado.getHoraEntrada().equals(depoisDaChamada) || resultado.getHoraEntrada().isBefore(depoisDaChamada),
+                    "Hora de entrada deveria ser igual ou antes do momento depois da chamada.");
+
+            verify(registroEntradaRepository, times(1)).findByVeiculo(veiculo);
+            verify(registroEntradaRepository, times(1)).save(any(RegistroEntrada.class));
         }
     }
 //
