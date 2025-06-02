@@ -644,10 +644,29 @@ public class EstacionamentoServiceTest {
             verify(estacionamentoRepository, never()).save(any());
             verify(estacionamentoRepository, never()).delete(any());
         }
+
+        @ParameterizedTest
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @CsvSource(
+                value = {
+                        "NULL_VAL,        Placa não pode ser nula ou vazia",
+                        "''      ,         Placa não pode ser nula ou vazia",
+                },
+                nullValues = {"NULL_VAL"}
+        )
+        @DisplayName("Deve lançar IllegalArgument para parametros inválidos ao buscar entrada")
+        void deveLancarIllegalArgumentParaParametrosInvalidosAoBuscarEntrada(
+                String placa,
+                String mensagem
+        ) {
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    estacionamentoService.buscarEntrada(placa));
+
+            assertEquals(mensagem, exception.getMessage());
+
+        }
     }
-
-
-
-
 
 }
