@@ -52,6 +52,31 @@ class DataLoaderTest {
             assertThat(outputStreamCaptor.toString()).contains(mensagemEsperada);
         }
 
+        @Test
+        @Tag("UnitTest")
+        @Tag("Mutation")
+        @DisplayName("Não deve carregar estacionamento e deve logar quando o banco já estiver populado")
+        void quandoBancoDeDadosNaoVazio_entaoDataLoaderNaoAdicionaNovo() {
+
+            estacionamentoRepository.deleteAll();
+            estacionamentoRepository.save(new Estacionamento("Estacionamento Existente", "Rua Teste", 50));
+            String mensagemEsperada = ">>>> DataLoader: Pelo menos um estacionamento já existe. Nenhum novo estacionamento padrão foi criado.";
+
+            ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+            PrintStream standardOut = System.out;
+            System.setOut(new PrintStream(outputStreamCaptor));
+
+            try {
+                dataLoader.run(null);
+            } catch (Exception ignored) {
+            } finally {
+                System.setOut(standardOut);
+            }
+
+            long total = estacionamentoRepository.count();
+            assertThat(total).isEqualTo(1);
+            assertThat(outputStreamCaptor.toString()).contains(mensagemEsperada);
+        }
 
     }
 }
