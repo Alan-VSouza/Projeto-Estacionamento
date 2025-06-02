@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -306,5 +307,37 @@ class PagamentoServiceTest {
                 verify(pagamentoRepository, never()).findById(any());
             }
         }
+    }
+
+    @Nested
+    @DisplayName("Testes estruturais")
+    class TestesEstruturais {
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Testa mensagem de erro para data nula em buscar por data")
+        void testaMensagemDeErroParaDataNulaEmBuscarPorData() {
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    pagamentoService.buscarPorData(null));
+
+            assertEquals("Data não pode ser nula", exception.getMessage());
+
+        }
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Testa mensagem de erro para data nula em calcular total por data")
+        void testaMensagemDeErroParaDataNulaEmCalcularTotalPorData() {
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    pagamentoService.calcularTotalArrecadadoPorData(null));
+
+            assertEquals("Data não pode ser nula", exception.getMessage());
+
+        }
+
     }
 }

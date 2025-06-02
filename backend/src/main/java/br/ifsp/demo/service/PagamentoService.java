@@ -16,6 +16,7 @@ public class PagamentoService {
 
     private final PagamentoRepository pagamentoRepository;
 
+
     public void salvarPagamento(Pagamento pagamento) {
         if (pagamento == null) {
             throw new IllegalArgumentException("O objeto de pagamento não pode ser nulo.");
@@ -42,12 +43,18 @@ public class PagamentoService {
     }
 
     public List<Pagamento> buscarPorData(LocalDate data) {
+        if(data ==  null)
+            throw new IllegalArgumentException("Data não pode ser nula");
+
         LocalDateTime inicio = data.atStartOfDay();
         LocalDateTime fim = data.atTime(23, 59, 59);
         return pagamentoRepository.findByHoraSaidaBetween(inicio, fim);
     }
 
     public double calcularTotalArrecadadoPorData(LocalDate data) {
+        if(data == null)
+            throw new IllegalArgumentException("Data não pode ser nula");
+
         LocalDateTime inicio = data.atStartOfDay();
         LocalDateTime fim = data.atTime(23, 59, 59);
         Double total = pagamentoRepository.somarPagamentosPorData(inicio, fim);
