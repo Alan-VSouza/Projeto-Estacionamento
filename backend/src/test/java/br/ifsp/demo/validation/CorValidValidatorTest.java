@@ -92,4 +92,47 @@ class CorValidValidatorTest {
         assertFalse(validator.isValid(null, context));
         verifyNoInteractions(context);
     }
+
+    @Test
+    @DisplayName("Deve rejeitar cor vazia")
+    void deveRejeitarCorVazia() {
+        assertFalse(validator.isValid("", context));
+        verifyNoInteractions(context);
+    }
+
+    @Test
+    @DisplayName("Deve rejeitar cor apenas com espaços")
+    void deveRejeitarCorApenasEspacos() {
+        assertFalse(validator.isValid("   ", context));
+        assertFalse(validator.isValid("\t\t", context));
+        assertFalse(validator.isValid("\n\n", context));
+
+        verifyNoInteractions(context);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"123", "456", "789", "0", "999", "12345"})
+    @DisplayName("Deve rejeitar cores que são apenas números")
+    void deveRejeitarCoresApenasNumeros(String corNumerica) {
+        assertFalse(validator.isValid(corNumerica, context));
+
+        verify(context).disableDefaultConstraintViolation();
+        verify(context).buildConstraintViolationWithTemplate(
+                "Cor não pode ser um número. Use nomes como: branco, preto, azul, etc."
+        );
+        verify(violationBuilder).addConstraintViolation();
+    }
+
+    @Test
+    @DisplayName("Deve rejeitar números com espaços")
+    void deveRejeitarNumerosComEspacos() {
+        assertFalse(validator.isValid("  123  ", context));
+
+        verify(context).disableDefaultConstraintViolation();
+        verify(context).buildConstraintViolationWithTemplate(
+                "Cor não pode ser um número. Use nomes como: branco, preto, azul, etc."
+        );
+        verify(violationBuilder).addConstraintViolation();
+    }
+
 }
