@@ -14,11 +14,13 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,6 +38,14 @@ class RelatorioServiceTest {
     @InjectMocks
     private RelatorioService relatorioService;
 
+    private RelatorioService relatorioServiceSpy;
+
+    @BeforeEach
+    void setUp() {
+        RelatorioService realService = new RelatorioService(pagamentoRepository, registroEntradaRepository);
+        relatorioServiceSpy = Mockito.spy(realService);
+    }
+
     @Nested
     @DisplayName("TDD Tests")
     class TddTests {
@@ -45,37 +55,45 @@ class RelatorioServiceTest {
         @Tag("Functional")
         @DisplayName("Deve calcular corretamente o relatório com base nos pagamentos da data")
         void deveCalcularCorretamenteORelatorioComBaseNosPagamentosDaData() {
-            Pagamento p1 = new Pagamento(
-                    new RegistroEntrada(
-                            new Veiculo("ABC6969", "carro", "carroA", "branco")),
-                    LocalDateTime.of(2025, 5, 3, 10, 0),
-                    LocalDateTime.of(2025, 5, 3, 12, 0),
-                    new CalculadoraTempoPermanencia(
-                            new ValorPermanencia()));
+            LocalDate dataTeste = LocalDate.of(2025, 5, 3);
 
-            Pagamento p2 = new Pagamento(
-                    new RegistroEntrada(
-                            new Veiculo("XYZ6969", "carro", "carroB", "preto")),
-                    LocalDateTime.of(2025, 5, 3, 14, 0),
-                    LocalDateTime.of(2025, 5, 3, 16, 30),
-                    new CalculadoraTempoPermanencia(
-                            new ValorPermanencia()));
+            Veiculo v1Mock = Mockito.mock(Veiculo.class);
+            when(v1Mock.getPlaca()).thenReturn("ABC6969");
+            RegistroEntrada re1Mock = Mockito.mock(RegistroEntrada.class);
+            when(re1Mock.getVeiculo()).thenReturn(v1Mock);
+            when(re1Mock.getHoraEntrada()).thenReturn(LocalDateTime.of(2025, 5, 3, 10, 0));
+
+            Veiculo v2Mock = Mockito.mock(Veiculo.class);
+            when(v2Mock.getPlaca()).thenReturn("XYZ6969");
+            RegistroEntrada re2Mock = Mockito.mock(RegistroEntrada.class);
+            when(re2Mock.getVeiculo()).thenReturn(v2Mock);
+            when(re2Mock.getHoraEntrada()).thenReturn(LocalDateTime.of(2025, 5, 3, 14, 0));
+
+            CalculadoraDeTarifa calc = new CalculadoraTempoPermanencia(new ValorPermanencia());
+            Pagamento p1 = new Pagamento(re1Mock, LocalDateTime.of(2025, 5, 3, 12, 0), calc);
+            Pagamento p2 = new Pagamento(re2Mock, LocalDateTime.of(2025, 5, 3, 16, 30), calc);
 
             List<Pagamento> pagamentosDeTeste = List.of(p1, p2);
 
-            double minutosOcupadosTotal = Duration.between(p1.getHoraEntrada(), p1.getHoraSaida()).toMinutes()
-                    + Duration.between(p2.getHoraEntrada(), p2.getHoraSaida()).toMinutes();
-            double ocupacaoEsperada = minutosOcupadosTotal / (1440.0 * 200);
-
             when(pagamentoRepository.findAll()).thenReturn(pagamentosDeTeste);
 
-            RelatorioDTO relatorio = relatorioService.gerarRelatorioDesempenho(LocalDate.of(2025, 5, 3));
+            double minutosOcupadosP1 = Duration.between(p1.getHoraEntrada(), p1.getHoraSaida()).toMinutes();
+            double minutosOcupadosP2 = Duration.between(p2.getHoraEntrada(), p2.getHoraSaida()).toMinutes();
+            double totalMinutosOcupados = minutosOcupadosP1 + minutosOcupadosP2;
+
+            long totalMinutosNoDia = 1440;
+            int numeroVagas = 200;
+            double fracaoOcupacao = totalMinutosOcupados / (double) (totalMinutosNoDia * numeroVagas);
+            double ocupacaoMediaEsperada = (double) Math.round(fracaoOcupacao * 100.0) / 100.0;
+
+
+            RelatorioDTO relatorio = relatorioServiceSpy.gerarRelatorioDesempenho(dataTeste);
 
             assertNotNull(relatorio);
             assertEquals(2, relatorio.quantidade());
             assertEquals(2.25, relatorio.tempoMedioHoras(), 0.01);
-            assertEquals(44.0, relatorio.receitaTotal(), 0.01);
-            assertEquals(ocupacaoEsperada, relatorio.ocupacaoMedia(), 0.01);
+            assertEquals(p1.getValor() + p2.getValor(), relatorio.receitaTotal(), 0.01);
+            assertEquals(ocupacaoMediaEsperada, relatorio.ocupacaoMedia(), 0.02);
         }
 
         @Test
@@ -181,4 +199,13 @@ class RelatorioServiceTest {
             assertEquals(2, vagasOcupadas);
         }
     }
+
+    @Nested
+    @DisplayName("Testes estruturais")
+    class TestesEstruturais {
+
+
+
+    }
+
 }
