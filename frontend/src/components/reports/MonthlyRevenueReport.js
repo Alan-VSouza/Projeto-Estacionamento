@@ -39,6 +39,13 @@ function MonthlyRevenueReport() {
   const [error, setError] = useState(null);
   const [exporting, setExporting] = useState(false);
 
+  const [flippedCards, setFlippedCards] = useState({
+    revenue: false,
+    vehicles: false,
+    avgTime: false,
+    bestDay: false
+  });
+
   const meses = [
     '', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
@@ -87,6 +94,13 @@ function MonthlyRevenueReport() {
     return `${h}h ${m}m`;
   };
 
+  const toggleFlip = (cardType) => {
+    setFlippedCards(prev => ({
+      ...prev,
+      [cardType]: !prev[cardType]
+    }));
+  };
+
   return (
     <div className="monthly-revenue-report">
       <div className="report-header">
@@ -113,34 +127,82 @@ function MonthlyRevenueReport() {
         </div>
       </div>
 
-      {loading && <div className="loading">Carregando relatório mensal...</div>}
+      {loading && <div className="loading">⏳ Carregando relatório mensal...</div>}
       
-      {error && <div className="error-message">Erro: {error}</div>}
+      {error && <div className="error-message">❌ Erro: {error}</div>}
 
       {reportData && !loading && (
         <div className="report-content">
           <div className="report-cards">
-            <div className="report-card revenue">
-              <h3>💰 Receita Total</h3>
-              <div className="value">{formatCurrency(reportData.receitaTotal || 0)}</div>
+            <div className="flip-card" onClick={() => toggleFlip('revenue')}>
+              <div className={`flip-card-inner ${flippedCards.revenue ? 'flipped' : ''}`}>
+                <div className="flip-card-front report-card revenue">
+                  <h3>💰 Receita Total</h3>
+                  <div className="value">{formatCurrency(reportData.receitaTotal || 0)}</div>
+                  <small className="flip-hint">💡 Clique para ver a descrição</small>
+                </div>
+                <div className="flip-card-back report-card revenue">
+                  <h3>💰 Receita Total</h3>
+                  <div className="description">
+                    Soma do valor de todos os pagamentos realizados no mês.
+                  </div>
+                  <small className="flip-hint">💡 Clique para voltar ao valor</small>
+                </div>
+              </div>
             </div>
-            
-            <div className="report-card vehicles">
-              <h3>🚗 Veículos Atendidos</h3>
-              <div className="value">{reportData.totalVeiculos || 0}</div>
+
+            <div className="flip-card" onClick={() => toggleFlip('vehicles')}>
+              <div className={`flip-card-inner ${flippedCards.vehicles ? 'flipped' : ''}`}>
+                <div className="flip-card-front report-card vehicles">
+                  <h3>🚗 Veículos Atendidos</h3>
+                  <div className="value">{reportData.totalVeiculos || 0}</div>
+                  <small className="flip-hint">💡 Clique para ver a descrição</small>
+                </div>
+                <div className="flip-card-back report-card vehicles">
+                  <h3>🚗 Veículos Atendidos</h3>
+                  <div className="description">
+                    Quantidade de veículos que utilizaram o estacionamento no mês.
+                  </div>
+                  <small className="flip-hint">💡 Clique para voltar ao valor</small>
+                </div>
+              </div>
             </div>
-            
-            <div className="report-card avg-time">
-              <h3>⏱️ Tempo Médio</h3>
-              <div className="value">{formatTime(reportData.tempoMedioHoras || 0)}</div>
+
+            <div className="flip-card" onClick={() => toggleFlip('avgTime')}>
+              <div className={`flip-card-inner ${flippedCards.avgTime ? 'flipped' : ''}`}>
+                <div className="flip-card-front report-card avg-time">
+                  <h3>⏱️ Tempo Médio</h3>
+                  <div className="value">{formatTime(reportData.tempoMedioHoras || 0)}</div>
+                  <small className="flip-hint">💡 Clique para ver a descrição</small>
+                </div>
+                <div className="flip-card-back report-card avg-time">
+                  <h3>⏱️ Tempo Médio</h3>
+                  <div className="description">
+                    Média de permanência dos veículos no estacionamento no mês.
+                  </div>
+                  <small className="flip-hint">💡 Clique para voltar ao valor</small>
+                </div>
+              </div>
             </div>
-            
-            <div className="report-card best-day">
-              <h3>🏆 Melhor Dia</h3>
-              <div className="value">
-                Dia {reportData.melhorDia}
-                <div style={{ fontSize: '0.7em', marginTop: '5px' }}>
-                  {formatCurrency(reportData.melhorReceita || 0)}
+
+            <div className="flip-card" onClick={() => toggleFlip('bestDay')}>
+              <div className={`flip-card-inner ${flippedCards.bestDay ? 'flipped' : ''}`}>
+                <div className="flip-card-front report-card best-day">
+                  <h3>🏆 Melhor Dia</h3>
+                  <div className="value">
+                    Dia {reportData.melhorDia}
+                    <div style={{ fontSize: '0.7em', marginTop: '5px' }}>
+                      {formatCurrency(reportData.melhorReceita || 0)}
+                    </div>
+                  </div>
+                  <small className="flip-hint">💡 Clique para ver a descrição</small>
+                </div>
+                <div className="flip-card-back report-card best-day">
+                  <h3>🏆 Melhor Dia</h3>
+                  <div className="description">
+                    Dia do mês com maior receita gerada no estacionamento.
+                  </div>
+                  <small className="flip-hint">💡 Clique para voltar ao valor</small>
                 </div>
               </div>
             </div>

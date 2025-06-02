@@ -93,36 +93,96 @@
   margin-bottom: 30px;
 }
 
+.flip-card {
+  background-color: transparent;
+  width: 100%;
+  height: 150px;
+  perspective: 1000px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flip-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, 
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+.flip-card:hover .flip-card-front,
+.flip-card:hover .flip-card-back {
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
 .report-card {
   background: rgba(248, 249, 250, 0.8);
   backdrop-filter: blur(10px);
   border-radius: 15px;
-  padding: 20px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  cursor: pointer;
   min-height: 120px;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-}
-
-.report-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .report-card h3 {
   margin: 0 0 10px 0;
   font-size: 1.1em;
   opacity: 0.9;
+  font-weight: 600;
 }
 
 .report-card .value {
   font-size: 2em;
   font-weight: bold;
   margin: 0;
+  text-align: center;
+}
+
+.report-card .description {
+  font-size: 0.95em;
+  line-height: 1.4;
+  text-align: center;
+  margin: 10px 0;
+  opacity: 0.95;
+}
+
+.flip-hint {
+  font-size: 0.8em;
+  opacity: 0.8;
+  margin-top: 10px;
+  display: block;
 }
 
 .report-card.revenue {
@@ -227,6 +287,18 @@
     grid-template-columns: 1fr;
   }
   
+  .flip-card {
+    height: 130px;
+  }
+  
+  .report-card .value {
+    font-size: 1.6em;
+  }
+  
+  .report-card .description {
+    font-size: 0.85em;
+  }
+  
   .reports-tabs {
     flex-direction: column;
   }
@@ -256,5 +328,21 @@
   
   .page-header h1 {
     font-size: 2em;
+  }
+  
+  .flip-card {
+    height: 120px;
+  }
+  
+  .report-card .value {
+    font-size: 1.4em;
+  }
+  
+  .report-card .description {
+    font-size: 0.8em;
+  }
+  
+  .report-card h3 {
+    font-size: 1em;
   }
 }
