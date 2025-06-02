@@ -229,7 +229,6 @@ class PagamentoTest {
             @Tag("Mutation")
             @DisplayName("Deve lançar exceção quando o valor da tarifa for negativo")
             void deveLancarExcecaoQuandoValorForNegativo() {
-                String mensagemEsperada = "Valor da tarifa não pode ser negativo";
                 when(calculadoraDeTarifa.calcularValor(any(LocalDateTime.class), any(LocalDateTime.class)))
                         .thenReturn(-10.0);
 
@@ -237,7 +236,7 @@ class PagamentoTest {
                     new Pagamento(registroEntrada, entrada, saida, calculadoraDeTarifa);
                 });
 
-                assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
+                assertThat(excecao.getMessage()).isEqualTo("Valor da tarifa não pode ser negativo");
             }
 
         }
