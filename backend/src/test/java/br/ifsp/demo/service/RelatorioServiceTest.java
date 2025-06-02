@@ -21,7 +21,9 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -204,11 +206,14 @@ class RelatorioServiceTest {
     @DisplayName("Testes funcionais")
     class TestesFuncionais {
 
-        @Test
-        @Tag("UnitTest")
-        @Tag("Functional")
-        @DisplayName("Deve gerar CSV corretamente com dados válidos")
-        void gerarRelatorioCSV_comDadosValidos_retornaStringCSVCorreta() {
+        @Nested
+        @DisplayName("CSV Testes")
+        class CSVTestes {
+            @Test
+            @Tag("UnitTest")
+            @Tag("Functional")
+            @DisplayName("Deve gerar CSV corretamente com dados válidos")
+            void gerarRelatorioCSV_comDadosValidos_retornaStringCSVCorreta () {
             LocalDate dataTeste = LocalDate.of(2025, 6, 1);
             RelatorioDTO mockRelatorioDto = new RelatorioDTO(
                     10,
@@ -241,11 +246,11 @@ class RelatorioServiceTest {
             verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
         }
 
-        @Test
-        @Tag("UnitTest")
-        @Tag("Functional")
-        @DisplayName("Deve lançar RuntimeException encapsulada quando gerarRelatorioDesempenho falhar")
-        void gerarRelatorioCSV_quandoGerarRelatorioDesempenhoFalha_lancaRuntimeException() {
+            @Test
+            @Tag("UnitTest")
+            @Tag("Functional")
+            @DisplayName("Deve lançar RuntimeException encapsulada quando gerarRelatorioDesempenho falhar")
+            void gerarRelatorioCSV_quandoGerarRelatorioDesempenhoFalha_lancaRuntimeException () {
             LocalDate dataTeste = LocalDate.of(2025, 6, 1);
             RuntimeException causaDaFalha = new RuntimeException("Falha simulada ao gerar desempenho");
 
@@ -259,12 +264,16 @@ class RelatorioServiceTest {
             assertSame(causaDaFalha, exceptionLancada.getCause());
             verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
         }
+        }
 
-        @Test
-        @Tag("UnitTest")
-        @Tag("Functional")
-        @DisplayName("Deve gerar array de bytes do PDF corretamente com dados válidos")
-        void gerarRelatorioPDF_comDadosValidos_retornaByteArrayNaoVazio() {
+        @Nested
+        @DisplayName("PDF Testes")
+        class PDFTestes{
+            @Test
+            @Tag("UnitTest")
+            @Tag("Functional")
+            @DisplayName("Deve gerar array de bytes do PDF corretamente com dados válidos")
+            void gerarRelatorioPDF_comDadosValidos_retornaByteArrayNaoVazio () {
             LocalDate dataTeste = LocalDate.of(2025, 7, 15);
             RelatorioDTO mockRelatorioDto = new RelatorioDTO(
                     15,
@@ -288,11 +297,11 @@ class RelatorioServiceTest {
             verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
         }
 
-        @Test
-        @Tag("UnitTest")
-        @Tag("Functional")
-        @DisplayName("Deve lançar RuntimeException encapsulada quando gerarRelatorioDesempenho falhar ao gerar PDF")
-        void gerarRelatorioPDF_quandoGerarRelatorioDesempenhoFalha_lancaRuntimeException() {
+            @Test
+            @Tag("UnitTest")
+            @Tag("Functional")
+            @DisplayName("Deve lançar RuntimeException encapsulada quando gerarRelatorioDesempenho falhar ao gerar PDF")
+            void gerarRelatorioPDF_quandoGerarRelatorioDesempenhoFalha_lancaRuntimeException () {
             LocalDate dataTeste = LocalDate.of(2025, 7, 15);
             RuntimeException causaDaFalha = new RuntimeException("Falha simulada ao obter dados para PDF");
 
@@ -307,16 +316,175 @@ class RelatorioServiceTest {
             verify(relatorioServiceSpy).gerarRelatorioDesempenho(dataTeste);
         }
 
-        @Test
-        @Tag("UnitTest")
-        @Tag("Functional")
-        @DisplayName("Deve lançar RuntimeException se ocorrer erro na biblioteca iText ao gerar PDF (Placeholder)") // Adicionado (Placeholder)
-        void gerarRelatorioPDF_quandoITextFalha_lancaRuntimeException() { // Pode adicionar _placeholder ao nome
-            LocalDate dataTeste = LocalDate.of(2025, 7, 15);
+            @Test
+            @Tag("UnitTest")
+            @Tag("Functional")
+            @DisplayName("Deve lançar RuntimeException se ocorrer erro na biblioteca iText ao gerar PDF (Placeholder)")
+            void gerarRelatorioPDF_quandoITextFalha_lancaRuntimeException () {
 
             assertTrue(true, "Teste para falha específica do iText requereria refatoração ou mocks mais complexos e não está implementado.");
             }
+        }
+
 
     }
+
+    @Nested
+    @DisplayName("Testes estruturais")
+    class TestesEstruturais {
+
+        @Nested
+        @DisplayName("Relatorio mensal testes")
+        class RelatorioMensalTestes {
+            @Test
+            @Tag("Structural")
+            @Tag("UnitTest")
+            @DisplayName("Deve calcular relatório mensal corretamente para mês com atividade em múltiplos dias")
+            void gerarRelatorioMensal_comAtividadeEmMultiplosDias () {
+                int ano = 2025;
+                int mes = 1;
+                LocalDate dia1 = LocalDate.of(ano, mes, 1);
+                LocalDate dia2 = LocalDate.of(ano, mes, 2);
+
+                RelatorioDTO relatorioDia1 = new RelatorioDTO(2, 2.0, 100.0, 0.1);
+                RelatorioDTO relatorioDia2 = new RelatorioDTO(3, 1.0, 150.0, 0.15);
+                RelatorioDTO relatorioDiaZero = new RelatorioDTO(0, 0.0, 0.0, 0.0);
+
+                doReturn(relatorioDia1).when(relatorioServiceSpy).gerarRelatorioDesempenho(dia1);
+                doReturn(relatorioDia2).when(relatorioServiceSpy).gerarRelatorioDesempenho(dia2);
+
+                LocalDate inicioMes = LocalDate.of(ano, mes, 1);
+                LocalDate fimMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth());
+                for (LocalDate data = inicioMes; !data.isAfter(fimMes); data = data.plusDays(1)) {
+                    if (!data.equals(dia1) && !data.equals(dia2)) {
+                        doReturn(relatorioDiaZero).when(relatorioServiceSpy).gerarRelatorioDesempenho(data);
+                    }
+                }
+
+                Map<String, Object> resultado = relatorioServiceSpy.gerarRelatorioMensal(mes, ano);
+
+                assertEquals(mes, resultado.get("mes"));
+                assertEquals(ano, resultado.get("ano"));
+                assertEquals(250.0, (Double) resultado.get("receitaTotal"), 0.01);
+                assertEquals(5, resultado.get("totalVeiculos"));
+
+                assertEquals(1.4, (Double) resultado.get("tempoMedioHoras"), 0.01);
+
+                assertEquals(2, resultado.get("melhorDia"));
+                assertEquals(150.0, (Double) resultado.get("melhorReceita"), 0.01);
+                assertEquals(fimMes.getDayOfMonth(), resultado.get("diasNoMes"));
+
+                @SuppressWarnings("unchecked")
+                Map<Integer, Double> receitaPorDia = (Map<Integer, Double>) resultado.get("receitaPorDia");
+                assertEquals(100.0, receitaPorDia.get(1), 0.01);
+                assertEquals(150.0, receitaPorDia.get(2), 0.01);
+                assertEquals(0.0, receitaPorDia.get(3), 0.01);
+
+                @SuppressWarnings("unchecked")
+                Map<Integer, Integer> veiculosPorDia = (Map<Integer, Integer>) resultado.get("veiculosPorDia");
+                assertEquals(2, veiculosPorDia.get(1));
+                assertEquals(3, veiculosPorDia.get(2));
+                assertEquals(0, veiculosPorDia.get(3));
+            }
+
+            @Test
+            @Tag("Structural")
+            @Tag("UnitTest")
+            @DisplayName("Deve calcular relatório mensal com zero veículos e zero receita")
+            void gerarRelatorioMensal_semAtividade_retornaValoresZerados () {
+                int ano = 2025;
+                int mes = 2;
+                RelatorioDTO relatorioDiaZero = new RelatorioDTO(0, 0.0, 0.0, 0.0);
+
+                LocalDate inicioMes = LocalDate.of(ano, mes, 1);
+                LocalDate fimMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth());
+                for (LocalDate data = inicioMes; !data.isAfter(fimMes); data = data.plusDays(1)) {
+                    doReturn(relatorioDiaZero).when(relatorioServiceSpy).gerarRelatorioDesempenho(data);
+                }
+
+                Map<String, Object> resultado = relatorioServiceSpy.gerarRelatorioMensal(mes, ano);
+
+                assertEquals(mes, resultado.get("mes"));
+                assertEquals(ano, resultado.get("ano"));
+                assertEquals(0.0, (Double) resultado.get("receitaTotal"), 0.01);
+                assertEquals(0, resultado.get("totalVeiculos"));
+                assertEquals(0.0, (Double) resultado.get("tempoMedioHoras"), 0.01);
+                assertEquals(0.0, (Double) resultado.get("receitaMediaDiaria"), 0.01);
+                assertEquals(0.0, (Double) resultado.get("veiculosMediaDiaria"), 0.01);
+                assertEquals(1, resultado.get("melhorDia"));
+                assertEquals(0.0, (Double) resultado.get("melhorReceita"), 0.01);
+                assertEquals(fimMes.getDayOfMonth(), resultado.get("diasNoMes"));
+
+                @SuppressWarnings("unchecked")
+                Map<Integer, Double> receitaPorDia = (Map<Integer, Double>) resultado.get("receitaPorDia");
+                assertTrue(receitaPorDia.values().stream().allMatch(v -> v == 0.0));
+
+                @SuppressWarnings("unchecked")
+                Map<Integer, Integer> veiculosPorDia = (Map<Integer, Integer>) resultado.get("veiculosPorDia");
+                assertTrue(veiculosPorDia.values().stream().allMatch(v -> v == 0));
+            }
+        }
+
+        @Nested
+        @DisplayName("Relatorio mensal PDF testes")
+        class RelatorioMensalPDFTestes {
+
+            @Test
+            @Tag("Structural")
+            @Tag("UnitTest")
+            @DisplayName("Deve gerar array de bytes do PDF mensal corretamente com dados válidos")
+            void gerarRelatorioMensalPDF_comDadosValidos_retornaByteArrayNaoVazio() {
+                int mesTeste = 5;
+                int anoTeste = 2025;
+
+                Map<String, Object> mockDadosMensais = new HashMap<>();
+                mockDadosMensais.put("receitaTotal", 1500.75);
+                mockDadosMensais.put("totalVeiculos", 120);
+                mockDadosMensais.put("tempoMedioHoras", 2.8);
+                mockDadosMensais.put("receitaMediaDiaria", 1500.75 / 31);
+                mockDadosMensais.put("melhorDia", 15);
+                mockDadosMensais.put("melhorReceita", 250.0);
+
+                doReturn(mockDadosMensais).when(relatorioServiceSpy).gerarRelatorioMensal(mesTeste, anoTeste);
+
+                byte[] pdfBytes = relatorioServiceSpy.gerarRelatorioMensalPDF(mesTeste, anoTeste);
+
+                assertNotNull(pdfBytes, "O array de bytes do PDF mensal não deveria ser nulo.");
+                assertTrue(pdfBytes.length > 0, "O array de bytes do PDF mensal não deveria estar vazio.");
+
+                if (pdfBytes.length > 4) {
+                    String pdfHeader = new String(pdfBytes, 0, 4);
+                    assertEquals("%PDF", pdfHeader, "O output não parece ser um ficheiro PDF válido (cabeçalho incorreto).");
+                }
+
+                verify(relatorioServiceSpy).gerarRelatorioMensal(mesTeste, anoTeste);
+            }
+
+            @Test
+            @Tag("Structural")
+            @Tag("UnitTest")
+            @DisplayName("Deve lançar RuntimeException encapsulada quando gerarRelatorioMensal falhar ao gerar PDF mensal")
+            void gerarRelatorioMensalPDF_quandoGerarRelatorioMensalFalha_lancaRuntimeException() {
+
+                int mesTeste = 7;
+                int anoTeste = 2025;
+                RuntimeException causaDaFalha = new RuntimeException("Falha simulada ao obter dados mensais para PDF");
+
+                doThrow(causaDaFalha).when(relatorioServiceSpy).gerarRelatorioMensal(mesTeste, anoTeste);
+
+                RuntimeException exceptionLancada = assertThrows(RuntimeException.class, () -> {
+                    relatorioServiceSpy.gerarRelatorioMensalPDF(mesTeste, anoTeste);
+                });
+
+                assertEquals("Erro ao gerar PDF mensal", exceptionLancada.getMessage());
+                assertSame(causaDaFalha, exceptionLancada.getCause(), "A causa da exceção não é a esperada.");
+                verify(relatorioServiceSpy).gerarRelatorioMensal(mesTeste, anoTeste);
+            }
+
+        }
+
+    }
+
+
 
 }
