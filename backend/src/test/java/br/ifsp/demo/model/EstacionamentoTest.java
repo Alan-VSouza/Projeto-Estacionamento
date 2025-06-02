@@ -26,7 +26,6 @@ class EstacionamentoTest {
         veiculo = new Veiculo("ABC-1234", "carro", "escort", "prata");
     }
 
-
     @Nested
     @DisplayName("Testes de mutante")
     class TestesDeMutante {
