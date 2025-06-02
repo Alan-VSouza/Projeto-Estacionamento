@@ -1,83 +1,73 @@
-//package br.ifsp.demo.service;
-//
-//import br.ifsp.demo.components.LogSistema;
-//import br.ifsp.demo.model.RegistroEntrada;
-//import br.ifsp.demo.model.Veiculo;
-//import br.ifsp.demo.repository.RegistroEntradaRepository;
-//import org.junit.jupiter.api.*;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//
-//import java.time.LocalDateTime;
-//import java.util.Optional;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.Mockito.*;
-//
-//@ExtendWith(MockitoExtension.class)
-//public class RegistroEntradaServiceTest {
-//
-//    private static final String PLACA_VEICULO = "ABC1234";
-//    private static final String MENSAGEM_VEICULO_JA_REGISTRADO = "Veículo já registrado no estacionamento";
-//    private static final String MOTIVO_CANCELAMENTO = "Cancelamento feito por engano";
-//
-//    @Mock
-//    private VeiculoService veiculoService;
-//
-//    @Mock
-//    private RegistroEntradaRepository registroEntradaRepository;
-//
-//    @Mock
-//    private LogSistema logSistema;
-//
-//    @InjectMocks
-//    private RegistroEntradaService registroEntradaService;
-//
-//    private Veiculo veiculo;
-//    private RegistroEntrada registroEntrada;
-//
-//    @BeforeEach
-//    void setup() {
-//        veiculo = criarVeiculo();
-//        registroEntrada = criarRegistroEntrada(veiculo);
-//    }
-//
-//    private Veiculo criarVeiculo() {
-//        Veiculo veiculo = new Veiculo();
-//        veiculo.setPlaca(PLACA_VEICULO);
-//        veiculo.setTipoVeiculo("Carro");
-//        veiculo.setModelo("Fusca");
-//        veiculo.setCor("Azul");
-//        return veiculo;
-//    }
-//
-//    private RegistroEntrada criarRegistroEntrada(Veiculo veiculo) {
-//        RegistroEntrada registroEntrada = new RegistroEntrada();
-//        registroEntrada.setVeiculo(veiculo);
-//        return registroEntrada;
-//    }
-//
-//    @Nested
-//    @DisplayName("Testes de Registro de Entrada")
-//    class TestesDeRegistroEntrada {
-//
-//        @Test
-//        @Tag("Functional")
-//        @Tag("UnitTest")
-//        @Tag("TDD")
-//        @DisplayName("Deve registrar entrada com sucesso quando veículo não estiver registrado")
-//        void registrarEntrada_comSucesso() {
-//            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
-//            when(registroEntradaRepository.save(any())).thenReturn(registroEntrada);
-//
-//            RegistroEntrada resultado = registroEntradaService.registrarEntrada(veiculo);
-//
-//            assertNotNull(resultado);
-//            assertEquals(veiculo, resultado.getVeiculo());
-//            verify(registroEntradaRepository, times(1)).save(any());
-//        }
+package br.ifsp.demo.service;
+
+import br.ifsp.demo.components.LogSistema;
+import br.ifsp.demo.model.RegistroEntrada;
+import br.ifsp.demo.model.Veiculo;
+import br.ifsp.demo.repository.RegistroEntradaRepository;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class RegistroEntradaServiceTest {
+
+    private static final String PLACA_VEICULO = "ABC1234";
+    private static final String MENSAGEM_VEICULO_JA_REGISTRADO = "Veículo já registrado no estacionamento";
+    private static final String MOTIVO_CANCELAMENTO = "Cancelamento feito por engano";
+
+    @Mock
+    private VeiculoService veiculoService;
+
+    @Mock
+    private RegistroEntradaRepository registroEntradaRepository;
+
+    @Mock
+    private LogSistema logSistema;
+
+    @InjectMocks
+    private RegistroEntradaService registroEntradaService;
+
+    private Veiculo veiculo;
+
+    @BeforeEach
+    void setup() {
+        veiculo = new Veiculo(PLACA_VEICULO, "Carro", "Fusca", "Azul");
+    }
+
+
+    @Nested
+    @DisplayName("Testes de Registro de Entrada")
+    class TestesDeRegistroEntrada {
+
+        @Test
+        @Tag("Functional")
+        @Tag("UnitTest")
+        @Tag("TDD")
+        @DisplayName("Deve registrar entrada com sucesso quando veículo não estiver registrado")
+        void registrarEntrada_comSucesso() {
+            when(registroEntradaRepository.findByVeiculo(veiculo)).thenReturn(Optional.empty());
+
+            when(registroEntradaRepository.save(any(RegistroEntrada.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+            RegistroEntrada resultado = registroEntradaService.registrarEntrada(veiculo);
+
+            assertNotNull(resultado);
+            assertEquals(veiculo, resultado.getVeiculo());
+            assertNotNull(resultado.getHoraEntrada());
+            assertNotNull(resultado.getVagaId());
+
+            verify(registroEntradaRepository, times(1)).findByVeiculo(veiculo);
+            verify(registroEntradaRepository, times(1)).save(any(RegistroEntrada.class));
+        }
 //
 //        @Test
 //        @Tag("Functional")
@@ -112,8 +102,8 @@
 //            assertEquals(veiculo, resultado.getVeiculo());
 //            assertNotNull(resultado.getHoraEntrada());
 //            verify(registroEntradaRepository, times(1)).save(any());
-//        }
-//    }
+        }
+    }
 //
 //    @Nested
 //    @DisplayName("Testes de Cancelamento de Entrada")
