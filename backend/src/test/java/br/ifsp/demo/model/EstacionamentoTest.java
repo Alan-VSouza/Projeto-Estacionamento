@@ -148,6 +148,50 @@ class EstacionamentoTest {
 
                 assertThat(excecao.getMessage()).isEqualTo(mensagemEsperada);
             }
+
+        }
+
+        @Nested
+        @DisplayName("Testes do corpo da classe")
+        class TestesDoCorpoDaClasse {
+
+
+            @Test
+            @DisplayName("Deve retornar excecao ao setar endereco nulo")
+            void deveRetornarExcecaoAoSetarEnderecoNulo() {
+
+                IllegalArgumentException excecao = assertThrows(IllegalArgumentException.class, () -> {
+                    estacionamento.setEndereco(null);
+                });
+
+                assertThat(excecao.getMessage()).isEqualTo("Endereço não pode ser nulo ou vazio");
+            }
+
+            @Test
+            @DisplayName("Deve retornar excecao ao setar nome nulo")
+            void deveRetornarExcecaoAoSetarNomeNulo() {
+
+                IllegalArgumentException excecao = assertThrows(IllegalArgumentException.class, () -> {
+                    estacionamento.setNome(null);
+                });
+
+                assertThat(excecao.getMessage()).isEqualTo("Nome não pode ser nulo ou vazio");
+            }
+
+            @ParameterizedTest
+            @Tag("UnitTest")
+            @Tag("Mutation")
+            @ValueSource(ints = {0, -1})
+            @DisplayName("Deve lançar exceção ao tentar alterar capacidade para valor invalido")
+            void deveLancarExcecaoAoAlterarCapacidadeParaValorInvalido(int valor) {
+
+                IllegalArgumentException excecao = assertThrows(IllegalArgumentException.class, () -> {
+                    estacionamento.setCapacidade(valor);
+                });
+
+                assertThat(excecao.getMessage()).isEqualTo("Capacidade deve ser maior que zero.");
+            }
+
         }
     }
 }
