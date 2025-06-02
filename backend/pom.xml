@@ -194,22 +194,42 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <historyInputFile>${project.build.directory}/pit-history.txt</historyInputFile>
-                    <historyOutputFile>${project.build.directory}/pit-history.txt</historyOutputFile>
-                    <jvmArgs>
-                        <arg>-Xmx2048m</arg>
-                        <arg>-Xms1024m</arg>
-                    </jvmArgs>
                     <targetClasses>
-                        <param>br.ifsp.demo*</param>
+                        <param>br.ifsp.demo.model.*</param>
+                        <param>br.ifsp.demo.service.*</param>
+                        <param>br.ifsp.demo.validation.*</param>
+                        <param>br.ifsp.demo.components.*</param>
                     </targetClasses>
                     <targetTests>
-                        <param>br.ifsp.demo*</param>
+                        <param>br.ifsp.demo.model.*Test</param>
+                        <param>br.ifsp.demo.service.*Test</param>
+                        <param>br.ifsp.demo.validation.*Test</param>
+                        <param>br.ifsp.demo.components.*Test</param>
                     </targetTests>
-                    <outputFormats>
-                        <outputFormat>HTML</outputFormat>
-                    </outputFormats>
+                    <excludedClasses>
+                        <param>br.ifsp.demo.controller.*</param>
+                        <param>br.ifsp.demo.exception.*</param>
+                        <param>br.ifsp.demo.security.auth.*</param>
+                        <param>br.ifsp.demo.security.config.*</param>
+                        <param>br.ifsp.demo.security.user.*</param>
+                        <param>br.ifsp.demo.*Application</param>
+                        <param>br.ifsp.demo.config.*</param>
+                        <param>br.ifsp.demo.dto.*</param>
+                        <param>br.edu.ifsp.testing.practice.*</param>
+                    </excludedClasses>
+                    <excludedTestClasses>
+                        <param>br.ifsp.demo.controller.*Test</param>
+                        <param>br.ifsp.demo.exception.*Test</param>
+                        <param>br.ifsp.demo.security.*Test</param>
+                        <param>br.edu.ifsp.testing.practice.*</param>
+                    </excludedTestClasses>
+
                     <verbose>true</verbose>
+                    <timeoutConstant>3000</timeoutConstant>
+                    <timeoutFactor>1.25</timeoutFactor>
+                    <threads>1</threads>
+                    <skipFailingTests>true</skipFailingTests>
+                    <failWhenNoMutations>false</failWhenNoMutations>
                 </configuration>
             </plugin>
 
