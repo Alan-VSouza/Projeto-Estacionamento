@@ -1041,5 +1041,88 @@ class RelatorioServiceTest {
             double resultadoComInvalidos = (double) method.invoke(relatorioService, todosValidosEInvalidos, inicioDoDia, fimDoDia);
             assertEquals(300.0, resultadoComInvalidos, 0.001, "Pagamentos inválidos não devem ser somados");
         }
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Deve cobrir todos os branches do filtro de horaEntrada/horaSaida")
+        void deveCobrirBranchesFiltroHoraEntradaHoraSaida() throws Exception {
+            Method method = RelatorioService.class.getDeclaredMethod(
+                    "calcularMinutosOcupados",
+                    List.class, LocalDateTime.class, LocalDateTime.class
+            );
+            method.setAccessible(true);
+
+            LocalDate data = LocalDate.of(2025, 6, 1);
+            LocalDateTime inicioDoDia = data.atStartOfDay();
+            LocalDateTime fimDoDia = data.atTime(23, 59, 59);
+
+            Pagamento p1 = new Pagamento(
+                    new RegistroEntrada(new Veiculo("A", "carro", "modelo", "cor")),
+                    inicioDoDia.plusHours(8),
+                    inicioDoDia.plusHours(10),
+                    new CalculadoraTempoPermanencia(new ValorPermanencia())
+            );
+
+            Pagamento p2 = mock(Pagamento.class);
+            lenient().when(p2.getHoraEntrada()).thenReturn(null);
+            lenient().when(p2.getHoraSaida()).thenReturn(inicioDoDia.plusHours(12));
+
+            Pagamento p3 = mock(Pagamento.class);
+            lenient().when(p3.getHoraEntrada()).thenReturn(inicioDoDia.plusHours(14));
+            lenient().when(p3.getHoraSaida()).thenReturn(null);
+
+            Pagamento p4 = mock(Pagamento.class);
+            lenient().when(p4.getHoraEntrada()).thenReturn(null);
+            lenient().when(p4.getHoraSaida()).thenReturn(null);
+
+            List<Pagamento> pagamentos = List.of(p1, p2, p3, p4);
+
+            double minutos = (double) method.invoke(relatorioService, pagamentos, inicioDoDia, fimDoDia);
+
+            assertEquals(120.0, minutos, 0.001, "Apenas pagamentos válidos devem ser somados");
+        }
+
+        @Test
+        @Tag("Structural")
+        @Tag("UnitTest")
+        @DisplayName("Deve cobrir todos os branches do filtro de horaSaida em getPagamentosDoDia")
+        void deveCobrirBranchesFiltroHoraSaidaGetPagamentosDoDia() throws Exception {
+            PagamentoRepository pagamentoRepository = mock(PagamentoRepository.class);
+            RegistroEntradaRepository registroEntradaRepository = mock(RegistroEntradaRepository.class);
+            RelatorioService relatorioService = new RelatorioService(pagamentoRepository, registroEntradaRepository);
+
+            Method method = RelatorioService.class.getDeclaredMethod(
+                    "getPagamentosDoDia", LocalDateTime.class, LocalDateTime.class
+            );
+            method.setAccessible(true);
+
+            LocalDate data = LocalDate.of(2025, 6, 1);
+            LocalDateTime inicioDoDia = data.atStartOfDay();
+            LocalDateTime fimDoDia = data.atTime(23, 59, 59);
+
+            Pagamento p1 = mock(Pagamento.class);
+            lenient().when(p1.getHoraSaida()).thenReturn(null);
+
+            Pagamento p2 = mock(Pagamento.class);
+            LocalDateTime before = inicioDoDia.minusMinutes(1);
+            lenient().when(p2.getHoraSaida()).thenReturn(before);
+
+            Pagamento p3 = mock(Pagamento.class);
+            LocalDateTime after = fimDoDia.plusMinutes(1);
+            lenient().when(p3.getHoraSaida()).thenReturn(after);
+
+            Pagamento p4 = mock(Pagamento.class);
+            LocalDateTime dentro = inicioDoDia.plusHours(12);
+            lenient().when(p4.getHoraSaida()).thenReturn(dentro);
+
+            when(pagamentoRepository.findAll()).thenReturn(List.of(p1, p2, p3, p4));
+
+            @SuppressWarnings("unchecked")
+            List<Pagamento> resultado = (List<Pagamento>) method.invoke(relatorioService, inicioDoDia, fimDoDia);
+
+            assertEquals(1, resultado.size());
+            assertSame(p4, resultado.getFirst());
+        }
     }
 }

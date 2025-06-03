@@ -24,6 +24,7 @@ class VeiculoComVagaDTOTest {
 
     @Test
     @Tag("UnitTest")
+    @Tag("Structural")
     void deveAceitarValoresValidos() {
         VeiculoComVagaDTO dto = new VeiculoComVagaDTO(
                 "ABC1234",
