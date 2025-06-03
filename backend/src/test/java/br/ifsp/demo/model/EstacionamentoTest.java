@@ -9,6 +9,7 @@ import br.ifsp.demo.components.CalculadoraTempoPermanencia;
 import br.ifsp.demo.components.ValorPermanencia;
 import br.ifsp.demo.exception.EstacionamentoLotadoException;
 import br.ifsp.demo.service.CalculadoraDeTarifa;
+import net.bytebuddy.pool.TypePool;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -96,7 +97,29 @@ class EstacionamentoTest {
             assertThat(estacionamento.getEndereco()).isEqualTo(endereco);
         }
 
+        @Test
+        @Tag("UnitTest")
+        @Tag("Structural")
+        @DisplayName("Deve retornar nome do estacionamento")
+        void deveRetornarNomeDoEstacionamento() {
+            String nome = "Estacionamento Teste";
 
+            assertThat(estacionamento.getNome()).isEqualTo(nome);
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Structural")
+        @DisplayName("Deve jogar uma excecao de erro ao tentar setar nome vazio")
+        void deveJogarUmaExcecaoDeErroAoTentarSetarNomeVazio(){
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                estacionamento.setNome(" ");
+            });
+
+            assertThat(exception.getMessage()).isEqualTo("Nome não pode ser nulo ou vazio");
+
+        }
 
 
     }
