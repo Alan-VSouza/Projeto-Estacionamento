@@ -239,8 +239,9 @@ function VehicleEntryForm({ spotId, onSubmit, onCancel }) {
       setErrors(prev => ({ ...prev, modelo: erroModelo }));
       
     } else if (name === 'cor') {
-      setFormData(prev => ({ ...prev, [name]: value }));
-      const erroCor = validarCor(value);
+      const corFormatada = capitalizeFirstLetter(value);
+      setFormData(prev => ({ ...prev, [name]: corFormatada }));
+      const erroCor = validarCor(corFormatada);
       setErrors(prev => ({ ...prev, cor: erroCor }));
       
     } else {
@@ -351,7 +352,7 @@ function VehicleEntryForm({ spotId, onSubmit, onCancel }) {
               name="cor"
               value={formData.cor}
               onChange={handleInputChange}
-              placeholder="Ex: branco, preto, azul"
+              placeholder="Ex: Branco, Preto, Azul"
               style={errors.cor ? inputErrorStyles : inputStyles}
               required
             />
