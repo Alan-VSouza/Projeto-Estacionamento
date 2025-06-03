@@ -54,6 +54,20 @@ class EstacionamentoTest {
             assertThat(exception.getMessage()).isEqualTo("Nome do estacionamento não pode ser nulo ou vazio");
         }
 
+        @Test
+        @Tag("UnitTest")
+        @Tag("Structural")
+        @DisplayName("Deve retornar uma exceção quando o endereco for nulo")
+        void deveRetornarUmaExcecaoQuandoEnderecoForNulo() {
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                Estacionamento estacionamento1 = new Estacionamento("ESTACIONAMENTO", null, 10);
+            });
+
+            assertThat(exception.getMessage()).isEqualTo("Endereço do estacionamento não pode ser nulo ou vazio");
+        }
+
+
 
 
     }
