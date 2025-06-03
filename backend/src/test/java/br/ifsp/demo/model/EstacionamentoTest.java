@@ -110,6 +110,16 @@ class EstacionamentoTest {
         @Test
         @Tag("UnitTest")
         @Tag("Structural")
+        @DisplayName("Deve retornar capacidade do estacionamento")
+        void deveRetornarCapacidadeDoEstacionamento() {
+            int capacidade = 10;
+
+            assertThat(estacionamento.getCapacidade()).isEqualTo(10);
+        }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Structural")
         @DisplayName("Deve jogar uma excecao de erro ao tentar setar nome vazio")
         void deveJogarUmaExcecaoDeErroAoTentarSetarNomeVazio(){
 
@@ -120,6 +130,21 @@ class EstacionamentoTest {
             assertThat(exception.getMessage()).isEqualTo("Nome não pode ser nulo ou vazio");
 
         }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Structural")
+        @DisplayName("Deve jogar uma excecao de erro ao tentar endereco nome vazio")
+        void deveJogarUmaExcecaoDeErroAoTentarSetarEnderecoVazio(){
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                estacionamento.setEndereco(" ");
+            });
+
+            assertThat(exception.getMessage()).isEqualTo("Endereço não pode ser nulo ou vazio");
+
+        }
+
 
 
     }
