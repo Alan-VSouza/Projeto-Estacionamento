@@ -1,10 +1,11 @@
 package br.ifsp.demo.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
+import br.ifsp.demo.components.CalculadoraTempoPermanencia;
+import br.ifsp.demo.components.ValorPermanencia;
 import br.ifsp.demo.exception.EstacionamentoLotadoException;
 import br.ifsp.demo.service.CalculadoraDeTarifa;
 import org.junit.jupiter.api.*;
@@ -20,10 +21,41 @@ class EstacionamentoTest {
     private Estacionamento estacionamento;
     private Veiculo veiculo;
 
+    private LocalDateTime entrada;
+    private LocalDateTime saida;
+    private CalculadoraDeTarifa calculadoraDeTarifa;
+
+
     @BeforeEach
     void setup() {
         estacionamento = new Estacionamento("Estacionamento Teste", "Rua Teste", 10);
         veiculo = new Veiculo("ABC-1234", "carro", "escort", "prata");
+
+        ValorPermanencia valorPermanencia = new ValorPermanencia();
+        entrada =  LocalDateTime.now();
+        saida = entrada.plusHours(2);
+        calculadoraDeTarifa = new CalculadoraTempoPermanencia(valorPermanencia);
+    }
+
+    @Nested
+    @DisplayName("Testes Estruturais")
+    class TestesEstruturais {
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Structural")
+        @DisplayName("Deve retornar uma exceção quando o nome for vazio")
+        void deveRetornarUmaExcecaoQuandoONomeForVazio() {
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+               Estacionamento estacionamento1 = new Estacionamento(" ", "São Carlos", 10);
+            });
+
+            assertThat(exception.getMessage()).isEqualTo("Nome do estacionamento não pode ser nulo ou vazio");
+        }
+
+
+
     }
 
     @Nested
