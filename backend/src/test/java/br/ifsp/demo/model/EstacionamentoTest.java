@@ -1,6 +1,7 @@
 package br.ifsp.demo.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCharSequence;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
@@ -73,7 +74,7 @@ class EstacionamentoTest {
         @Tag("UnitTest")
         @Tag("Structural")
         @DisplayName("Deve retornar um pagamento quando registrar saida com sucesso")
-        void deveRetornarUmaExcecaoQuandoRegistrarSaidaComRegistroNulo() {
+        void deveRetornarUmPagamentoQuandoRegistrarSaidaComSucesso() {
 
             Pagamento pagamento = estacionamento.registroSaida(registroEntrada, saida, calculadoraDeTarifa);
 
@@ -84,6 +85,18 @@ class EstacionamentoTest {
             assertThat(pagamento.getPlaca()).isEqualTo(veiculo.getPlaca());
 
         }
+
+        @Test
+        @Tag("UnitTest")
+        @Tag("Structural")
+        @DisplayName("Deve retornar endereco do estacionamento")
+        void deveRetornarEnderecoDoEstacionamento() {
+            String endereco = "Rua Teste";
+
+            assertThat(estacionamento.getEndereco()).isEqualTo(endereco);
+        }
+
+
 
 
     }
