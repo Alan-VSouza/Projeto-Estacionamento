@@ -24,6 +24,7 @@ class EstacionamentoTest {
     private LocalDateTime entrada;
     private LocalDateTime saida;
     private CalculadoraDeTarifa calculadoraDeTarifa;
+    private RegistroEntrada registroEntrada;
 
 
     @BeforeEach
@@ -32,6 +33,7 @@ class EstacionamentoTest {
         veiculo = new Veiculo("ABC-1234", "carro", "escort", "prata");
 
         ValorPermanencia valorPermanencia = new ValorPermanencia();
+        registroEntrada = estacionamento.registrarEntrada(veiculo, 5);
         entrada =  LocalDateTime.now();
         saida = entrada.plusHours(2);
         calculadoraDeTarifa = new CalculadoraTempoPermanencia(valorPermanencia);
@@ -70,14 +72,17 @@ class EstacionamentoTest {
         @Test
         @Tag("UnitTest")
         @Tag("Structural")
-        @DisplayName("Deve retornar uma exceção quando registrar saida com registro nulo")
+        @DisplayName("Deve retornar um pagamento quando registrar saida com sucesso")
         void deveRetornarUmaExcecaoQuandoRegistrarSaidaComRegistroNulo() {
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                estacionamento.registroSaida(null, saida, calculadoraDeTarifa);
-            });
+            Pagamento pagamento = estacionamento.registroSaida(registroEntrada, saida, calculadoraDeTarifa);
 
-            assertThat(exception.getMessage()).isEqualTo("Registro de entrada não pode ser nulo");
+            assertThat(pagamento).isNotNull();
+            assertThat(pagamento.getValor()).isEqualTo(18.0);
+            assertThat(pagamento.getHoraSaida()).isEqualTo(saida);
+            assertThat(pagamento.getHoraEntrada()).isEqualTo(entrada);
+            assertThat(pagamento.getPlaca()).isEqualTo(veiculo.getPlaca());
+
         }
 
 
