@@ -67,7 +67,18 @@ class EstacionamentoTest {
             assertThat(exception.getMessage()).isEqualTo("Endereço do estacionamento não pode ser nulo ou vazio");
         }
 
+        @Test
+        @Tag("UnitTest")
+        @Tag("Structural")
+        @DisplayName("Deve retornar uma exceção quando registrar saida com registro nulo")
+        void deveRetornarUmaExcecaoQuandoRegistrarSaidaComRegistroNulo() {
 
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                estacionamento.registroSaida(null, saida, calculadoraDeTarifa);
+            });
+
+            assertThat(exception.getMessage()).isEqualTo("Registro de entrada não pode ser nulo");
+        }
 
 
     }
