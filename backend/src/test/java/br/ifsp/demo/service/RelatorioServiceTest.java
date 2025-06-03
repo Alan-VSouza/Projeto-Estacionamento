@@ -523,6 +523,7 @@ class RelatorioServiceTest {
     class TestesParaMatarMutantesSobreviventes {
 
         @Test
+        @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve filtrar pagamentos por data corretamente usando método público")
         void deveFiltrarPagamentosPorDataCorretamente() {
@@ -550,6 +551,7 @@ class RelatorioServiceTest {
         }
 
         @Test
+        @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve gerar PDF mensal completo com document close")
         void deveGerarPDFMensalCompletoComDocumentClose() {
@@ -562,6 +564,7 @@ class RelatorioServiceTest {
         }
 
         @Test
+        @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve verificar que CSV é finalizado corretamente")
         void deveVerificarQueCSVEhFinalizadoCorretamente() throws Exception {
@@ -586,6 +589,7 @@ class RelatorioServiceTest {
         }
 
         @Test
+        @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve validar cálculos críticos contra mutantes matemáticos")
         void deveValidarCalculosCriticosContraMutantesMatematicos() {
@@ -621,6 +625,7 @@ class RelatorioServiceTest {
         }
 
         @Test
+        @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve verificar que CSVPrinter é fechado e 'flushado' corretamente")
         void shouldFlushAndCloseCSVPrinter() throws Exception {
@@ -819,6 +824,7 @@ class RelatorioServiceTest {
             assertNotEquals(receitaMediaFev, receitaMediaMutanteFev,
                     "Para fevereiro, divisão e multiplicação devem ser diferentes");
         }
+
         @Test
         @Tag("UnitTest")
         @Tag("Mutation")
@@ -940,6 +946,7 @@ class RelatorioServiceTest {
         }
 
         @Test
+        @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve matar mutantes de multiplicação/divisão e return 0.0 em calcularOcupacaoMedia")
         void deveMatarMutantesCalcularOcupacaoMedia() throws Exception {
@@ -979,6 +986,7 @@ class RelatorioServiceTest {
         }
 
         @Test
+        @Tag("UnitTest")
         @Tag("Mutation")
         @DisplayName("Deve matar mutantes de soma e filtro em calcularMinutosOcupados")
         void deveMatarMutantesCalcularMinutosOcupados() throws Exception {
