@@ -197,7 +197,7 @@ public class EstacionamentoControllerIntegrationTest extends BaseApiIntegrationT
                 .then()
                 .statusCode(201)
                 .body("nome", equalTo("Estacionamento Central"))
-                .body("totalVagas", equalTo(1));
+                .body("capacidade", equalTo(1));
     }
 
     @Test
