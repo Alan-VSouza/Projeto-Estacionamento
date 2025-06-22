@@ -4,6 +4,7 @@ import br.ifsp.demo.dto.CriarEstacionamentoDTO;
 import br.ifsp.demo.dto.VeiculoComVagaDTO;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +16,8 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Tag("ApiTest")
+@Tag("IntegrationTest")
 public class EstacionamentoControllerIntegrationTest extends BaseApiIntegrationTest {
 
     private String token;
@@ -199,17 +202,36 @@ public class EstacionamentoControllerIntegrationTest extends BaseApiIntegrationT
                 .body("nome", equalTo("Estacionamento Central"))
                 .body("capacidade", equalTo(1));
     }
-
     @Test
     public void testBuscarEstacionamentoAtual() {
+
+       /*
+
+        Aparentemente, o endpoint utiliza o método que existe no service, mas o método do
+        service usa um findFirst(), quando o back-end é inicializado um estacionamento
+        principal ou seja o método aparentemente só retorna ele.
+
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(new CriarEstacionamentoDTO("Estacionamento Central", "Endereço X", 100))
+                .when()
+                .post("/estacionamento/criar-estacionamento")
+                .then()
+                .statusCode(201); */
+
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()
                 .get("/estacionamento/buscar-atual-estacionamento")
                 .then()
                 .statusCode(200)
-                .body("id", notNullValue());
+                .body("nome", equalTo("Estacionamento Principal Centrar"))
+                .body("endereco", equalTo("Rua Sei Lá"))
+                .body("totalVagas", equalTo(null));
     }
+
 
     @Test
     public void testGetAvailableSpots() {
