@@ -185,6 +185,29 @@ public class MainPageTest {
        // assertTrue(mainPage.existeToastComTexto("Erro ao registrar"));
     }
 
+    @Test
+    @Order(9)
+    public void testRegistrarSaidaEmVagaOcupada() {
+
+        mainPage.clicarNaPrimeiraVagaOcupada();
+
+
+        mainPage.clicarRegistrarSaida();
+
+        //assertTrue(mainPage.existeToastComTexto(" desocupada com sucesso"));
+    }
+
+    @Test
+    public void testCancelarEntradaEmVagaOcupada() {
+
+        mainPage.clicarNaPrimeiraVagaOcupada();
+
+
+        mainPage.clicarCancelarEntrada();
+
+        //assertTrue(mainPage.existeToastComTexto("Entrada da vaga " + numeroVaga + " cancelada com sucesso"));
+    }
+
     @AfterEach
     public void tearDown() {
         driver.quit();

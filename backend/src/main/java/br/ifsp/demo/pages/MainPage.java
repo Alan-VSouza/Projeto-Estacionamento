@@ -26,4 +26,26 @@ public class MainPage {
             return false;
         }
     }
+
+    public void clicarNaPrimeiraVagaOcupada() {
+        WebElement vaga = driver.findElement(By.cssSelector(".parking-spot.occupied")); // pega a primeira vaga ocupada
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", vaga);
+    }
+
+    public void clicarRegistrarSaida() {
+        WebElement botao = driver.findElement(By.cssSelector(".vacate-btn"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", botao);
+    }
+
+    public void clicarCancelarEntrada() {
+        WebElement botao = driver.findElement(By.cssSelector(".cancel-btn"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", botao);
+    }
+
+
+    public String obterNumeroDaVagaSelecionada() {
+        WebElement titulo = driver.findElement(By.cssSelector(".action-modal-header h3"));
+        String texto = titulo.getText(); // Exemplo: "🚗 3"
+        return texto.replaceAll("\\D+", ""); // Remove tudo que não é número
+    }
 }
