@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RegisterPageTest {
     private WebDriver driver;
     private RegisterPage registerPage;
+    private static WebDriverWait wait;
 
 
     @BeforeEach
@@ -24,6 +25,7 @@ public class RegisterPageTest {
         driver = new ChromeDriver();
         registerPage = new RegisterPage(driver);
         registerPage.open();
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
     }
 
@@ -95,7 +97,7 @@ public class RegisterPageTest {
     public void deveRegistrarComDadosValidos() throws InterruptedException {
         registerPage.nameField().sendKeys("Joao");
         registerPage.lastnameField().sendKeys("Silva");
-        registerPage.emailField().sendKeys("joao@email.com");
+        registerPage.emailField().sendKeys("slote@email.com");
         registerPage.passwordField().sendKeys("senha123");
         registerPage.confirmPasswordField().sendKeys("senha123");
 
@@ -103,7 +105,11 @@ public class RegisterPageTest {
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", registerPage.registerButton());
 
-        assertTrue(registerPage.successMessage().getText().contains("Administrador registrado com sucesso"));
+        WebElement toast = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".Toastify__toast--success")
+        ));
+
+        assertTrue(toast.getText().contains("Administrador registrado com sucesso"));
     }
 
     @Test
@@ -121,7 +127,7 @@ public class RegisterPageTest {
 
 
         driver.navigate().refresh();
-        Thread.sleep(1000);
+        wait.until(ExpectedConditions.visibilityOf(registerPage.nameField()));
 
         registerPage.nameField().sendKeys("Joao");
         registerPage.lastnameField().sendKeys("Silva");
@@ -132,9 +138,13 @@ public class RegisterPageTest {
         WebElement botaoRepetido = driver.findElement(By.xpath("//button[@type='submit']"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", botaoRepetido);
 
+        // Espera o toast de erro aparecer
+        WebElement toastErro = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".Toastify__toast--error")
+        ));
 
-        assertTrue(registerPage.errorMessage().getText().contains("já está em uso") ||
-                registerPage.errorMessage().getText().contains("already registered"));
+        assertTrue(toastErro.getText().contains("already registered"));
+
     }
 
 }
