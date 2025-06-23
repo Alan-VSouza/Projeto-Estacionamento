@@ -16,7 +16,7 @@ public class ReportsPage {
 
     public ReportsPage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(2));
     }
 
     public void abrirPagina() {
