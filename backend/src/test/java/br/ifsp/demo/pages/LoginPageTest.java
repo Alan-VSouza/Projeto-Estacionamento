@@ -74,10 +74,6 @@ public class LoginPageTest {
         loginPage.preencherEmail("admin@email.com");
         loginPage.preencherSenha("senhaAdmin123");
         loginPage.clicarLogin();
-
-        // Aqui você pode validar o redirecionamento ou algum elemento esperado após login
-        // Exemplo fictício:
-        // assertTrue(driver.getCurrentUrl().contains("/dashboard"));
     }
 
 }
