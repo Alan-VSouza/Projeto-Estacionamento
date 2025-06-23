@@ -12,7 +12,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-@Tag("UiTest")
+@Tag("UITest")
 public class StatisticsPageTest {
 
     private WebDriver driver;

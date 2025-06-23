@@ -14,7 +14,7 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Tag("UiTest")
+@Tag("UITest")
 public class ReportsPageTest {
     private WebDriver driver;
     private ReportsPage reportsPage;

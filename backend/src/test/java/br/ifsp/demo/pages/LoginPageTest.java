@@ -36,7 +36,7 @@ public class LoginPageTest {
 
 
     @Test
-    @Tag("UiTest")
+    @Tag("UITest")
     void deveMostrarErroComEmailInvalido() {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.preencherEmail("invalido-email");
@@ -52,7 +52,7 @@ public class LoginPageTest {
 
 
     @Test
-    @Tag("UiTest")
+    @Tag("UITest")
     void deveMostrarErroComSenhaCurta() {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.preencherEmail("teste@email.com");
@@ -68,7 +68,7 @@ public class LoginPageTest {
 
 
     @Test
-    @Tag("UiTest")
+    @Tag("UITest")
     void devePermitirLoginComCredenciaisValidas() {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.preencherEmail("admin@email.com");
