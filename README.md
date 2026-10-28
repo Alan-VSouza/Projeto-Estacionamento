@@ -10,66 +10,28 @@ Permite cadastro de veículos, controle de entrada/saída, relatórios e autenti
 ## ✨ Funcionalidades
 
 ### Back-end
-- Cadastro de veículos (placa, modelo, cor)
-- Registro de entrada/saída com cálculo automático de permanência
-- Geração de relatórios diários (PDF/CSV)
-- Autenticação JWT para acesso seguro
 
-### Front-end
-- Interface Web responsiva (React)
-- Login e registro de usuários
-- Dashboard com métricas em tempo real
-- Formulários para cadastro de veículos e pagamentos
-
----
-
-## 🔧 Tecnologias Utilizadas
-
-### Back-end
-- Java 21
-- Spring Boot 3.2
-- Spring Security
-- Spring Data JPA
-- H2 Database (testes)
-- Lombok
-- OpenAPI (Swagger)
-
-### Front-end
-- React 18
-- Axios (integração com API)
-- Bootstrap 5
-
-### Testes
-- Mockito
-- Pitest (mutation testing)
-
----
-
-## 🚀 Configuração e Execução
-
-### Pré-requisitos
-- Java 21
-- Node.js 18+
-- MySQL 8+ (opcional para produção)
-
-### Back-end
-
-Clonar repositório
+```bash
 git clone https://github.com/Alan-VSouza/Projeto-Estacionamento.git
-
-Entrar na pasta do projeto
 cd Projeto-Estacionamento/backend
+```
 
-Executar aplicação através da execução de DemoAuthAppApplication
+Defina a chave usada para assinar os tokens JWT (uma string longa e aleatória, com pelo menos 32 caracteres). Ela não fica no repositório:
+
+```bash
+export JWT_SECRET_KEY="troque-por-uma-string-longa-e-aleatoria"   # Windows (PowerShell): $env:JWT_SECRET_KEY="..."
+./mvnw spring-boot:run
+```
+
+Também é possível executar a classe `DemoAuthAppApplication` pela IDE, com a variável de ambiente definida. O banco SQLite (`database.db`) é criado automaticamente na primeira execução.
 
 ### Front-end
+
+```bash
 cd Projeto-Estacionamento/frontend
-
-Instalar dependências
 npm install
-
-Executar aplicação
 npm start
+```
 
 Acesse: `http://localhost:3000`
 
@@ -91,3 +53,4 @@ Faça o registro na página de Register e o devido Login para ter acesso as fun�
 
 ## 📄 Documentação da API
 Acesse `http://localhost:8080/swagger-ui.html` após iniciar o back-end.
+ 
