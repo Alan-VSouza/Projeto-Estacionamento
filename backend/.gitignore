@@ -34,3 +34,6 @@ build/
 
 ### Database file to be ignored ###
 ../database.db
+
+# Local database
+*.db
