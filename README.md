@@ -1,13 +1,54 @@
 ![NavbarGit](frontend/src/assets/images/NavbarGit.png)
 
-# 🚗 Sistema de Controle de Estacionamento
+# 🚗 Parking Management System
 
-Projeto completo de gerenciamento de estacionamento, desenvolvido em **Spring Boot** com front-end integrado.  
-Permite cadastro de veículos, controle de entrada/saída, relatórios e autenticação de usuários.
+A complete parking management project built with **Spring Boot** and an integrated front-end. It handles vehicle registration, entry and exit control, reports and user authentication.
 
 ---
 
-## ✨ Funcionalidades
+## ✨ Features
+
+### Back-end
+- Vehicle registration (plate, model, color)
+- Entry and exit logging with automatic calculation of parking time
+- Daily reports (PDF/CSV)
+- JWT authentication for secure access
+
+### Front-end
+- Responsive web interface (React)
+- User login and registration
+- Dashboard with real-time metrics
+- Forms for vehicle registration and payments
+
+---
+
+## 🔧 Tech stack
+
+### Back-end
+- Java 21
+- Spring Boot 3.2
+- Spring Security
+- Spring Data JPA
+- SQLite (H2 for tests)
+- Lombok
+- OpenAPI (Swagger)
+
+### Front-end
+- React 18
+- Axios (API integration)
+- Bootstrap 5
+
+### Testing
+- Mockito
+- Pitest (mutation testing)
+
+---
+
+## 🚀 Getting started
+
+### Requirements
+- Java 21
+- Node.js 18+
 
 ### Back-end
 
@@ -16,14 +57,14 @@ git clone https://github.com/Alan-VSouza/Projeto-Estacionamento.git
 cd Projeto-Estacionamento/backend
 ```
 
-Defina a chave usada para assinar os tokens JWT (uma string longa e aleatória, com pelo menos 32 caracteres). Ela não fica no repositório:
+Set the key used to sign JWT tokens (a long random string with at least 32 characters). It is not stored in the repository:
 
 ```bash
-export JWT_SECRET_KEY="troque-por-uma-string-longa-e-aleatoria"   # Windows (PowerShell): $env:JWT_SECRET_KEY="..."
+export JWT_SECRET_KEY="replace-with-a-long-random-string"   # Windows (PowerShell): $env:JWT_SECRET_KEY="..."
 ./mvnw spring-boot:run
 ```
 
-Também é possível executar a classe `DemoAuthAppApplication` pela IDE, com a variável de ambiente definida. O banco SQLite (`database.db`) é criado automaticamente na primeira execução.
+You can also run the `DemoAuthAppApplication` class from your IDE, with the environment variable set. The SQLite database (`database.db`) is created automatically on the first run.
 
 ### Front-end
 
@@ -33,24 +74,26 @@ npm install
 npm start
 ```
 
-Acesse: `http://localhost:3000`
+Open `http://localhost:3000`.
 
-## 🔒 Autenticação
-A autenticação é protegidos por JWT. Sendo utilizado os Endpoints:
-- **Registro:** POST `/api/auth/register`
+## 🔒 Authentication
+
+Authentication is protected by JWT, using these endpoints:
+- **Register:** POST `/api/auth/register`
 - **Login:** POST `/api/auth/login`
 
-Faça o registro na página de Register e o devido Login para ter acesso as funções.
+Create an account on the Register page and sign in to access the features.
 
 ---
 
-## 📊 Qualidade
-![Cobertura de Código](https://img.shields.io/badge/coverage-100%25-brightgreen)
-![Mutantes Mortos](https://img.shields.io/badge/mutants-99%25-brightgreen)
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+## 📊 Quality
+
+![Code coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+![Mutants killed](https://img.shields.io/badge/mutants-99%25-brightgreen)
+![Build status](https://img.shields.io/badge/build-passing-brightgreen)
 
 ---
 
-## 📄 Documentação da API
-Acesse `http://localhost:8080/swagger-ui.html` após iniciar o back-end.
- 
+## 📄 API documentation
+
+Open `http://localhost:8080/swagger-ui.html` after starting the back-end.
